@@ -1,0 +1,1 @@
+src/Config/Secrets/*.json filter=git-crypt diff=git-crypt
