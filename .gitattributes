@@ -1,1 +1,1 @@
-src/Config/Secrets/** filter=git-crypt diff=git-crypt
+src/Config/Secrets/*.json filter=git-crypt diff=git-crypt
