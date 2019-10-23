@@ -6,6 +6,7 @@
     <RootNamespace>civica_service</RootNamespace>
     <TargetLatestRuntimePatch>true</TargetLatestRuntimePatch>
     <RuntimeFrameworkVersion>2.2.6</RuntimeFrameworkVersion>
+    <AspNetCoreModuleName>AspNetCoreModuleV2</AspNetCoreModuleName>
   </PropertyGroup>
 
   <ItemGroup>
