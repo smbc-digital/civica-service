@@ -1,5 +1,9 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using System.Collections.Generic;
+using civica_service.Helpers.QueryBuilder;
+using civica_service.Helpers.QueryBuilder.Models;
+using civica_service.Helpers.SessionProvider;
+using civica_service.Helpers.SessionProvider.Models;
 using civica_service.Utils.HealthChecks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -26,9 +30,12 @@ namespace civica_service
 
         public void ConfigureServices(IServiceCollection services)
         {
+            services.Configure<SessionConfiguration>(Configuration.GetSection("SessionConfiguration"));
+            services.AddSingleton<IQueryBuilder, QueryBuilder>();
+            services.AddSingleton<ISessionProvider, SessionProvider>();
+
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
-            services.AddHealthChecks()
-                .AddCheck<TestHealthCheck>("TestHealthCheck");
+            services.AddHealthChecks().AddCheck<TestHealthCheck>("TestHealthCheck");
             services.AddAvailability();
             services.AddResilientHttpClients<IGateway, Gateway>(Configuration);
             services.AddSwaggerGen(c =>
