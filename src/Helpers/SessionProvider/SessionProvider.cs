@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using civica_service.Helpers.QueryBuilder;
 using civica_service.Helpers.SessionProvider.Models;
@@ -39,6 +40,7 @@ namespace civica_service.Helpers.SessionProvider
             }
 
             var url = _queryBuilder
+                .Add("outputtype", "xml")
                 .Add("docid", "crmlogin")
                 .Add("userid", _configuration.Username)
                 .Add("password", _configuration.Password)
@@ -79,7 +81,6 @@ namespace civica_service.Helpers.SessionProvider
 
             var resposne = await _gateway.GetAsync(url);
             var xmlResponse = await resposne.Content.ReadAsStringAsync();
-
             var result = XmlParser.DeserializeXmlStringToType<SetPersonModel>(xmlResponse, "SetPerson");
 
             var matchingErrorCodes = new List<string>
