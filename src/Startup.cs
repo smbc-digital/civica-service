@@ -1,10 +1,11 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Collections.Generic;
 using civica_service.Helpers.QueryBuilder;
-using civica_service.Helpers.QueryBuilder.Models;
 using civica_service.Helpers.SessionProvider;
 using civica_service.Helpers.SessionProvider.Models;
 using civica_service.Utils.HealthChecks;
+using civica_service.Utils.StorageProvider;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
@@ -33,11 +34,14 @@ namespace civica_service
             services.Configure<SessionConfiguration>(Configuration.GetSection("SessionConfiguration"));
             services.AddSingleton<IQueryBuilder, QueryBuilder>();
             services.AddSingleton<ISessionProvider, SessionProvider>();
+            services.AddStorageProvider(Configuration);
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
-            services.AddHealthChecks().AddCheck<TestHealthCheck>("TestHealthCheck");
             services.AddAvailability();
             services.AddResilientHttpClients<IGateway, Gateway>(Configuration);
+            services.AddHealthChecks()
+                .AddCheck<TestHealthCheck>("TestHealthCheck");
+
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new Info { Title = "civica_service API", Version = "v1" });
@@ -65,16 +69,17 @@ namespace civica_service
             {
                 app.UseHsts();
             }
-            
+
             app.UseMiddleware<Availability>();
             app.UseMiddleware<ExceptionHandling>();
             app.UseHttpsRedirection();
             app.UseHealthChecks("/healthcheck", HealthCheckConfig.Options);
             app.UseMvc();
             app.UseSwagger();
+            var swaggerPrefix = env.IsDevelopment() ? string.Empty : "/civicaservice";
             app.UseSwaggerUI(c =>
             {
-                c.SwaggerEndpoint("/swagger/v1/swagger.json", "civica_service API");
+                c.SwaggerEndpoint($"{swaggerPrefix}/swagger/v1/swagger.json", "civica_service API");
             });
         }
     }
