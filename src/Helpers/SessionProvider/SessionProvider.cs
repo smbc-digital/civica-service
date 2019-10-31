@@ -2,9 +2,11 @@
 using System.Threading.Tasks;
 using civica_service.Helpers.QueryBuilder;
 using civica_service.Helpers.SessionProvider.Models;
+using civica_service.Utils.Xml;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Caching.Distributed;
 using StockportGovUK.AspNetCore.Gateways;
+using System.Collections.Generic;
 
 namespace civica_service.Helpers.SessionProvider
 {

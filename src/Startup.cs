@@ -1,7 +1,6 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using System.Collections.Generic;
 using civica_service.Helpers.QueryBuilder;
-using civica_service.Helpers.QueryBuilder.Models;
 using civica_service.Helpers.SessionProvider;
 using civica_service.Helpers.SessionProvider.Models;
 using civica_service.Utils.HealthChecks;
@@ -15,6 +14,7 @@ using StockportGovUK.AspNetCore.Availability;
 using StockportGovUK.AspNetCore.Availability.Middleware;
 using StockportGovUK.AspNetCore.Gateways;
 using Swashbuckle.AspNetCore.Swagger;
+using civica_service.Utils.StorageProvider;
 
 namespace civica_service
 {
@@ -34,6 +34,7 @@ namespace civica_service
             services.AddSingleton<IQueryBuilder, QueryBuilder>();
             services.AddSingleton<ISessionProvider, SessionProvider>();
 
+            services.AddStorageProvider(Configuration);
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
             services.AddHealthChecks().AddCheck<TestHealthCheck>("TestHealthCheck");
             services.AddAvailability();
