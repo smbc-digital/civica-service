@@ -49,7 +49,7 @@ namespace civica_service.Helpers.SessionProvider
             var deserializedResponse = XmlParser.DeserializeXmlStringToType<SessionIdModel>(xmlResponse, "Login").Result;
             sessionId = deserializedResponse.SessionID;
 
-            if (!deserializedResponse.ErrorCode.Text.Equals(5))
+            if (!deserializedResponse.ErrorCode.Text.Equals("5"))
             {
                 throw new Exception($"API login unsuccessful, check credentials. Actual response: {xmlResponse.ToString()}");
             }
@@ -72,7 +72,6 @@ namespace civica_service.Helpers.SessionProvider
         private async Task<bool> AssignPersonToSession(string sessionId, string personReference)
         {
             var url = _queryBuilder
-                .Add("outputtype", "xml")
                 .Add("SessionId", sessionId)
                 .Add("docid", "cocrmper")
                 .Add("personref", personReference)
@@ -81,7 +80,7 @@ namespace civica_service.Helpers.SessionProvider
             var resposne = await _gateway.GetAsync(url);
             var xmlResponse = await resposne.Content.ReadAsStringAsync();
 
-            var result = XmlParser.DeserializeXmlStringToType<SetPersonModel>(xmlResponse, "ErrorCode");
+            var result = XmlParser.DeserializeXmlStringToType<SetPersonModel>(xmlResponse, "SetPerson");
 
             var matchingErrorCodes = new List<string>
             {

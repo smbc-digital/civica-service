@@ -1,8 +1,10 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using civica_service.Helpers.QueryBuilder;
 using civica_service.Helpers.SessionProvider;
+using civica_service.Utils.Xml;
+using civica_service.Services.Models;
 using StockportGovUK.AspNetCore.Gateways;
+using System.Linq;
 
 namespace civica_service.Services
 {
@@ -21,21 +23,18 @@ namespace civica_service.Services
 
         public async Task<bool> IsBenefitsClaimant(string personReference)
         {
-            /**
-             * Add session -- done
-             * store session in redis -- done
-             * Build query -- done
-             * Call endpoint 
-             */
             var sessionId = await _sessionProvider.GetSessionId(personReference);
 
             var url = _queryBuilder
-                .Add("", "")
-                .Add("", "")
+                .Add("docid", "hbsel")
                 .Add("sessionId", sessionId)
                 .Build();
 
-            throw new NotImplementedException("loser");
+            var response = await _gateway.GetAsync(url);
+            var xmlResponse = await response.Content.ReadAsStringAsync();
+            var claimsSummaryResponse = XmlParser.DeserializeXmlStringToType<ClaimsSummaryResponse>(xmlResponse, "HBSelectDoc");
+
+            return claimsSummaryResponse.ClaimsList != null && claimsSummaryResponse.ClaimsList.ClaimSummary.Any();
         }
     }
 }
