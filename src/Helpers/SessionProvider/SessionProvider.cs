@@ -5,7 +5,9 @@ using civica_service.Helpers.QueryBuilder;
 using civica_service.Helpers.SessionProvider.Models;
 using civica_service.Utils.Xml;
 using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Caching.Distributed;
 using StockportGovUK.AspNetCore.Gateways;
+using System.Collections.Generic;
 
 namespace civica_service.Helpers.SessionProvider
 {
@@ -14,20 +16,29 @@ namespace civica_service.Helpers.SessionProvider
         private readonly IGateway _gateway;
         private readonly IQueryBuilder _queryBuilder;
         private readonly SessionConfiguration _configuration;
+        private readonly IDistributedCache _distributedCache;
 
         public SessionProvider(
             IGateway gateway, 
             IQueryBuilder queryBuilder, 
-            IOptions<SessionConfiguration> configuration)
+            IOptions<SessionConfiguration> configuration,
+            IDistributedCache distributedCache)
         {
             _gateway = gateway;
             _queryBuilder = queryBuilder;
             _configuration = configuration.Value;
+            _distributedCache = distributedCache;
         }
 
         public async Task<string> GetSessionId(string personReference)
         {
-            // TODO: Check storage provider for key and return if found
+
+            var sessionId = _distributedCache.GetString(personReference);
+
+            if (sessionId != null)
+            {
+                return sessionId;
+            }
 
             var url = _queryBuilder
                 .Add("outputtype", "xml")
@@ -40,31 +51,35 @@ namespace civica_service.Helpers.SessionProvider
             var xmlResponse = await response.Content.ReadAsStringAsync();
 
             var deserializedResponse = XmlParser.DeserializeXmlStringToType<SessionIdModel>(xmlResponse, "Login").Result;
+            sessionId = deserializedResponse.SessionID;
 
-            if (!deserializedResponse.ErrorCode.Text.Equals(5))
+            if (!deserializedResponse.ErrorCode.Text.Equals("5"))
+
             {
                 throw new Exception($"API login unsuccessful, check credentials. Actual response: {xmlResponse.ToString()}");
             }
 
-            if (string.IsNullOrWhiteSpace(deserializedResponse.SessionID))
+            if (string.IsNullOrWhiteSpace(sessionId))
             {
                 throw new Exception("No session id returned");
             }
 
-            if (!await AssignPersonToSession(deserializedResponse.SessionID, personReference))
+
+            if (!await AssignPersonToSession(sessionId, personReference))
             {
-                throw new Exception($"Could not assign person reference {personReference} to session {deserializedResponse.SessionID}");
+                throw new Exception($"Could not assign person reference {personReference} to session {sessionId}");
             }
 
-            // TODO: Save sessionId to storage provider
+            _distributedCache.SetStringAsync(personReference, sessionId);
 
-            return deserializedResponse.SessionID;
+            return sessionId;
+
         }
 
         private async Task<bool> AssignPersonToSession(string sessionId, string personReference)
         {
             var url = _queryBuilder
-                .Add("outputtype", "xml")
+
                 .Add("SessionId", sessionId)
                 .Add("docid", "cocrmper")
                 .Add("personref", personReference)
@@ -73,7 +88,9 @@ namespace civica_service.Helpers.SessionProvider
             var resposne = await _gateway.GetAsync(url);
             var xmlResponse = await resposne.Content.ReadAsStringAsync();
 
-            var result = XmlParser.DeserializeXmlStringToType<SetPersonModel>(xmlResponse, "ErrorCode");
+
+            var result = XmlParser.DeserializeXmlStringToType<SetPersonModel>(xmlResponse, "SetPerson");
+
 
             var matchingErrorCodes = new List<string>
             {

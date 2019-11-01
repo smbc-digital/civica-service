@@ -4,20 +4,23 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace civica_service.Utils.StorageProvider
 {
-    public static class StorageProvider
+    public static class StorageProviderExtension
     {
         public static void AddStorageProvider(this IServiceCollection services, IConfiguration configuration)
         {
-            var type = configuration.GetSection("StorageProvider")?["Type"] ?? string.Empty;
+            var storageProviderConfiguration = configuration.GetSection("StorageProvider");
 
-            switch (type)
+            switch (storageProviderConfiguration["Type"])
             {
                 case "Redis":
-                    services.AddStackExchangeRedisCache(options =>
+                    services.AddStackExchangeRedisCache(options => 
                     {
-                        options.Configuration = "localhost";
-                        options.InstanceName = "SampleInstance";
+                        options.Configuration = storageProviderConfiguration["Address"];
+                        options.InstanceName = storageProviderConfiguration["InstanceName"];
                     });
+                    break;
+                case "Application":
+                    services.AddDistributedMemoryCache();
                     break;
                 default:
                     services.AddDistributedMemoryCache();

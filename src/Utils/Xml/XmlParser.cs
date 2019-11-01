@@ -16,7 +16,7 @@ namespace civica_service.Utils.Xml
         public static T DeserializeNodeToType<T>(this XElement root, string nodeName)
         {
             var xmlSerializers = XmlSerializer.FromTypes(new[] { typeof(T) });
-            
+
             return (T)xmlSerializers.First().Deserialize(root.DescendantsAndSelf(nodeName).First().CreateReader());
         }
     }
