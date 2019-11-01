@@ -21,7 +21,7 @@ namespace civica_service.Controllers
         }
 
         [HttpGet]
-        [Route("summary/{personReference}/benefist-claimant")]
+        [Route("summary/{personReference}/benefits-claimant")]
         public async Task<IActionResult> IsBenefitsClaimant([FromRoute][Required]string personReference)
         {
             var model = await _civicaService.IsBenefitsClaimant(personReference);
