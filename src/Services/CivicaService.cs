@@ -5,6 +5,8 @@ using civica_service.Utils.Xml;
 using civica_service.Services.Models;
 using StockportGovUK.AspNetCore.Gateways;
 using System.Linq;
+using System.Collections.Generic;
+using civica_service.Helpers.SessionProvider.Models;
 
 namespace civica_service.Services
 {
@@ -36,5 +38,25 @@ namespace civica_service.Services
 
             return claimsSummaryResponse.ClaimsList != null && claimsSummaryResponse.ClaimsList.ClaimSummary.Any();
         }
+
+        public async Task<IEnumerable<TransactionModel>> GetAllTransactionsForYear(string personReference, int year)
+          {
+            var sessionId = await _sessionProvider.GetSessionId(personReference);
+
+            var url = _queryBuilder
+                .Add("sessionId", sessionId)
+                .Add("docid", "ctxtrn")
+                .Add("recyear", year.ToString())
+                .Add("trantype", "All")
+                .Build();
+
+            var response = await _gateway.GetAsync(url);
+            var xmlResponse = await response.Content.ReadAsStringAsync();
+
+            var transactionResponse = XmlParser.DeserializeXmlStringToType<TransactionListModel>(xmlResponse, "TransactionList");
+            return transactionResponse;
+        }
+
     }
 }
+

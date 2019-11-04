@@ -41,7 +41,6 @@ namespace civica_service.Helpers.SessionProvider
             }
 
             var url = _queryBuilder
-                .Add("outputtype", "xml")
                 .Add("docid", "crmlogin")
                 .Add("userid", _configuration.Username)
                 .Add("password", _configuration.Password)
@@ -49,7 +48,6 @@ namespace civica_service.Helpers.SessionProvider
 
             var response = await _gateway.GetAsync(url);
             var xmlResponse = await response.Content.ReadAsStringAsync();
-
             var deserializedResponse = XmlParser.DeserializeXmlStringToType<SessionIdModel>(xmlResponse, "Login").Result;
             sessionId = deserializedResponse.SessionID;
 
