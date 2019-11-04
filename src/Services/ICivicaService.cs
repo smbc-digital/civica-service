@@ -1,5 +1,4 @@
 ﻿using civica_service.Helpers.SessionProvider.Models;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace civica_service.Services
@@ -8,6 +7,8 @@ namespace civica_service.Services
     {
         Task<bool> IsBenefitsClaimant(string personReference);
 
-        Task<IEnumerable<TransactionModel>> GetAllTransactionsForYear(string personReference, int year);
+        void GetCouncilTaxDetails(string personReference, string accountReference);
+
+        Task<TransactionListModel> GetAllTransactionsForYear(string personReference, int year);
     }
 }

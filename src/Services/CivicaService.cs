@@ -39,8 +39,23 @@ namespace civica_service.Services
             return claimsSummaryResponse.ClaimsList != null && claimsSummaryResponse.ClaimsList.ClaimSummary.Any();
         }
 
-        public async Task<IEnumerable<TransactionModel>> GetAllTransactionsForYear(string personReference, int year)
-          {
+        // TODO: this is a useful call that may be needed later
+        // Currently we don't need the info from it, hence the void.
+        public void GetCouncilTaxDetails(string personReference, string accountReference)
+        {
+            var sessionId = _sessionProvider.GetSessionId(personReference).Result;
+
+            var url = _queryBuilder
+                .Add("sessionId", sessionId)
+                .Add("docid", "ctxdet")
+                .Add("actref", accountReference)
+                .Build();
+
+            _gateway.GetAsync(url);
+        }
+
+        public async Task<TransactionListModel> GetAllTransactionsForYear(string personReference, int year)
+        {
             var sessionId = await _sessionProvider.GetSessionId(personReference);
 
             var url = _queryBuilder
@@ -53,10 +68,8 @@ namespace civica_service.Services
             var response = await _gateway.GetAsync(url);
             var xmlResponse = await response.Content.ReadAsStringAsync();
 
-            var transactionResponse = XmlParser.DeserializeXmlStringToType<TransactionListModel>(xmlResponse, "TransactionList");
-            return transactionResponse;
+            return XmlParser.DeserializeXmlStringToType<TransactionListModel>(xmlResponse, "TranList");
         }
-
     }
 }
 

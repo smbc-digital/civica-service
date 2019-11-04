@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace civica_service.Controllers
 {
     [Produces("application/json")]
-    [Route("api/v2/[Controller]")]
+    [Route("api/v2/council-tax")]
     [ApiController]
     [TokenAuthentication]
     public class CouncilTaxController : ControllerBase
@@ -20,9 +20,10 @@ namespace civica_service.Controllers
         }
 
         [HttpGet]
-        [Route("council-tax/{personReference}/details/transactions/{year}")]
-        public async Task<IActionResult> GetAllTransactionsForYear([FromRoute][Required]string personReference, [FromRoute][Required] int year)
+        [Route("{personReference}/details/{accountReference}/transactions/{year}")]
+        public async Task<IActionResult> GetAllTransactionsForYear([FromRoute][Required]string personReference, [FromRoute][Required]string accountReference, [FromRoute][Required] int year)
         {
+            _civicaService.GetCouncilTaxDetails(personReference, accountReference);
             var response = await _civicaService.GetAllTransactionsForYear(personReference, year);
 
             return Ok(response);

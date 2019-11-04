@@ -38,7 +38,6 @@ namespace civica_service.Helpers.SessionProvider
             }
 
             var url = _queryBuilder
-                .Add("outputtype", "xml")
                 .Add("docid", "crmlogin")
                 .Add("userid", _configuration.Username)
                 .Add("password", _configuration.Password)

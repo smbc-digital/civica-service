@@ -53,13 +53,5 @@ namespace civica_service.Helpers
         }
     }
 
-    public static bool IsRelevantRecentPaymentMethod(PaymentTransactionResponse payment)
-    {
-        return payment.Method == PaymentMethod.DirectDebit ||
-               payment.Method == PaymentMethod.DebitCreditCard ||
-               payment.Method == PaymentMethod.Cash ||
-               payment.Method == PaymentMethod.Cheque ||
-               payment.Method == PaymentMethod.StandingOrder;
-    }
 }
 }

@@ -7,7 +7,6 @@ namespace civica_service.Helpers.SessionProvider.Models
     {
         [XmlElement("Result")]
         public Result Result { get; set; }
-
     }
 
     public class Result {
