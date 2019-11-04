@@ -7,7 +7,6 @@ using civica_service.Utils.Xml;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Caching.Distributed;
 using StockportGovUK.AspNetCore.Gateways;
-using System.Collections.Generic;
 
 namespace civica_service.Helpers.SessionProvider
 {
@@ -17,7 +16,6 @@ namespace civica_service.Helpers.SessionProvider
         private readonly IQueryBuilder _queryBuilder;
         private readonly SessionConfiguration _configuration;
         private readonly IDistributedCache _distributedCache;
-
         public SessionProvider(
             IGateway gateway, 
             IQueryBuilder queryBuilder, 
@@ -32,7 +30,6 @@ namespace civica_service.Helpers.SessionProvider
 
         public async Task<string> GetSessionId(string personReference)
         {
-
             var sessionId = _distributedCache.GetString(personReference);
 
             if (sessionId != null)
@@ -41,6 +38,7 @@ namespace civica_service.Helpers.SessionProvider
             }
 
             var url = _queryBuilder
+                .Add("outputtype", "xml")
                 .Add("docid", "crmlogin")
                 .Add("userid", _configuration.Username)
                 .Add("password", _configuration.Password)
@@ -52,7 +50,6 @@ namespace civica_service.Helpers.SessionProvider
             sessionId = deserializedResponse.SessionID;
 
             if (!deserializedResponse.ErrorCode.Text.Equals("5"))
-
             {
                 throw new Exception($"API login unsuccessful, check credentials. Actual response: {xmlResponse.ToString()}");
             }
@@ -62,7 +59,6 @@ namespace civica_service.Helpers.SessionProvider
                 throw new Exception("No session id returned");
             }
 
-
             if (!await AssignPersonToSession(sessionId, personReference))
             {
                 throw new Exception($"Could not assign person reference {personReference} to session {sessionId}");
@@ -71,13 +67,11 @@ namespace civica_service.Helpers.SessionProvider
             _distributedCache.SetStringAsync(personReference, sessionId);
 
             return sessionId;
-
         }
 
         private async Task<bool> AssignPersonToSession(string sessionId, string personReference)
         {
             var url = _queryBuilder
-
                 .Add("SessionId", sessionId)
                 .Add("docid", "cocrmper")
                 .Add("personref", personReference)
@@ -85,10 +79,7 @@ namespace civica_service.Helpers.SessionProvider
 
             var resposne = await _gateway.GetAsync(url);
             var xmlResponse = await resposne.Content.ReadAsStringAsync();
-
-
             var result = XmlParser.DeserializeXmlStringToType<SetPersonModel>(xmlResponse, "SetPerson");
-
 
             var matchingErrorCodes = new List<string>
             {
