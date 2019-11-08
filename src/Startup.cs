@@ -1,5 +1,4 @@
-﻿using System;
-using System.Diagnostics.CodeAnalysis;
+﻿using System.Diagnostics.CodeAnalysis;
 using System.Collections.Generic;
 using civica_service.Helpers.QueryBuilder;
 using civica_service.Helpers.SessionProvider;
@@ -16,7 +15,6 @@ using StockportGovUK.AspNetCore.Availability;
 using StockportGovUK.AspNetCore.Availability.Middleware;
 using StockportGovUK.AspNetCore.Gateways;
 using Swashbuckle.AspNetCore.Swagger;
-using civica_service.Utils.StorageProvider;
 using civica_service.Services;
 
 namespace civica_service
