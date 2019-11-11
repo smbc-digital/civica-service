@@ -5,6 +5,8 @@ using civica_service.Utils.Xml;
 using civica_service.Services.Models;
 using StockportGovUK.AspNetCore.Gateways;
 using System.Linq;
+using Microsoft.Extensions.Caching.Distributed;
+using Newtonsoft.Json;
 
 namespace civica_service.Services
 {
@@ -13,16 +15,38 @@ namespace civica_service.Services
         private readonly IGateway _gateway;
         private readonly IQueryBuilder _queryBuilder;
         private readonly ISessionProvider _sessionProvider;
+        private readonly IDistributedCache _cacheProvider;
 
-        public CivicaService(IGateway gateway, IQueryBuilder queryBuilder, ISessionProvider sessionProvider)
+        public CivicaService(IGateway gateway, IQueryBuilder queryBuilder, ISessionProvider sessionProvider, IDistributedCache cacheProvider)
         {
             _gateway = gateway;
             _queryBuilder = queryBuilder;
             _sessionProvider = sessionProvider;
+            _cacheProvider = cacheProvider;
         }
 
         public async Task<bool> IsBenefitsClaimant(string personReference)
         {
+            var claimsSummaryResponse = await GetBenefits(personReference);
+
+            return claimsSummaryResponse.ClaimsList != null && claimsSummaryResponse.ClaimsList.ClaimSummary.Any();
+        }
+
+        public async Task<ClaimsSummaryResponse> GetBenefits(string personReference)
+        {
+            var cacheModel = new CacheModel();
+            var cacheResponse = await _cacheProvider.GetStringAsync(personReference);
+
+            if (!string.IsNullOrEmpty(cacheResponse))
+            {
+                cacheModel = JsonConvert.DeserializeObject<CacheModel>(cacheResponse);
+
+                if (cacheModel.ClaimsSummary != null)
+                {
+                    return cacheModel.ClaimsSummary;
+                }
+            }
+
             var sessionId = await _sessionProvider.GetSessionId(personReference);
 
             var url = _queryBuilder
@@ -31,10 +55,14 @@ namespace civica_service.Services
                 .Build();
 
             var response = await _gateway.GetAsync(url);
-            var xmlResponse = await response.Content.ReadAsStringAsync();
-            var claimsSummaryResponse = XmlParser.DeserializeXmlStringToType<ClaimsSummaryResponse>(xmlResponse, "HBSelectDoc");
+            var content = await response.Content.ReadAsStringAsync();
+            var claimSummary = XmlParser.DeserializeXmlStringToType<ClaimsSummaryResponse>(content, "HBSelectDoc");
 
-            return claimsSummaryResponse.ClaimsList != null && claimsSummaryResponse.ClaimsList.ClaimSummary.Any();
+            // TODO: get value from redis again and update our values
+            cacheModel.ClaimsSummary = claimSummary;
+            _cacheProvider.SetStringAsync(personReference, JsonConvert.SerializeObject(cacheModel));
+
+            return claimSummary;
         }
     }
 }

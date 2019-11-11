@@ -28,5 +28,14 @@ namespace civica_service.Controllers
 
             return StatusCode(StatusCodes.Status200OK, model);
         }
+
+        [HttpGet]
+        [Route("{personReference}/benefits")]
+        public async Task<IActionResult> GetBenefits([FromRoute][Required]string personReference)
+        {
+            var model = await _civicaService.GetBenefits(personReference);
+
+            return StatusCode(StatusCodes.Status200OK, model);
+        }
     }
 }
