@@ -7,6 +7,8 @@ using civica_service.Utils.Xml;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Caching.Distributed;
 using StockportGovUK.AspNetCore.Gateways;
+using Newtonsoft.Json;
+using civica_service.Utils.StorageProvider;
 
 namespace civica_service.Helpers.SessionProvider
 {
@@ -30,11 +32,11 @@ namespace civica_service.Helpers.SessionProvider
 
         public async Task<string> GetSessionId(string personReference)
         {
-            var sessionId = _distributedCache.GetString(personReference);
+            var cacheResponse = _distributedCache.GetString($"{personReference}-{CacheKeys.SessionId}");
 
-            if (sessionId != null)
+            if (!string.IsNullOrEmpty(cacheResponse))
             {
-                return sessionId;
+                return cacheResponse;
             }
 
             var url = _queryBuilder
@@ -46,12 +48,13 @@ namespace civica_service.Helpers.SessionProvider
             var response = await _gateway.GetAsync(url);
             var xmlResponse = await response.Content.ReadAsStringAsync();
             var deserializedResponse = XmlParser.DeserializeXmlStringToType<SessionIdModel>(xmlResponse, "Login").Result;
-            sessionId = deserializedResponse.SessionID;
 
             if (!deserializedResponse.ErrorCode.Text.Equals("5"))
             {
                 throw new Exception($"API login unsuccessful, check credentials. Actual response: {xmlResponse.ToString()}");
             }
+
+            var sessionId = deserializedResponse.SessionID;
 
             if (string.IsNullOrWhiteSpace(sessionId))
             {
@@ -63,7 +66,7 @@ namespace civica_service.Helpers.SessionProvider
                 throw new Exception($"Could not assign person reference {personReference} to session {sessionId}");
             }
 
-            _distributedCache.SetStringAsync(personReference, sessionId);
+            _distributedCache.SetStringAsync($"{personReference}-{CacheKeys.SessionId}", JsonConvert.SerializeObject(sessionId));
 
             return sessionId;
         }

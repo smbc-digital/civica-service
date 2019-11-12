@@ -1,5 +1,6 @@
 ﻿using civica_service.Helpers.SessionProvider.Models;
 using System.Threading.Tasks;
+using civica_service.Services.Models;
 
 namespace civica_service.Services
 {
@@ -10,5 +11,7 @@ namespace civica_service.Services
         void GetCouncilTaxDetails(string personReference, string accountReference);
 
         Task<TransactionListModel> GetAllTransactionsForYear(string personReference, int year);
+
+        Task<ClaimsSummaryResponse> GetBenefits(string personReference);
     }
 }
