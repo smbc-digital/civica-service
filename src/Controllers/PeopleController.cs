@@ -37,5 +37,15 @@ namespace civica_service.Controllers
 
             return StatusCode(StatusCodes.Status200OK, model);
         }
+
+        [HttpGet]
+        [Route("{personReference}/details/{accountReference}/transactions/{year}")]
+        public async Task<IActionResult> GetAllTransactionsForYear([FromRoute][Required]string personReference, [FromRoute][Required]string accountReference, [FromRoute][Required] int year)
+        {
+            _civicaService.GetCouncilTaxDetails(personReference, accountReference);
+            var response = await _civicaService.GetAllTransactionsForYear(personReference, year);
+
+            return Ok(response);
+        }
     }
 }
