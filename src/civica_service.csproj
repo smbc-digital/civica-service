@@ -29,6 +29,7 @@
 
   <PropertyGroup>
     <PackageLicenseFile>License.txt</PackageLicenseFile>
+    <LangVersion>7.1</LangVersion>
   </PropertyGroup>
   <ItemGroup>
     <None Include="License.txt" Pack="true" PackagePath="$(PackageLicenseFile)" />

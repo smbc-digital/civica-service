@@ -16,7 +16,6 @@ using StockportGovUK.AspNetCore.Availability;
 using StockportGovUK.AspNetCore.Availability.Middleware;
 using StockportGovUK.AspNetCore.Gateways;
 using Swashbuckle.AspNetCore.Swagger;
-using civica_service.Utils.StorageProvider;
 using civica_service.Services;
 
 namespace civica_service

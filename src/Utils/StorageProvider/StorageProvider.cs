@@ -18,9 +18,6 @@ namespace civica_service.Utils.StorageProvider
                         options.InstanceName = storageProviderConfiguration["InstanceName"];
                     });
                     break;
-                case "Application":
-                    services.AddDistributedMemoryCache();
-                    break;
                 default:
                     services.AddDistributedMemoryCache();
                     break;
