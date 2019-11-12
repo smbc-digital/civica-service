@@ -11,17 +11,17 @@ namespace civica_service.Controllers
     [Route("api/v1/[Controller]")]
     [ApiController]
     [TokenAuthentication]
-    public class PersonController : ControllerBase
+    public class PeopleController : ControllerBase
     {
         private readonly ICivicaService _civicaService;
 
-        public PersonController(ICivicaService civicaService)
+        public PeopleController(ICivicaService civicaService)
         {
             _civicaService = civicaService;
         }
 
         [HttpGet]
-        [Route("summary/{personReference}/benefits-claimant")]
+        [Route("{personReference}/is-benefits-claimant")]
         public async Task<IActionResult> IsBenefitsClaimant([FromRoute][Required]string personReference)
         {
             var model = await _civicaService.IsBenefitsClaimant(personReference);

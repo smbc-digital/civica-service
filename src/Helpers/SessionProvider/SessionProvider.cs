@@ -7,9 +7,8 @@ using civica_service.Utils.Xml;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Caching.Distributed;
 using StockportGovUK.AspNetCore.Gateways;
-using System.Collections.Generic;
-using civica_service.Services.Models;
 using Newtonsoft.Json;
+using civica_service.Utils.StorageProvider;
 
 namespace civica_service.Helpers.SessionProvider
 {
@@ -34,17 +33,11 @@ namespace civica_service.Helpers.SessionProvider
 
         public async Task<string> GetSessionId(string personReference)
         {
-            var cacheModel = new CacheModel();
-            var cacheResponse = _distributedCache.GetString(personReference);
+            var cacheResponse = _distributedCache.GetString($"{personReference}-{CacheKeys.SessionId}");
 
             if (!string.IsNullOrEmpty(cacheResponse))
             {
-                cacheModel = JsonConvert.DeserializeObject<CacheModel>(cacheResponse);
-
-                if (!string.IsNullOrEmpty(cacheModel.SessionId))
-                {
-                    return cacheModel.SessionId;
-                }
+                return cacheResponse;
             }
 
             var url = _queryBuilder
@@ -56,12 +49,13 @@ namespace civica_service.Helpers.SessionProvider
             var response = await _gateway.GetAsync(url);
             var xmlResponse = await response.Content.ReadAsStringAsync();
             var deserializedResponse = XmlParser.DeserializeXmlStringToType<SessionIdModel>(xmlResponse, "Login").Result;
-            var sessionId = deserializedResponse.SessionID;
 
             if (!deserializedResponse.ErrorCode.Text.Equals("5"))
             {
                 throw new Exception($"API login unsuccessful, check credentials. Actual response: {xmlResponse.ToString()}");
             }
+
+            var sessionId = deserializedResponse.SessionID;
 
             if (string.IsNullOrWhiteSpace(sessionId))
             {
@@ -73,8 +67,7 @@ namespace civica_service.Helpers.SessionProvider
                 throw new Exception($"Could not assign person reference {personReference} to session {sessionId}");
             }
 
-            cacheModel.SessionId = sessionId;
-            _distributedCache.SetStringAsync(personReference, JsonConvert.SerializeObject(cacheModel));
+            _distributedCache.SetStringAsync($"{personReference}-{CacheKeys.SessionId}", JsonConvert.SerializeObject(sessionId));
 
             return sessionId;
         }

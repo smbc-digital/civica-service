@@ -7,6 +7,7 @@ using StockportGovUK.AspNetCore.Gateways;
 using System.Linq;
 using Microsoft.Extensions.Caching.Distributed;
 using Newtonsoft.Json;
+using civica_service.Utils.StorageProvider;
 
 namespace civica_service.Services
 {
@@ -34,17 +35,11 @@ namespace civica_service.Services
 
         public async Task<ClaimsSummaryResponse> GetBenefits(string personReference)
         {
-            var cacheModel = new CacheModel();
-            var cacheResponse = await _cacheProvider.GetStringAsync(personReference);
+            var cacheResponse = await _cacheProvider.GetStringAsync($"{personReference}-{CacheKeys.Benefits}");
 
             if (!string.IsNullOrEmpty(cacheResponse))
             {
-                cacheModel = JsonConvert.DeserializeObject<CacheModel>(cacheResponse);
-
-                if (cacheModel.ClaimsSummary != null)
-                {
-                    return cacheModel.ClaimsSummary;
-                }
+                return JsonConvert.DeserializeObject<ClaimsSummaryResponse>(cacheResponse);
             }
 
             var sessionId = await _sessionProvider.GetSessionId(personReference);
@@ -58,10 +53,8 @@ namespace civica_service.Services
             var content = await response.Content.ReadAsStringAsync();
             var claimSummary = XmlParser.DeserializeXmlStringToType<ClaimsSummaryResponse>(content, "HBSelectDoc");
 
-            // TODO: get value from redis again and update our values
-            cacheModel.ClaimsSummary = claimSummary;
-            _cacheProvider.SetStringAsync(personReference, JsonConvert.SerializeObject(cacheModel));
-
+            _cacheProvider.SetStringAsync($"{personReference}-{CacheKeys.Benefits}", JsonConvert.SerializeObject(claimSummary));
+            
             return claimSummary;
         }
     }

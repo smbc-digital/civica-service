@@ -6,14 +6,12 @@ namespace civica_service.Services.Models
     [XmlRoot("HBSelectDoc")]
     public class ClaimsSummaryResponse
     {
-        [XmlElement("HBClaimList")]
         public ClaimListResponse ClaimsList { get; set; }
     }
 
     [XmlRoot("HBClaimList")]
     public class ClaimListResponse
     {
-        [XmlElement("HBClaimDetails")]
         public List<ClaimSummaryResponse> ClaimSummary { get; set; }
     }
 
