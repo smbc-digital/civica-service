@@ -37,4 +37,9 @@
   <ItemGroup>
     <Folder Include="Controllers\" />
   </ItemGroup>
+  <ItemGroup>
+    <Reference Include="StockportGovUK.AspNetCore.Gateways">
+      <HintPath>..\..\..\other\StockportGovUK.AspNetCore.Gateways\bin\Debug\netcoreapp2.2\StockportGovUK.AspNetCore.Gateways.dll</HintPath>
+    </Reference>
+  </ItemGroup>
 </Project>

@@ -1,3 +1,4 @@
+using System;
 using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
@@ -44,6 +45,62 @@ namespace civica_service.Controllers
         {
             _civicaService.GetCouncilTaxDetails(personReference, accountReference);
             var response = await _civicaService.GetAllTransactionsForYear(personReference, year);
+
+            return Ok(response);
+        }
+
+
+        [HttpGet]
+        [Route("{personReference}/documents")]
+        public async Task<IActionResult> GetDocuments([FromRoute][Required]string personReference)
+        {
+            var response = await _civicaService.GetDocuments(personReference);
+
+            return Ok(response);
+        }
+
+        [HttpGet]
+        [Route("{personReference}/documents/{accountReference}")]
+        public async Task<IActionResult> GetDocumentsWithAccountReference([FromRoute][Required]string personReference, [FromRoute][Required]string accountReference)
+        {
+            var response = await _civicaService.GetDocumentsWithAccountReference(personReference, accountReference);
+
+            return Ok(response);
+        }
+
+        [HttpGet]
+        [Route("{personReference}/properties-owned")]
+        public async Task<IActionResult> GetPropertiesOwned([FromRoute][Required]string personReference)
+        {
+            var response = await _civicaService.GetPropertiesOwned(personReference);
+
+            return Ok(response);
+        }
+
+
+        [HttpGet]
+        [Route("{personReference}/properties-owned/current")]
+        public async Task<IActionResult> GetCurrentProperty([FromRoute][Required]string personReference)
+        {
+            var response = await _civicaService.GetCurrentProperty(personReference);
+
+            return Ok(response);
+        }
+
+        [HttpGet]
+        [Route("{personReference}/accounts")]
+        public async Task<IActionResult> GetAccounts([FromRoute][Required]string personReference)
+        {
+            var response = await _civicaService.GetAccounts(personReference);
+
+            return Ok(response);
+        }
+
+        [HttpGet]
+        [Route("{personReference}/payment-schedule/{year}")]
+        public async Task<IActionResult> GetPaymentSchedule([FromRoute][Required]string personReference, [FromRoute][Required]string year)
+        {
+            var response = await _civicaService.GetPaymentSchedule(personReference, year);
 
             return Ok(response);
         }

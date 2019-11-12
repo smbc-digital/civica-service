@@ -1,4 +1,5 @@
-﻿using civica_service.Helpers.SessionProvider.Models;
+﻿using System.Collections.Generic;
+using civica_service.Helpers.SessionProvider.Models;
 using System.Threading.Tasks;
 using civica_service.Services.Models;
 
@@ -13,5 +14,17 @@ namespace civica_service.Services
         Task<TransactionListModel> GetAllTransactionsForYear(string personReference, int year);
 
         Task<ClaimsSummaryResponse> GetBenefits(string personReference);
+
+        Task<List<CouncilTaxDocumentReference>> GetDocuments(string personReference);
+
+        Task<List<CouncilTaxDocumentReference>> GetDocumentsWithAccountReference(string personReference, string accountReference);
+
+        Task<List<Places>> GetPropertiesOwned(string personReference);
+
+        Task<Places> GetCurrentProperty(string personReference);
+
+        Task<IEnumerable<CtaxActDetails>> GetAccounts(string personReference);
+
+        Task<CouncilTaxPaymentScheduleResponse> GetPaymentSchedule(string personReference, string year);
     }
 }
