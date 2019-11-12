@@ -8,6 +8,8 @@ using System.Linq;
 using Microsoft.Extensions.Caching.Distributed;
 using Newtonsoft.Json;
 using civica_service.Utils.StorageProvider;
+using System.Collections.Generic;
+using System.Net.Http;
 
 namespace civica_service.Services
 {
@@ -30,7 +32,7 @@ namespace civica_service.Services
         {
             var claimsSummaryResponse = await GetBenefits(personReference);
 
-            return claimsSummaryResponse.ClaimsList != null && claimsSummaryResponse.ClaimsList.ClaimSummary.Any();
+            return claimsSummaryResponse.Claims != null && claimsSummaryResponse.Claims.Summary.Any();
         }
 
         public async Task<ClaimsSummaryResponse> GetBenefits(string personReference)
@@ -49,9 +51,14 @@ namespace civica_service.Services
                 .Add("sessionId", sessionId)
                 .Build();
 
-            var response = await _gateway.GetAsync(url);
-            var content = await response.Content.ReadAsStringAsync();
-            var claimSummary = XmlParser.DeserializeXmlStringToType<ClaimsSummaryResponse>(content, "HBSelectDoc");
+            var content = new FormUrlEncodedContent(new List<KeyValuePair<string, string>>
+            {
+                new KeyValuePair<string, string>("claimsts", "All")
+            });
+
+            var response = await _gateway.PostAsync(url, content);
+            var reponseContent = await response.Content.ReadAsStringAsync();
+            var claimSummary = XmlParser.DeserializeXmlStringToType<ClaimsSummaryResponse>(reponseContent, "HBSelectDoc");
 
             _cacheProvider.SetStringAsync($"{personReference}-{CacheKeys.Benefits}", JsonConvert.SerializeObject(claimSummary));
             
