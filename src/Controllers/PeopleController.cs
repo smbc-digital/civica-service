@@ -49,7 +49,6 @@ namespace civica_service.Controllers
             return Ok(response);
         }
 
-
         [HttpGet]
         [Route("{personReference}/documents")]
         public async Task<IActionResult> GetDocuments([FromRoute][Required]string personReference)
