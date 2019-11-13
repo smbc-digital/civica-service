@@ -9,7 +9,7 @@ namespace civica_service.Services
     {
         Task<bool> IsBenefitsClaimant(string personReference);
 
-        void GetCouncilTaxDetails(string personReference, string accountReference);
+        Task<CouncilTaxAccountResponse> GetCouncilTaxDetails(string personReference, string accountReference);
 
         Task<TransactionListModel> GetAllTransactionsForYear(string personReference, int year);
 

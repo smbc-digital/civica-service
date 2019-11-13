@@ -8,8 +8,9 @@ namespace civica_service.Utils.StorageProvider
         CouncilTaxDocuments,
         CouncilTaxDocumentsByReference,
         CouncilTaxPropertiesOwned,
+        CouncilTaxAccounts,
         CouncilTaxAccount,
         CouncilTaxPaymentSchedule,
-        CouncilTaxCurrentProperty
+        CouncilTaxCurrentProperty,
     }
 }

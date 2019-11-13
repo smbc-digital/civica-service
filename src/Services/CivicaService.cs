@@ -160,7 +160,7 @@ namespace civica_service.Services
 
         public async Task<IEnumerable<CtaxActDetails>> GetAccounts(string personReference)
         {
-            var cacheResponse = await _cacheProvider.GetStringAsync($"{personReference}-{CacheKeys.CouncilTaxAccount}");
+            var cacheResponse = await _cacheProvider.GetStringAsync($"{personReference}-{CacheKeys.CouncilTaxAccounts}");
 
             if (!string.IsNullOrEmpty(cacheResponse))
             {
@@ -178,7 +178,7 @@ namespace civica_service.Services
             var responseContent = await response.Content.ReadAsStringAsync();
             var parsedResponse = XmlParser.DeserializeXmlStringToType<CtaxSelectDoc>(responseContent, "CtaxSelectDoc");
 
-            _ = _cacheProvider.SetStringAsync($"{personReference}-{CacheKeys.CouncilTaxPropertiesOwned}", JsonConvert.SerializeObject(parsedResponse));
+            _ = _cacheProvider.SetStringAsync($"{personReference}-{CacheKeys.CouncilTaxAccounts}", JsonConvert.SerializeObject(parsedResponse));
 
             return parsedResponse.CtaxActList.CtaxActDetails;
         }
@@ -211,10 +211,16 @@ namespace civica_service.Services
             return parsedResponse;
         }
 
-        // TODO: this is a useful call that may be needed later, currently we don't need the info from it, hence the void.
-        public void GetCouncilTaxDetails(string personReference, string accountReference)
+        public async Task<CouncilTaxAccountResponse> GetCouncilTaxDetails(string personReference, string accountReference)
         {
-            var sessionId = _sessionProvider.GetSessionId(personReference).Result;
+            var cacheResponse = await _cacheProvider.GetStringAsync($"{personReference}-{CacheKeys.CouncilTaxAccount}");
+
+            if (!string.IsNullOrEmpty(cacheResponse))
+            {
+                return JsonConvert.DeserializeObject<CouncilTaxAccountResponse>(cacheResponse);
+            }
+
+            var sessionId = await _sessionProvider.GetSessionId(personReference);
 
             var url = _queryBuilder
                 .Add("sessionId", sessionId)
@@ -222,7 +228,13 @@ namespace civica_service.Services
                 .Add("actref", accountReference)
                 .Build();
 
-            _gateway.GetAsync(url);
+            var response = await _gateway.GetAsync(url);
+            var responseContent = await response.Content.ReadAsStringAsync();
+            var parsedResponse = XmlParser.DeserializeXmlStringToType<CouncilTaxAccountResponse>(responseContent, "CtaxDetails");
+
+            _ = _cacheProvider.SetStringAsync($"{personReference}-{CacheKeys.CouncilTaxAccount}", JsonConvert.SerializeObject(parsedResponse));
+
+            return parsedResponse;
         }
 
         public async Task<TransactionListModel> GetAllTransactionsForYear(string personReference, int year)

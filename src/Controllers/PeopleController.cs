@@ -49,10 +49,18 @@ namespace civica_service.Controllers
         }
 
         [HttpGet]
+        [Route("{personReference}/accounts/{accountReference}")]
+        public async Task<IActionResult> GetAccount([FromRoute][Required]string personReference, [FromRoute][Required]string accountReference)
+        {
+            var response = await _civicaService.GetCouncilTaxDetails(personReference, accountReference);
+
+            return Ok(response);
+        }
+
+        [HttpGet]
         [Route("{personReference}/accounts/{accountReference}/transactions/{year}")]
         public async Task<IActionResult> GetAllTransactionsForYear([FromRoute][Required]string personReference, [FromRoute][Required]string accountReference, [FromRoute][Required] int year)
         {
-            _civicaService.GetCouncilTaxDetails(personReference, accountReference);
             var response = await _civicaService.GetAllTransactionsForYear(personReference, year);
 
             return Ok(response);
