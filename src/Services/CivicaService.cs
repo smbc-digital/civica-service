@@ -1,17 +1,16 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using civica_service.Helpers.QueryBuilder;
 using civica_service.Helpers.SessionProvider;
 using civica_service.Utils.Xml;
-using civica_service.Services.Models;
 using StockportGovUK.AspNetCore.Gateways;
 using System.Linq;
 using System.Collections.Generic;
-using civica_service.Helpers.SessionProvider.Models;
 using Microsoft.Extensions.Caching.Distributed;
 using Newtonsoft.Json;
 using civica_service.Utils.StorageProvider;
 using System.Net.Http;
+using civica_service.Helpers.SessionProvider.Models;
+using StockportGovUK.NetStandard.Models.Models.Civica.CouncilTax;
 
 namespace civica_service.Services
 {

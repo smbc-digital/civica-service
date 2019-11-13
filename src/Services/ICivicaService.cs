@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
-using civica_service.Helpers.SessionProvider.Models;
 using System.Threading.Tasks;
-using civica_service.Services.Models;
+using civica_service.Helpers.SessionProvider.Models;
+using StockportGovUK.NetStandard.Models.Models.Civica.CouncilTax;
 
 namespace civica_service.Services
 {
