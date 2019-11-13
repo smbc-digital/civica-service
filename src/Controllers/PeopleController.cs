@@ -40,11 +40,29 @@ namespace civica_service.Controllers
         }
 
         [HttpGet]
-        [Route("{personReference}/details/{accountReference}/transactions/{year}")]
+        [Route("{personReference}/accounts")]
+        public async Task<IActionResult> GetAccounts([FromRoute][Required]string personReference)
+        {
+            var response = await _civicaService.GetAccounts(personReference);
+
+            return Ok(response);
+        }
+
+        [HttpGet]
+        [Route("{personReference}/accounts/{accountReference}/transactions/{year}")]
         public async Task<IActionResult> GetAllTransactionsForYear([FromRoute][Required]string personReference, [FromRoute][Required]string accountReference, [FromRoute][Required] int year)
         {
             _civicaService.GetCouncilTaxDetails(personReference, accountReference);
             var response = await _civicaService.GetAllTransactionsForYear(personReference, year);
+
+            return Ok(response);
+        }
+
+        [HttpGet]
+        [Route("{personReference}/accounts/{accountReference}/documents")]
+        public async Task<IActionResult> GetDocumentsWithAccountReference([FromRoute][Required]string personReference, [FromRoute][Required]string accountReference)
+        {
+            var response = await _civicaService.GetDocumentsWithAccountReference(personReference, accountReference);
 
             return Ok(response);
         }
@@ -59,16 +77,7 @@ namespace civica_service.Controllers
         }
 
         [HttpGet]
-        [Route("{personReference}/documents/{accountReference}")]
-        public async Task<IActionResult> GetDocumentsWithAccountReference([FromRoute][Required]string personReference, [FromRoute][Required]string accountReference)
-        {
-            var response = await _civicaService.GetDocumentsWithAccountReference(personReference, accountReference);
-
-            return Ok(response);
-        }
-
-        [HttpGet]
-        [Route("{personReference}/properties-owned")]
+        [Route("{personReference}/properties")]
         public async Task<IActionResult> GetPropertiesOwned([FromRoute][Required]string personReference)
         {
             var response = await _civicaService.GetPropertiesOwned(personReference);
@@ -76,9 +85,8 @@ namespace civica_service.Controllers
             return Ok(response);
         }
 
-
         [HttpGet]
-        [Route("{personReference}/properties-owned/current")]
+        [Route("{personReference}/properties/current")]
         public async Task<IActionResult> GetCurrentProperty([FromRoute][Required]string personReference)
         {
             var response = await _civicaService.GetCurrentProperty(personReference);
@@ -87,16 +95,7 @@ namespace civica_service.Controllers
         }
 
         [HttpGet]
-        [Route("{personReference}/accounts")]
-        public async Task<IActionResult> GetAccounts([FromRoute][Required]string personReference)
-        {
-            var response = await _civicaService.GetAccounts(personReference);
-
-            return Ok(response);
-        }
-
-        [HttpGet]
-        [Route("{personReference}/payment-schedule/{year}")]
+        [Route("{personReference}/payments/{year}")]
         public async Task<IActionResult> GetPaymentSchedule([FromRoute][Required]string personReference, [FromRoute][Required]string year)
         {
             var response = await _civicaService.GetPaymentSchedule(personReference, year);
