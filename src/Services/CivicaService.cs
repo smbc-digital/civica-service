@@ -136,7 +136,7 @@ namespace civica_service.Services
             var responseContent = await response.Content.ReadAsStringAsync();
             var parsedResponse = XmlParser.DeserializeXmlStringToType<CtaxPropDetails>(responseContent, "CtaxPropDetails");
 
-            _ = _cacheProvider.SetStringAsync($"{personReference}-{CacheKeys.CouncilTaxPropertiesOwned}", JsonConvert.SerializeObject(parsedResponse));
+            _ = _cacheProvider.SetStringAsync($"{personReference}-{CacheKeys.CouncilTaxPropertiesOwned}", JsonConvert.SerializeObject(parsedResponse.PropertyList.Places));
 
             return parsedResponse.PropertyList.Places;
         }
@@ -179,7 +179,7 @@ namespace civica_service.Services
             var responseContent = await response.Content.ReadAsStringAsync();
             var parsedResponse = XmlParser.DeserializeXmlStringToType<CtaxSelectDoc>(responseContent, "CtaxSelectDoc");
 
-            _ = _cacheProvider.SetStringAsync($"{personReference}-{CacheKeys.CouncilTaxAccounts}", JsonConvert.SerializeObject(parsedResponse));
+            _ = _cacheProvider.SetStringAsync($"{personReference}-{CacheKeys.CouncilTaxAccounts}", JsonConvert.SerializeObject(parsedResponse.CtaxActList.CtaxActDetails));
 
             return parsedResponse.CtaxActList.CtaxActDetails;
         }
