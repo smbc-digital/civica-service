@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using civica_service.Helpers.QueryBuilder;
 using civica_service.Helpers.SessionProvider;
 using civica_service.Utils.Xml;
@@ -59,10 +60,11 @@ namespace civica_service.Services
 
             var response = await _gateway.PostAsync(url, content);
             var reponseContent = await response.Content.ReadAsStringAsync();
-            var claimSummary = XmlParser.DeserializeXmlStringToType<ClaimsSummaryResponse>(reponseContent, "HBSelectDoc");
+            var claimSummary =
+                XmlParser.DeserializeXmlStringToType<ClaimsSummaryResponse>(reponseContent, "HBSelectDoc");
 
-            _cacheProvider.SetStringAsync($"{personReference}-{CacheKeys.Benefits}", JsonConvert.SerializeObject(claimSummary));
-            
+            _ = _cacheProvider.SetStringAsync($"{personReference}-{CacheKeys.Benefits}",JsonConvert.SerializeObject(claimSummary));
+
             return claimSummary;
         }
 

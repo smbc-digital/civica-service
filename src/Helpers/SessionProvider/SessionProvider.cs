@@ -33,7 +33,6 @@ namespace civica_service.Helpers.SessionProvider
         public async Task<string> GetSessionId(string personReference)
         {
             var cacheResponse = _distributedCache.GetString($"{personReference}-{CacheKeys.SessionId}");
-
             if (!string.IsNullOrEmpty(cacheResponse))
             {
                 return cacheResponse;
@@ -66,7 +65,7 @@ namespace civica_service.Helpers.SessionProvider
                 throw new Exception($"Could not assign person reference {personReference} to session {sessionId}");
             }
 
-            _distributedCache.SetStringAsync($"{personReference}-{CacheKeys.SessionId}", JsonConvert.SerializeObject(sessionId));
+            _ = _distributedCache.SetStringAsync($"{personReference}-{CacheKeys.SessionId}", sessionId);
 
             return sessionId;
         }
