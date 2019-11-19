@@ -7,6 +7,8 @@ namespace civica_service.Services
 {
     public interface ICivicaService
     {
+        Task<string> GetSessionId(string personReference);
+
         Task<bool> IsBenefitsClaimant(string personReference);
 
         Task<CouncilTaxAccountResponse> GetCouncilTaxDetails(string personReference, string accountReference);

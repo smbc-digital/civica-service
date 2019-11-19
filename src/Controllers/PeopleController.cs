@@ -22,6 +22,15 @@ namespace civica_service.Controllers
         }
 
         [HttpGet]
+        [Route("{personReference}/session-id")]
+        public async Task<IActionResult> GetSessionId([FromRoute] [Required] string personReference)
+        {
+            var sessionId = await _civicaService.GetSessionId(personReference);
+
+            return StatusCode(StatusCodes.Status200OK, sessionId);
+        }
+
+        [HttpGet]
         [Route("{personReference}/is-benefits-claimant")]
         public async Task<IActionResult> IsBenefitsClaimant([FromRoute][Required]string personReference)
         {

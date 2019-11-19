@@ -1,5 +1,4 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using civica_service.Helpers.QueryBuilder;
 using civica_service.Helpers.SessionProvider;
 using civica_service.Utils.Xml;
@@ -28,6 +27,11 @@ namespace civica_service.Services
             _queryBuilder = queryBuilder;
             _sessionProvider = sessionProvider;
             _cacheProvider = cacheProvider;
+        }
+
+        public async Task<string> GetSessionId(string personReference)
+        {
+            return await _sessionProvider.GetSessionId(personReference);
         }
 
         public async Task<bool> IsBenefitsClaimant(string personReference)
