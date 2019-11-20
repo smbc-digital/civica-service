@@ -157,7 +157,7 @@ namespace civica_service.Services {
             var response = await _gateway.GetAsync (url);
             var responseContent = await response.Content.ReadAsStringAsync ();
             var parsedResponse = XmlParser.DeserializeXmlStringToType<CouncilTaxDocumentsResponse> (responseContent, "Documents");
-            var documentsList = parsedResponse.DocumentList.ToList ();
+            var documentsList = parsedResponse.DocumentList.ToList();
 
             _ = _cacheProvider.SetStringAsync ($"{personReference}-{CacheKeys.CouncilTaxDocuments}", JsonConvert.SerializeObject (documentsList));
 
