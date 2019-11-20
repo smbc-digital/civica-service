@@ -4,13 +4,19 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using civica_service.Helpers.QueryBuilder;
 using civica_service.Helpers.SessionProvider;
+using civica_service.Helpers.SessionProvider.Models;
 using civica_service.Services.Models;
 using civica_service.Utils.StorageProvider;
 using civica_service.Utils.Xml;
 using Microsoft.Extensions.Caching.Distributed;
 using Newtonsoft.Json;
 using StockportGovUK.AspNetCore.Gateways;
+using StockportGovUK.NetStandard.Models.Models.Civica.CouncilTax;
 using StockportGovUK.NetStandard.Models.RevsAndBens;
+using CouncilTaxAccountResponse = StockportGovUK.NetStandard.Models.Models.Civica.CouncilTax.CouncilTaxAccountResponse;
+using CouncilTaxDocumentsResponse = StockportGovUK.NetStandard.Models.Models.Civica.CouncilTax.CouncilTaxDocumentsResponse;
+using CtaxSelectDoc = StockportGovUK.NetStandard.Models.Models.Civica.CouncilTax.CtaxSelectDoc;
+using Transaction = StockportGovUK.NetStandard.Models.Models.Civica.CouncilTax.Transaction;
 
 namespace civica_service.Services {
     public class CivicaService : ICivicaService {
@@ -139,11 +145,11 @@ namespace civica_service.Services {
             return ctaxPaymentList;
         }
 
-        public async Task<List<CouncilTaxDocument>> GetDocuments (string personReference) {
+        public async Task<List<CouncilTaxDocumentReference>> GetDocuments (string personReference) {
             var cacheResponse = await _cacheProvider.GetStringAsync ($"{personReference}-{CacheKeys.CouncilTaxDocuments}");
 
             if (!string.IsNullOrEmpty (cacheResponse)) {
-                return JsonConvert.DeserializeObject<List<CouncilTaxDocument>> (cacheResponse);
+                return JsonConvert.DeserializeObject<List<CouncilTaxDocumentReference>> (cacheResponse);
             }
 
             var sessionId = await _sessionProvider.GetSessionId (personReference);
@@ -164,11 +170,11 @@ namespace civica_service.Services {
             return documentsList;
         }
 
-        public async Task<List<CouncilTaxDocument>> GetDocumentsWithAccountReference (string personReference, string accountReference) {
+        public async Task<List<CouncilTaxDocumentReference>> GetDocumentsWithAccountReference (string personReference, string accountReference) {
             var cacheResponse = await _cacheProvider.GetStringAsync ($"{personReference}-{CacheKeys.CouncilTaxDocumentsByReference}");
 
             if (!string.IsNullOrEmpty (cacheResponse)) {
-                return JsonConvert.DeserializeObject<List<CouncilTaxDocument>> (cacheResponse);
+                return JsonConvert.DeserializeObject<List<CouncilTaxDocumentReference>> (cacheResponse);
             }
 
             var documents = await GetDocuments (personReference);
@@ -221,11 +227,11 @@ namespace civica_service.Services {
             return currentProperty;
         }
 
-        public async Task<List<CouncilTaxAccountDetails>> GetAccounts (string personReference) {
+        public async Task<List<CtaxActDetails>> GetAccounts (string personReference) {
             var cacheResponse = await _cacheProvider.GetStringAsync ($"{personReference}-{CacheKeys.CouncilTaxAccounts}");
 
             if (!string.IsNullOrEmpty (cacheResponse)) {
-                return JsonConvert.DeserializeObject<List<CouncilTaxAccountDetails>> (cacheResponse);
+                return JsonConvert.DeserializeObject<List<CtaxActDetails>> (cacheResponse);
             }
 
             var sessionId = await _sessionProvider.GetSessionId (personReference);
@@ -238,7 +244,7 @@ namespace civica_service.Services {
             var response = await _gateway.GetAsync (url);
             var responseContent = await response.Content.ReadAsStringAsync ();
             var parsedResponse = XmlParser.DeserializeXmlStringToType<CtaxSelectDoc> (responseContent, "CtaxSelectDoc");
-            var accounts = parsedResponse.CounciltaxAccountList.CouncilTaxAccounts;
+            var accounts = parsedResponse.CtaxActList.CtaxActDetails;
 
             _ = _cacheProvider.SetStringAsync ($"{personReference}-{CacheKeys.CouncilTaxAccounts}", JsonConvert.SerializeObject (accounts));
 
@@ -250,7 +256,7 @@ namespace civica_service.Services {
             var cacheResponse = await _cacheProvider.GetStringAsync($"{personReference}-{CacheKeys.CouncilTaxPaymentSchedule}");
 
             if (!string.IsNullOrEmpty (cacheResponse)) {
-                return JsonConvert.DeserializeObject<CouncilTaxPaymentSchedule> (cacheResponse);
+                return JsonConvert.DeserializeObject<CouncilTaxPaymentScheduleResponse> (cacheResponse);
             }
 
             var sessionId = await _sessionProvider.GetSessionId (personReference);
@@ -265,7 +271,7 @@ namespace civica_service.Services {
 
             var response = await _gateway.GetAsync (url);
             var responseContent = await response.Content.ReadAsStringAsync ();
-            var parsedResponse = XmlParser.DeserializeXmlStringToType<CouncilTaxPaymentSchedule> (responseContent, "IRInstalments");
+            var parsedResponse = XmlParser.DeserializeXmlStringToType<CouncilTaxPaymentScheduleResponse> (responseContent, "IRInstalments");
 
             _ = _cacheProvider.SetStringAsync ($"{personReference}-{CacheKeys.CouncilTaxPaymentSchedule}", JsonConvert.SerializeObject (parsedResponse));
 

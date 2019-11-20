@@ -1,7 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using civica_service.Services.Models;
+using StockportGovUK.NetStandard.Models.Models.Civica.CouncilTax;
 using StockportGovUK.NetStandard.Models.RevsAndBens;
+using Transaction = StockportGovUK.NetStandard.Models.Models.Civica.CouncilTax.Transaction;
 
 namespace civica_service.Services {
     public interface ICivicaService {
@@ -25,14 +26,14 @@ namespace civica_service.Services {
 
         Task<CouncilTaxPaymentScheduleResponse> GetPaymentSchedule(string personReference, int year);
 
-        Task<List<CouncilTaxDocument>> GetDocuments (string personReference);
+        Task<List<CouncilTaxDocumentReference>> GetDocuments (string personReference);
 
-        Task<List<CouncilTaxDocument>> GetDocumentsWithAccountReference (string personReference, string accountReference);
+        Task<List<CouncilTaxDocumentReference>> GetDocumentsWithAccountReference (string personReference, string accountReference);
 
         Task<List<Place>> GetPropertiesOwned (string personReference);
 
         Task<Place> GetCurrentProperty (string personReference);
 
-        Task<List<CouncilTaxAccountDetails>> GetAccounts (string personReference);
+        Task<List<CtaxActDetails>> GetAccounts (string personReference);
     }
 }
