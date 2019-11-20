@@ -22,8 +22,10 @@
     <PackageReference Include="Serilog.Sinks.Console" Version="3.1.1" />
     <PackageReference Include="StockportGovUK.AspNetCore.Attributes.TokenAuthentication" Version="0.*" />
     <PackageReference Include="StockportGovUK.AspNetCore.Availability" Version="0.*" />
+    <PackageReference Include="StockportGovUK.AspNetCore.Gateways" Version="0.8.2-prerelease71" />
     <PackageReference Include="StockportGovUK.AspNetCore.Logging.Elasticsearch.Aws" Version="0.*" />
     <PackageReference Include="StockportGovUK.AspNetCore.Middleware.ExceptionHandling" Version="0.*" />
+    <PackageReference Include="StockportGovUK.NetStandard.Models" Version="0.4.0" />
     <PackageReference Include="System.Text.RegularExpressions" Version="4.*" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="4.0.1" />
     <PackageReference Include="System.Net.Http" Version="4.3.4" />
@@ -38,13 +40,5 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Controllers\" />
-  </ItemGroup>
-  <ItemGroup>
-    <Reference Include="StockportGovUK.AspNetCore.Gateways">
-      <HintPath>..\..\..\other\StockportGovUK.AspNetCore.Gateways\bin\Debug\netcoreapp2.2\StockportGovUK.AspNetCore.Gateways.dll</HintPath>
-    </Reference>
-    <Reference Include="StockportGovUK.NetStandard.Models">
-      <HintPath>..\..\..\other\StockportGovUk.NetStandard.Models\bin\Debug\netcoreapp2.2\StockportGovUK.NetStandard.Models.dll</HintPath>
-    </Reference>
   </ItemGroup>
 </Project>

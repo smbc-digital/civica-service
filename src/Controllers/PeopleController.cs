@@ -104,7 +104,7 @@ namespace civica_service.Controllers
 
         [HttpGet]
         [Route("{personReference}/payments/{year}")]
-        public async Task<IActionResult> GetPaymentSchedule([FromRoute][Required]string personReference, [FromRoute][Required]string year)
+        public async Task<IActionResult> GetPaymentSchedule([FromRoute][Required]string personReference, [FromRoute][Required]int year)
         {
             var response = await _civicaService.GetPaymentSchedule(personReference, year);
 

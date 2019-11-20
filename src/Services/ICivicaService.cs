@@ -25,6 +25,6 @@ namespace civica_service.Services
 
         Task<IEnumerable<CtaxActDetails>> GetAccounts(string personReference);
 
-        Task<CouncilTaxPaymentScheduleResponse> GetPaymentSchedule(string personReference, string year);
+        Task<CouncilTaxPaymentScheduleResponse> GetPaymentSchedule(string personReference, int year);
     }
 }

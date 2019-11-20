@@ -184,7 +184,7 @@ namespace civica_service.Services
             return parsedResponse.CtaxActList.CtaxActDetails;
         }
 
-        public async Task<CouncilTaxPaymentScheduleResponse> GetPaymentSchedule(string personReference, string year)
+        public async Task<CouncilTaxPaymentScheduleResponse> GetPaymentSchedule(string personReference, int year)
         {
             var cacheResponse = await _cacheProvider.GetStringAsync($"{personReference}-{CacheKeys.CouncilTaxPaymentSchedule}");
 
@@ -199,7 +199,7 @@ namespace civica_service.Services
                 .Add("docid", "irins")
                 .Add("recno", "1")
                 .Add("module", "C")
-                .Add("recyear", year)
+                .Add("recyear", year.ToString())
                 .Add("sessionId", sessionId)
                 .Build();
 
