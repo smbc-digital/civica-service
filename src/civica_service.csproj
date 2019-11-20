@@ -39,10 +39,5 @@
   <ItemGroup>
     <None Include="License.txt" Pack="true" PackagePath="$(PackageLicenseFile)" />
   </ItemGroup>
-<<<<<<< HEAD
-  <ItemGroup>
-    <Folder Include="Controllers\" />
-  </ItemGroup>
-=======
->>>>>>> 6089d18c775bf552d89cb412183dd77738d8ac5e
+
 </Project>
