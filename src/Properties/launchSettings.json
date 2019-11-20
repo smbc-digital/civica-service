@@ -13,18 +13,12 @@
       "commandName": "IISExpress",
       "launchBrowser": true,
       "launchUrl": "swagger/index.html",
-      "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development"
-      }
     },
     "civica_service": {
       "commandName": "Project",
       "launchBrowser": true,
       "launchUrl": "api/values",
       "applicationUrl": "http://localhost:6001",
-      "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development"
-      }
     }
   }
 }

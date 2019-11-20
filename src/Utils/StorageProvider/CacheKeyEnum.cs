@@ -12,5 +12,10 @@ namespace civica_service.Utils.StorageProvider
         CouncilTaxAccount,
         CouncilTaxPaymentSchedule,
         CouncilTaxCurrentProperty,
+        ClaimDetails,
+        HousingBenefitsPaymentDetails,
+        CouncilTaxPaymentDetails,
+        CouncilTaxAccountForYear,
+        Transactions
     }
 }

@@ -1,199 +1,259 @@
-﻿using System;
+﻿using System.Collections.Generic;
+using System.Linq;
+using System.Net.Http;
 using System.Threading.Tasks;
 using civica_service.Helpers.QueryBuilder;
 using civica_service.Helpers.SessionProvider;
+using civica_service.Services.Models;
+using civica_service.Utils.StorageProvider;
 using civica_service.Utils.Xml;
-using StockportGovUK.AspNetCore.Gateways;
-using System.Linq;
-using System.Collections.Generic;
 using Microsoft.Extensions.Caching.Distributed;
 using Newtonsoft.Json;
-using civica_service.Utils.StorageProvider;
-using System.Net.Http;
-using civica_service.Helpers.SessionProvider.Models;
-using StockportGovUK.NetStandard.Models.Models.Civica.CouncilTax;
+using StockportGovUK.AspNetCore.Gateways;
+using StockportGovUK.NetStandard.Models.RevsAndBens;
 
-namespace civica_service.Services
-{
-    public class CivicaService : ICivicaService
-    {
+namespace civica_service.Services {
+    public class CivicaService : ICivicaService {
         private readonly IGateway _gateway;
         private readonly IQueryBuilder _queryBuilder;
         private readonly ISessionProvider _sessionProvider;
         private readonly IDistributedCache _cacheProvider;
 
-        public CivicaService(IGateway gateway, IQueryBuilder queryBuilder, ISessionProvider sessionProvider, IDistributedCache cacheProvider)
-        {
+        public CivicaService (IGateway gateway, IQueryBuilder queryBuilder, ISessionProvider sessionProvider, IDistributedCache cacheProvider) {
             _gateway = gateway;
             _queryBuilder = queryBuilder;
             _sessionProvider = sessionProvider;
             _cacheProvider = cacheProvider;
         }
 
-        public async Task<bool> IsBenefitsClaimant(string personReference)
-        {
-            var claimsSummaryResponse = await GetBenefits(personReference);
-
-            return claimsSummaryResponse.Claims != null && claimsSummaryResponse.Claims.Summary.Any();
+        public async Task<string> GetSessionId (string personReference) {
+            return await _sessionProvider.GetSessionId (personReference);
         }
 
-        public async Task<ClaimsSummaryResponse> GetBenefits(string personReference)
-        {
-            var cacheResponse = await _cacheProvider.GetStringAsync($"{personReference}-{CacheKeys.Benefits}");
+        public async Task<bool> IsBenefitsClaimant (string personReference) {
+            var claims = await GetBenefits (personReference);
 
-            if (!string.IsNullOrEmpty(cacheResponse))
-            {
-                return JsonConvert.DeserializeObject<ClaimsSummaryResponse>(cacheResponse);
+            return claims.Any ();
+        }
+
+        public async Task<List<BenefitsClaimSummary>> GetBenefits (string personReference) {
+            var cacheResponse = await _cacheProvider.GetStringAsync ($"{personReference}-{CacheKeys.Benefits}");
+
+            if (!string.IsNullOrEmpty (cacheResponse)) {
+                return JsonConvert.DeserializeObject<List<BenefitsClaimSummary>> (cacheResponse);
             }
 
-            var sessionId = await _sessionProvider.GetSessionId(personReference);
+            var sessionId = await _sessionProvider.GetSessionId (personReference);
 
             var url = _queryBuilder
-                .Add("docid", "hbsel")
-                .Add("sessionId", sessionId)
-                .Build();
+                .Add ("docid", "hbsel")
+                .Add ("sessionId", sessionId)
+                .Build ();
 
-            var content = new FormUrlEncodedContent(new List<KeyValuePair<string, string>>
-            {
-                new KeyValuePair<string, string>("claimsts", "All")
+            var body = new FormUrlEncodedContent (new List<KeyValuePair<string, string>> {
+                new KeyValuePair<string, string> ("claimsts", "All")
             });
 
-            var response = await _gateway.PostAsync(url, content);
-            var reponseContent = await response.Content.ReadAsStringAsync();
-            var claimSummary =
-                XmlParser.DeserializeXmlStringToType<ClaimsSummaryResponse>(reponseContent, "HBSelectDoc");
+            var response = await _gateway.PostAsync (url, body);
+            var content = await response.Content.ReadAsStringAsync ();
+            var parsedResponse = XmlParser.DeserializeXmlStringToType<BenefitsClaimsSummaryResponse> (content, "HBSelectDoc");
+            var claimSummary = parsedResponse.Claims.Summary;
 
-            _ = _cacheProvider.SetStringAsync($"{personReference}-{CacheKeys.Benefits}",JsonConvert.SerializeObject(claimSummary));
+            _ = _cacheProvider.SetStringAsync ($"{personReference}-{CacheKeys.Benefits}", JsonConvert.SerializeObject (claimSummary));
 
             return claimSummary;
         }
 
-        public async Task<List<CouncilTaxDocumentReference>> GetDocuments(string personReference)
-        {
-            var cacheResponse = await _cacheProvider.GetStringAsync($"{personReference}-{CacheKeys.CouncilTaxDocuments}");
+        public async Task<BenefitsClaim> GetBenefitDetails (string personReference, string claimReference, string placeReference) {
+            var cacheResponse = await _cacheProvider.GetStringAsync ($"{personReference}-{CacheKeys.ClaimDetails}");
 
-            if (!string.IsNullOrEmpty(cacheResponse))
-            {
-                return JsonConvert.DeserializeObject<List<CouncilTaxDocumentReference>>(cacheResponse);
+            if (!string.IsNullOrEmpty (cacheResponse)) {
+                return JsonConvert.DeserializeObject<BenefitsClaim> (cacheResponse);
             }
 
-            var sessionId = await _sessionProvider.GetSessionId(personReference);
+            var sessionId = await _sessionProvider.GetSessionId (personReference);
 
             var url = _queryBuilder
-                .Add("docid", "viewdoc")
-                .Add("type", "all")
-                .Add("sessionId", sessionId)
-                .Build();
+                .Add ("sessionId", sessionId)
+                .Add ("docid", "hbdet")
+                .Add ("claimref", claimReference)
+                .Add ("placeref", placeReference)
+                .Build ();
 
-            var response = await _gateway.GetAsync(url);
-            var responseContent = await response.Content.ReadAsStringAsync();
-            var parsedResponse = XmlParser.DeserializeXmlStringToType<CouncilTaxDocumentsResponse>(responseContent, "Documents");
+            var response = await _gateway.GetAsync (url);
+            var responseContent = await response.Content.ReadAsStringAsync ();
+            var parsedResponse = XmlParser.DeserializeXmlStringToType<BenefitsClaim> (responseContent, "HBClaimDetails");
 
-            var documentsList = parsedResponse.DocumentList.ToList();
+            _ = _cacheProvider.SetStringAsync ($"{personReference}-{CacheKeys.ClaimDetails}", JsonConvert.SerializeObject (parsedResponse));
 
-            _ = _cacheProvider.SetStringAsync($"{personReference}-{CacheKeys.CouncilTaxDocuments}", JsonConvert.SerializeObject(documentsList));
+            return parsedResponse;
+        }
+
+        public async Task<List<PaymentDetail>> GetHousingBenefitPaymentHistory (string personReference) {
+            var cacheResponse = await _cacheProvider.GetStringAsync ($"{personReference}-{CacheKeys.HousingBenefitsPaymentDetails}");
+
+            if (!string.IsNullOrEmpty (cacheResponse)) {
+                return JsonConvert.DeserializeObject<List<PaymentDetail>> (cacheResponse);
+            }
+
+            var sessionId = await _sessionProvider.GetSessionId (personReference);
+
+            var url = _queryBuilder
+                .Add ("sessionId", sessionId)
+                .Add ("docid", "hbpaydet")
+                .Add ("type", "prp")
+                .Build ();
+
+            var response = await _gateway.GetAsync (url);
+            var content = await response.Content.ReadAsStringAsync ();
+            var paymentDetails = XmlParser.DeserializeXmlStringToType<PaymentDetailsResponse> (content, "HBPaymentDetails");
+            var housingBenefitList = paymentDetails.PaymentList.PaymentDetails;
+
+            _ = _cacheProvider.SetStringAsync ($"{personReference}-{CacheKeys.HousingBenefitsPaymentDetails}", JsonConvert.SerializeObject (housingBenefitList));
+
+            return housingBenefitList;
+        }
+
+        public async Task<List<PaymentDetail>> GetCouncilTaxBenefitPaymentHistory (string personReference) {
+            var cacheResponse = await _cacheProvider.GetStringAsync ($"{personReference}-{CacheKeys.CouncilTaxPaymentDetails}");
+
+            if (!string.IsNullOrEmpty (cacheResponse)) {
+                return JsonConvert.DeserializeObject<List<PaymentDetail>> (cacheResponse);
+            }
+
+            var sessionId = await _sessionProvider.GetSessionId (personReference);
+
+            var url = _queryBuilder
+                .Add ("sessionId", sessionId)
+                .Add ("docid", "hbpaydet")
+                .Add ("type", "ctp")
+                .Build ();
+
+            var response = await _gateway.GetAsync (url);
+            var content = await response.Content.ReadAsStringAsync ();
+            var paymentDetails = XmlParser.DeserializeXmlStringToType<PaymentDetailsResponse> (content, "HBPaymentDetails");
+            var ctaxPaymentList = paymentDetails.PaymentList.PaymentDetails;
+
+            _ = _cacheProvider.SetStringAsync ($"{personReference}-{CacheKeys.CouncilTaxPaymentDetails}", JsonConvert.SerializeObject (ctaxPaymentList));
+
+            return ctaxPaymentList;
+        }
+
+        public async Task<List<CouncilTaxDocument>> GetDocuments (string personReference) {
+            var cacheResponse = await _cacheProvider.GetStringAsync ($"{personReference}-{CacheKeys.CouncilTaxDocuments}");
+
+            if (!string.IsNullOrEmpty (cacheResponse)) {
+                return JsonConvert.DeserializeObject<List<CouncilTaxDocument>> (cacheResponse);
+            }
+
+            var sessionId = await _sessionProvider.GetSessionId (personReference);
+
+            var url = _queryBuilder
+                .Add ("docid", "viewdoc")
+                .Add ("type", "all")
+                .Add ("sessionId", sessionId)
+                .Build ();
+
+            var response = await _gateway.GetAsync (url);
+            var responseContent = await response.Content.ReadAsStringAsync ();
+            var parsedResponse = XmlParser.DeserializeXmlStringToType<CouncilTaxDocumentsResponse> (responseContent, "Documents");
+            var documentsList = parsedResponse.DocumentList.ToList ();
+
+            _ = _cacheProvider.SetStringAsync ($"{personReference}-{CacheKeys.CouncilTaxDocuments}", JsonConvert.SerializeObject (documentsList));
 
             return documentsList;
         }
 
-        public async Task<List<CouncilTaxDocumentReference>> GetDocumentsWithAccountReference(string personReference, string accountReference)
-        {
-            var cacheResponse = await _cacheProvider.GetStringAsync($"{personReference}-{CacheKeys.CouncilTaxDocumentsByReference}");
+        public async Task<List<CouncilTaxDocument>> GetDocumentsWithAccountReference (string personReference, string accountReference) {
+            var cacheResponse = await _cacheProvider.GetStringAsync ($"{personReference}-{CacheKeys.CouncilTaxDocumentsByReference}");
 
-            if (!string.IsNullOrEmpty(cacheResponse))
-            {
-                return JsonConvert.DeserializeObject<List<CouncilTaxDocumentReference>>(cacheResponse);
+            if (!string.IsNullOrEmpty (cacheResponse)) {
+                return JsonConvert.DeserializeObject<List<CouncilTaxDocument>> (cacheResponse);
             }
 
-            var documents = await GetDocuments(personReference);
+            var documents = await GetDocuments (personReference);
             var filteredDocuments = documents
-                .Where(_ => _.AccountReference == accountReference)
-                .ToList();
+                .Where (_ => _.AccountReference == accountReference)
+                .ToList ();
 
-            _ = _cacheProvider.SetStringAsync($"{personReference}-{CacheKeys.CouncilTaxDocumentsByReference}", JsonConvert.SerializeObject(filteredDocuments));
+            _ = _cacheProvider.SetStringAsync ($"{personReference}-{CacheKeys.CouncilTaxDocumentsByReference}", JsonConvert.SerializeObject (filteredDocuments));
 
             return filteredDocuments;
         }
 
-        public async Task<List<Places>> GetPropertiesOwned(string personReference)
-        {
-            var cacheResponse = await _cacheProvider.GetStringAsync($"{personReference}-{CacheKeys.CouncilTaxPropertiesOwned}");
+        public async Task<List<Place>> GetPropertiesOwned (string personReference) {
+            var cacheResponse = await _cacheProvider.GetStringAsync ($"{personReference}-{CacheKeys.CouncilTaxPropertiesOwned}");
 
-            if (!string.IsNullOrEmpty(cacheResponse))
-            {
-                return JsonConvert.DeserializeObject<List<Places>>(cacheResponse);
+            if (!string.IsNullOrEmpty (cacheResponse)) {
+                return JsonConvert.DeserializeObject<List<Place>> (cacheResponse);
             }
 
-            var sessionId = await _sessionProvider.GetSessionId(personReference);
+            var sessionId = await _sessionProvider.GetSessionId (personReference);
 
             var url = _queryBuilder
-                .Add("docid", "ctxprop")
-                .Add("proplist", "y")
-                .Add("sessionId", sessionId)
-                .Build();
+                .Add ("docid", "ctxprop")
+                .Add ("proplist", "y")
+                .Add ("sessionId", sessionId)
+                .Build ();
 
-            var response = await _gateway.GetAsync(url);
-            var responseContent = await response.Content.ReadAsStringAsync();
-            var parsedResponse = XmlParser.DeserializeXmlStringToType<CtaxPropDetails>(responseContent, "CtaxPropDetails");
+            var response = await _gateway.GetAsync (url);
+            var responseContent = await response.Content.ReadAsStringAsync ();
+            var parsedResponse = XmlParser.DeserializeXmlStringToType<CouncilTaxPropertyDetails> (responseContent, "CtaxPropDetails");
+            var places = parsedResponse.PropertyList.Places;
 
-            _ = _cacheProvider.SetStringAsync($"{personReference}-{CacheKeys.CouncilTaxPropertiesOwned}", JsonConvert.SerializeObject(parsedResponse.PropertyList.Places));
+            _ = _cacheProvider.SetStringAsync ($"{personReference}-{CacheKeys.CouncilTaxPropertiesOwned}", JsonConvert.SerializeObject (places));
 
-            return parsedResponse.PropertyList.Places;
+            return places;
         }
 
-        public async Task<Places> GetCurrentProperty(string personReference)
-        {
-            var cacheResponse = await _cacheProvider.GetStringAsync($"{personReference}-{CacheKeys.CouncilTaxCurrentProperty}");
+        public async Task<Place> GetCurrentProperty (string personReference) {
+            var cacheResponse = await _cacheProvider.GetStringAsync ($"{personReference}-{CacheKeys.CouncilTaxCurrentProperty}");
 
-            if (!string.IsNullOrEmpty(cacheResponse))
-            {
-                return JsonConvert.DeserializeObject<Places>(cacheResponse);
+            if (!string.IsNullOrEmpty (cacheResponse)) {
+                return JsonConvert.DeserializeObject<Place> (cacheResponse);
             }
 
-            var properties = await GetPropertiesOwned(personReference);
+            var properties = await GetPropertiesOwned (personReference);
+            var currentProperty = properties.FirstOrDefault (p => p.Status == "Current") ?? properties.FirstOrDefault ();
 
-            var currentProperty = properties.FirstOrDefault(p => p.PropertyStatus == "Current") ?? properties.FirstOrDefault();
-
-            _ = _cacheProvider.SetStringAsync($"{personReference}-{CacheKeys.CouncilTaxCurrentProperty}", JsonConvert.SerializeObject(currentProperty));
+            _ = _cacheProvider.SetStringAsync ($"{personReference}-{CacheKeys.CouncilTaxCurrentProperty}", JsonConvert.SerializeObject (currentProperty));
 
             return currentProperty;
         }
 
-        public async Task<IEnumerable<CtaxActDetails>> GetAccounts(string personReference)
-        {
-            var cacheResponse = await _cacheProvider.GetStringAsync($"{personReference}-{CacheKeys.CouncilTaxAccounts}");
+        public async Task<List<CouncilTaxAccountDetails>> GetAccounts (string personReference) {
+            var cacheResponse = await _cacheProvider.GetStringAsync ($"{personReference}-{CacheKeys.CouncilTaxAccounts}");
 
-            if (!string.IsNullOrEmpty(cacheResponse))
-            {
-                return JsonConvert.DeserializeObject<IEnumerable<CtaxActDetails>> (cacheResponse);
+            if (!string.IsNullOrEmpty (cacheResponse)) {
+                return JsonConvert.DeserializeObject<List<CouncilTaxAccountDetails>> (cacheResponse);
             }
 
-            var sessionId = await _sessionProvider.GetSessionId(personReference);
+            var sessionId = await _sessionProvider.GetSessionId (personReference);
 
             var url = _queryBuilder
-                .Add("docid", "ctxsel")
-                .Add("sessionId", sessionId)
-                .Build();
+                .Add ("docid", "ctxsel")
+                .Add ("sessionId", sessionId)
+                .Build ();
 
-            var response = await _gateway.GetAsync(url);
-            var responseContent = await response.Content.ReadAsStringAsync();
-            var parsedResponse = XmlParser.DeserializeXmlStringToType<CtaxSelectDoc>(responseContent, "CtaxSelectDoc");
+            var response = await _gateway.GetAsync (url);
+            var responseContent = await response.Content.ReadAsStringAsync ();
+            var parsedResponse = XmlParser.DeserializeXmlStringToType<CtaxSelectDoc> (responseContent, "CtaxSelectDoc");
+            var accounts = parsedResponse.CounciltaxAccountList.CouncilTaxAccounts;
 
-            _ = _cacheProvider.SetStringAsync($"{personReference}-{CacheKeys.CouncilTaxAccounts}", JsonConvert.SerializeObject(parsedResponse.CtaxActList.CtaxActDetails));
+            _ = _cacheProvider.SetStringAsync ($"{personReference}-{CacheKeys.CouncilTaxAccounts}", JsonConvert.SerializeObject (accounts));
 
-            return parsedResponse.CtaxActList.CtaxActDetails;
+            return accounts;
         }
 
         public async Task<CouncilTaxPaymentScheduleResponse> GetPaymentSchedule(string personReference, int year)
         {
             var cacheResponse = await _cacheProvider.GetStringAsync($"{personReference}-{CacheKeys.CouncilTaxPaymentSchedule}");
 
-            if (!string.IsNullOrEmpty(cacheResponse))
-            {
-                return JsonConvert.DeserializeObject<CouncilTaxPaymentScheduleResponse>(cacheResponse);
+            if (!string.IsNullOrEmpty (cacheResponse)) {
+                return JsonConvert.DeserializeObject<CouncilTaxPaymentSchedule> (cacheResponse);
             }
 
-            var sessionId = await _sessionProvider.GetSessionId(personReference);
+            var sessionId = await _sessionProvider.GetSessionId (personReference);
 
             var url = _queryBuilder
                 .Add("docid", "irins")
@@ -203,57 +263,89 @@ namespace civica_service.Services
                 .Add("sessionId", sessionId)
                 .Build();
 
-            var response = await _gateway.GetAsync(url);
-            var responseContent = await response.Content.ReadAsStringAsync();
-            var parsedResponse = XmlParser.DeserializeXmlStringToType<CouncilTaxPaymentScheduleResponse>(responseContent, "IRInstalments");
+            var response = await _gateway.GetAsync (url);
+            var responseContent = await response.Content.ReadAsStringAsync ();
+            var parsedResponse = XmlParser.DeserializeXmlStringToType<CouncilTaxPaymentSchedule> (responseContent, "IRInstalments");
 
-            _ = _cacheProvider.SetStringAsync($"{personReference}-{CacheKeys.CouncilTaxPaymentSchedule}", JsonConvert.SerializeObject(parsedResponse));
+            _ = _cacheProvider.SetStringAsync ($"{personReference}-{CacheKeys.CouncilTaxPaymentSchedule}", JsonConvert.SerializeObject (parsedResponse));
 
             return parsedResponse;
         }
 
-        public async Task<CouncilTaxAccountResponse> GetCouncilTaxDetails(string personReference, string accountReference)
-        {
-            var cacheResponse = await _cacheProvider.GetStringAsync($"{personReference}-{CacheKeys.CouncilTaxAccount}");
+        public async Task<CouncilTaxAccountResponse> GetCouncilTaxDetails (string personReference, string accountReference) {
+            var cacheResponse = await _cacheProvider.GetStringAsync ($"{personReference}-{CacheKeys.CouncilTaxAccount}");
 
-            if (!string.IsNullOrEmpty(cacheResponse))
-            {
-                return JsonConvert.DeserializeObject<CouncilTaxAccountResponse>(cacheResponse);
+            if (!string.IsNullOrEmpty (cacheResponse)) {
+                return JsonConvert.DeserializeObject<CouncilTaxAccountResponse> (cacheResponse);
             }
 
-            var sessionId = await _sessionProvider.GetSessionId(personReference);
+            var sessionId = await _sessionProvider.GetSessionId (personReference);
 
             var url = _queryBuilder
-                .Add("sessionId", sessionId)
-                .Add("docid", "ctxdet")
-                .Add("actref", accountReference)
-                .Build();
+                .Add ("sessionId", sessionId)
+                .Add ("docid", "ctxdet")
+                .Add ("actref", accountReference)
+                .Build ();
 
-            var response = await _gateway.GetAsync(url);
-            var responseContent = await response.Content.ReadAsStringAsync();
-            var parsedResponse = XmlParser.DeserializeXmlStringToType<CouncilTaxAccountResponse>(responseContent, "CtaxDetails");
+            var response = await _gateway.GetAsync (url);
+            var responseContent = await response.Content.ReadAsStringAsync ();
+            var parsedResponse = XmlParser.DeserializeXmlStringToType<CouncilTaxAccountResponse> (responseContent, "CtaxDetails");
 
-            _ = _cacheProvider.SetStringAsync($"{personReference}-{CacheKeys.CouncilTaxAccount}", JsonConvert.SerializeObject(parsedResponse));
+            _ = _cacheProvider.SetStringAsync ($"{personReference}-{CacheKeys.CouncilTaxAccount}", JsonConvert.SerializeObject (parsedResponse));
 
             return parsedResponse;
         }
 
-        public async Task<TransactionListModel> GetAllTransactionsForYear(string personReference, int year)
-        {
-            var sessionId = await _sessionProvider.GetSessionId(personReference);
+        public async Task<RecievedYearTotal> GetCouncilTaxDetailsForYear (string personReference, string accountReference, string year) {
+            var cacheResponse = await _cacheProvider.GetStringAsync ($"{personReference}-{CacheKeys.CouncilTaxAccountForYear}");
+
+            if (!string.IsNullOrEmpty (cacheResponse)) {
+                return JsonConvert.DeserializeObject<RecievedYearTotal> (cacheResponse);
+            }
+
+            var sessionId = await _sessionProvider.GetSessionId (personReference);
 
             var url = _queryBuilder
-                .Add("sessionId", sessionId)
-                .Add("docid", "ctxtrn")
-                .Add("recyear", year.ToString())
-                .Add("trantype", "All")
-                .Build();
+                .Add ("sessionId", sessionId)
+                .Add ("docid", "ctxdet")
+                .Add ("actref", accountReference)
+                .Add ("year", year)
+                .Build ();
 
-            var response = await _gateway.GetAsync(url);
-            var xmlResponse = await response.Content.ReadAsStringAsync();
+            var response = await _gateway.GetAsync (url);
+            var responseContent = await response.Content.ReadAsStringAsync ();
+            var parsedResponse = XmlParser.DeserializeXmlStringToType<CouncilTaxAccountSummary> (responseContent, "CtaxDetails");
+            var recievedYearTotals = parsedResponse.FinancialDetails.RecievedYearTotal;
 
-            return XmlParser.DeserializeXmlStringToType<TransactionListModel>(xmlResponse, "TranList");
+            _ = _cacheProvider.SetStringAsync ($"{personReference}-{CacheKeys.CouncilTaxAccountForYear}", JsonConvert.SerializeObject (recievedYearTotals));
+
+            return recievedYearTotals;
+        }
+
+        public async Task<List<Transaction>> GetAllTransactionsForYear (string personReference, int year) {
+            var cacheResponse = await _cacheProvider.GetStringAsync ($"{personReference}-{CacheKeys.Transactions}");
+
+            if (!string.IsNullOrEmpty (cacheResponse)) {
+                return JsonConvert.DeserializeObject<List<Transaction>> (cacheResponse);
+            }
+
+            var sessionId = await _sessionProvider.GetSessionId (personReference);
+
+            var url = _queryBuilder
+                .Add ("sessionId", sessionId)
+                .Add ("docid", "ctxtrn")
+                .Add ("recyear", year.ToString ())
+                .Add ("trantype", "All")
+                .Build ();
+
+            var response = await _gateway.GetAsync (url);
+            var content = await response.Content.ReadAsStringAsync ();
+            var parsedResponse = XmlParser.DeserializeXmlStringToType<TransactionListModel> (content, "tranList");
+            var transactions = parsedResponse.Transaction;
+
+            _ = _cacheProvider.SetStringAsync ($"{personReference}-{CacheKeys.Transactions}", JsonConvert.SerializeObject (transactions));
+
+            return transactions;
         }
     }
 }
-
