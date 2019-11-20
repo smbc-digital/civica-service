@@ -74,6 +74,7 @@ namespace civica_service.Controllers
             return StatusCode(StatusCodes.Status200OK, model);
         }
 
+        [HttpGet]
         [Route("{personReference}/accounts")]
         public async Task<IActionResult> GetAccounts([FromRoute][Required]string personReference)
         {
