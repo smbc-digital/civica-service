@@ -1,32 +1,38 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using civica_service.Helpers.SessionProvider.Models;
-using StockportGovUK.NetStandard.Models.Models.Civica.CouncilTax;
+using civica_service.Services.Models;
+using StockportGovUK.NetStandard.Models.RevsAndBens;
 
-namespace civica_service.Services
-{
-    public interface ICivicaService
-    {
-        Task<string> GetSessionId(string personReference);
+namespace civica_service.Services {
+    public interface ICivicaService {
+        Task<string> GetSessionId (string personReference);
 
-        Task<bool> IsBenefitsClaimant(string personReference);
+        Task<bool> IsBenefitsClaimant (string personReference);
 
-        Task<CouncilTaxAccountResponse> GetCouncilTaxDetails(string personReference, string accountReference);
+        Task<CouncilTaxAccountResponse> GetCouncilTaxDetails (string personReference, string accountReference);
 
-        Task<TransactionListModel> GetAllTransactionsForYear(string personReference, int year);
+        Task<RecievedYearTotal> GetCouncilTaxDetailsForYear (string personReference, string accountReference, string year);
 
-        Task<ClaimsSummaryResponse> GetBenefits(string personReference);
+        Task<List<Transaction>> GetAllTransactionsForYear (string personReference, int year);
 
-        Task<List<CouncilTaxDocumentReference>> GetDocuments(string personReference);
+        Task<List<BenefitsClaimSummary>> GetBenefits (string personReference);
 
-        Task<List<CouncilTaxDocumentReference>> GetDocumentsWithAccountReference(string personReference, string accountReference);
+        Task<BenefitsClaim> GetBenefitDetails (string personReference, string claimReference, string placeReference);
 
-        Task<List<Places>> GetPropertiesOwned(string personReference);
+        Task<List<PaymentDetail>> GetHousingBenefitPaymentHistory (string personReference);
 
-        Task<Places> GetCurrentProperty(string personReference);
+        Task<List<PaymentDetail>> GetCouncilTaxBenefitPaymentHistory (string personReference);
 
-        Task<IEnumerable<CtaxActDetails>> GetAccounts(string personReference);
+        Task<List<CouncilTaxDocument>> GetDocuments (string personReference);
 
-        Task<CouncilTaxPaymentScheduleResponse> GetPaymentSchedule(string personReference, string year);
+        Task<List<CouncilTaxDocument>> GetDocumentsWithAccountReference (string personReference, string accountReference);
+
+        Task<List<Place>> GetPropertiesOwned (string personReference);
+
+        Task<Place> GetCurrentProperty (string personReference);
+
+        Task<List<CouncilTaxAccountDetails>> GetAccounts (string personReference);
+
+        Task<CouncilTaxPaymentSchedule> GetPaymentSchedule (string personReference, string year);
     }
 }

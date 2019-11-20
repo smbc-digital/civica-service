@@ -1,4 +1,3 @@
-using System;
 using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
@@ -41,7 +40,7 @@ namespace civica_service.Controllers
 
         [HttpGet]
         [Route("{personReference}/benefits")]
-        public async Task<IActionResult> GetBenefits([FromRoute][Required]string personReference)
+        public async Task<IActionResult> GetBenefits([FromRoute][Required] string personReference)
         {
             var model = await _civicaService.GetBenefits(personReference);
 
@@ -49,6 +48,32 @@ namespace civica_service.Controllers
         }
 
         [HttpGet]
+        [Route("{personReference}/benefits/{claimReference}/{placeReference}")]
+        public async Task<IActionResult> GetBenefitDetails([FromRoute][Required] string personReference, [FromRoute][Required] string claimReference, [FromRoute][Required] string placeReference)
+        {
+            var model = await _civicaService.GetBenefitDetails(personReference, claimReference, placeReference);
+
+            return StatusCode(StatusCodes.Status200OK, model);
+        }
+
+        [HttpGet]
+        [Route("{personReference}/benefits/housing")]
+        public async Task<IActionResult> GetHousingBenefitPaymentHistory([FromRoute][Required] string personReference)
+        {
+            var model = await _civicaService.GetHousingBenefitPaymentHistory(personReference);
+
+            return StatusCode(StatusCodes.Status200OK, model);
+        }
+
+        [HttpGet]
+        [Route("{personReference}/benefits/council-tax")]
+        public async Task<IActionResult> GetCouncilTaxBenefitPaymentHistory([FromRoute][Required] string personReference)
+        {
+            var model = await _civicaService.GetCouncilTaxBenefitPaymentHistory(personReference);
+
+            return StatusCode(StatusCodes.Status200OK, model);
+        }
+
         [Route("{personReference}/accounts")]
         public async Task<IActionResult> GetAccounts([FromRoute][Required]string personReference)
         {
@@ -62,6 +87,15 @@ namespace civica_service.Controllers
         public async Task<IActionResult> GetAccount([FromRoute][Required]string personReference, [FromRoute][Required]string accountReference)
         {
             var response = await _civicaService.GetCouncilTaxDetails(personReference, accountReference);
+
+            return Ok(response);
+        }
+
+        [HttpGet]
+        [Route("{personReference}/accounts/{accountReference}/{year}")]
+        public async Task<IActionResult> GetAccountDetailsForYear([FromRoute][Required]string personReference, [FromRoute][Required]string accountReference, [FromRoute][Required] string year)
+        {
+            var response = await _civicaService.GetCouncilTaxDetailsForYear(personReference, accountReference, year);
 
             return Ok(response);
         }

@@ -22,10 +22,10 @@
     <PackageReference Include="Serilog.Sinks.Console" Version="3.1.1" />
     <PackageReference Include="StockportGovUK.AspNetCore.Attributes.TokenAuthentication" Version="0.*" />
     <PackageReference Include="StockportGovUK.AspNetCore.Availability" Version="0.*" />
-    <PackageReference Include="StockportGovUK.AspNetCore.Gateways" Version="0.7.6-prerelease62" />
+    <PackageReference Include="StockportGovUK.AspNetCore.Gateways" Version="0.8.1" />
     <PackageReference Include="StockportGovUK.AspNetCore.Logging.Elasticsearch.Aws" Version="0.*" />
     <PackageReference Include="StockportGovUK.AspNetCore.Middleware.ExceptionHandling" Version="0.*" />
-    <PackageReference Include="StockportGovUK.NetStandard.Models" Version="0.3.8-prerelease136" />
+    <PackageReference Include="StockportGovUK.NetStandard.Models" Version="0.4.0" />
     <PackageReference Include="System.Text.RegularExpressions" Version="4.*" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="4.0.1" />
     <PackageReference Include="System.Net.Http" Version="4.3.4" />
@@ -35,10 +35,8 @@
     <PackageLicenseFile>License.txt</PackageLicenseFile>
     <LangVersion>7.1</LangVersion>
   </PropertyGroup>
+  
   <ItemGroup>
     <None Include="License.txt" Pack="true" PackagePath="$(PackageLicenseFile)" />
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Controllers\" />
   </ItemGroup>
 </Project>
