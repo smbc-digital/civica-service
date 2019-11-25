@@ -10,7 +10,7 @@ namespace civica_service_tests.Service
 {
     public class CivicaServiceTests
     {
-        private readonly CivicaService _service;
+        private readonly CivicaService _civicaService;
         private readonly Mock<IGateway> _mockGateway = new Mock<IGateway>();
         private readonly Mock<IQueryBuilder> _mockQueryBuilder = new Mock<IQueryBuilder>();
         private readonly Mock<ISessionProvider> _mockSessionProvider = new Mock<ISessionProvider>();
@@ -18,7 +18,7 @@ namespace civica_service_tests.Service
 
         public CivicaServiceTests()
         {
-            _service = new CivicaService(_mockGateway.Object, _mockQueryBuilder.Object, _mockSessionProvider.Object, _mockCacheProvider.Object);
+            _civicaService = new CivicaService(_mockGateway.Object, _mockQueryBuilder.Object, _mockSessionProvider.Object, _mockCacheProvider.Object);
         }
 
         [Fact]
@@ -30,11 +30,33 @@ namespace civica_service_tests.Service
                 .ReturnsAsync(It.IsAny<string>());
 
             //Act
-            await _service.GetSessionId(It.IsAny<string>());
+            await _civicaService.GetSessionId(It.IsAny<string>());
 
             //Assert
-            _service.Verify(_ => _.GetSessionId(It.IsAny<string>()), Times.Once);
-            _mockService.Verify(_ => _.GetPaymentSchedule(It.IsAny<string>(), It.IsAny<int>()), Times.Once);
+            _mockSessionProvider.Verify(_ => _.GetSessionId(It.IsAny<string>()), Times.Once);
+        }
+
+        [Fact]
+        public async void GetSessionId_ShouldReturnPersonReference()
+        {
+            //Arrange
+            _mockSessionProvider
+                .Setup(_ => _.GetSessionId(It.IsAny<string>()))
+                    .ReturnsAsync(It.IsAny<string>());
+
+            //Act
+            var result = await _civicaService.GetSessionId("test");
+
+            //Assert
+            Assert.Equal(It.IsAny<string>(), result);
+        }
+
+        [Fact]
+        public async void IsBenefitsClaimant_ShouldReturnIsBenefitsClaimant()
+        {
+            //Arrange
+
+          
         }
     }
 }
