@@ -26,10 +26,10 @@ namespace civica_service.Services
         private readonly IGateway _gateway;
         private readonly IQueryBuilder _queryBuilder;
         private readonly ISessionProvider _sessionProvider;
-        private readonly IDistributedCache _cacheProvider;
+        private readonly ICacheProvider _cacheProvider;
         private readonly IXmlParser _xmlParser;
 
-        public CivicaService(IGateway gateway, IQueryBuilder queryBuilder, ISessionProvider sessionProvider, IDistributedCache cacheProvider, IXmlParser xmlParser)
+        public CivicaService(IGateway gateway, IQueryBuilder queryBuilder, ISessionProvider sessionProvider, ICacheProvider cacheProvider, IXmlParser xmlParser)
         {
             _gateway = gateway;
             _queryBuilder = queryBuilder;

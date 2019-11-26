@@ -8,6 +8,7 @@ using civica_service.Helpers.QueryBuilder;
 using civica_service.Helpers.SessionProvider;
 using civica_service.Services;
 using civica_service.Services.Models;
+using civica_service.Utils.StorageProvider;
 using civica_service.Utils.Xml;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Caching.Memory;
@@ -26,7 +27,7 @@ namespace civica_service_tests.Service
         private readonly Mock<IGateway> _mockGateway = new Mock<IGateway>();
         private readonly Mock<IQueryBuilder> _mockQueryBuilder = new Mock<IQueryBuilder>();
         private readonly Mock<ISessionProvider> _mockSessionProvider = new Mock<ISessionProvider>();
-        private readonly Mock<IDistributedCache> _mockCacheProvider = new Mock<IDistributedCache>();
+        private readonly Mock<ICacheProvider> _mockCacheProvider = new Mock<ICacheProvider>();
         private readonly Mock<IXmlParser> _mockXmlParser = new Mock<IXmlParser>();
         private const string SessionId = "test-session-id";
 
