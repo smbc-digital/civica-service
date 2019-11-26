@@ -6,6 +6,7 @@ using civica_service.Helpers.SessionProvider.Models;
 using civica_service.Services;
 using civica_service.Utils.HealthChecks;
 using civica_service.Utils.StorageProvider;
+using civica_service.Utils.Xml;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
@@ -35,6 +36,7 @@ namespace civica_service
             services.AddSingleton<ICivicaService, CivicaService>();
             services.AddSingleton<ISessionProvider, SessionProvider>();
             services.AddTransient<IQueryBuilder, QueryBuilder>();
+            services.AddSingleton<IXmlParser, XmlParser>();
 
             services.AddStorageProvider(Configuration);
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);

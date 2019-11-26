@@ -4,16 +4,11 @@ using System.Xml.Serialization;
 
 namespace civica_service.Utils.Xml
 {
-    public static class XmlParser
+    public class XmlParser : IXmlParser
     {
-        public static T DeserializeXmlStringToType<T>(string xmlElement, string nodeName)
-        {
-            XElement xml = XElement.Parse(xmlElement);
+        public T DeserializeXmlStringToType<T>(string xmlElement, string nodeName) => DeserializeNodeToType<T>(XElement.Parse(xmlElement), nodeName);
 
-            return xml.DeserializeNodeToType<T>(nodeName);
-        }
-
-        public static T DeserializeNodeToType<T>(this XElement root, string nodeName)
+        public T DeserializeNodeToType<T>(XElement root, string nodeName)
         {
             var xmlSerializers = XmlSerializer.FromTypes(new[] { typeof(T) });
 

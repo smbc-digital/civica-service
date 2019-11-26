@@ -18,16 +18,20 @@ namespace civica_service.Helpers.SessionProvider
         private readonly IQueryBuilder _queryBuilder;
         private readonly SessionConfiguration _configuration;
         private readonly IDistributedCache _distributedCache;
+        private readonly IXmlParser _xmlParser;
+
         public SessionProvider(
             IGateway gateway, 
             IQueryBuilder queryBuilder, 
             IOptions<SessionConfiguration> configuration,
-            IDistributedCache distributedCache)
+            IDistributedCache distributedCache,
+            IXmlParser xmlParser)
         {
             _gateway = gateway;
             _queryBuilder = queryBuilder;
             _configuration = configuration.Value;
             _distributedCache = distributedCache;
+            _xmlParser = xmlParser;
         }
 
         public async Task<string> GetSessionId(string personReference)
@@ -46,7 +50,7 @@ namespace civica_service.Helpers.SessionProvider
 
             var response = await _gateway.GetAsync(url);
             var xmlResponse = await response.Content.ReadAsStringAsync();
-            var deserializedResponse = XmlParser.DeserializeXmlStringToType<SessionIdModel>(xmlResponse, "Login").Result;
+            var deserializedResponse = _xmlParser.DeserializeXmlStringToType<SessionIdModel>(xmlResponse, "Login").Result;
 
             if (!deserializedResponse.ErrorCode.Text.Equals("5"))
             {
@@ -78,9 +82,9 @@ namespace civica_service.Helpers.SessionProvider
                 .Add("personref", personReference)
                 .Build();
 
-            var resposne = await _gateway.GetAsync(url);
-            var xmlResponse = await resposne.Content.ReadAsStringAsync();
-            var result = XmlParser.DeserializeXmlStringToType<SetPersonModel>(xmlResponse, "SetPerson");
+            var response = await _gateway.GetAsync(url);
+            var xmlResponse = await response.Content.ReadAsStringAsync();
+            var result = _xmlParser.DeserializeXmlStringToType<SetPersonModel>(xmlResponse, "SetPerson");
 
             var matchingErrorCodes = new List<string>
             {

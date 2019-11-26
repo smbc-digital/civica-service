@@ -7,6 +7,7 @@ using System.Xml;
 using civica_service.Helpers.QueryBuilder;
 using civica_service.Helpers.SessionProvider;
 using civica_service.Services;
+using civica_service.Services.Models;
 using civica_service.Utils.Xml;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Caching.Memory;
@@ -26,6 +27,7 @@ namespace civica_service_tests.Service
         private readonly Mock<IQueryBuilder> _mockQueryBuilder = new Mock<IQueryBuilder>();
         private readonly Mock<ISessionProvider> _mockSessionProvider = new Mock<ISessionProvider>();
         private readonly Mock<IDistributedCache> _mockCacheProvider = new Mock<IDistributedCache>();
+        private readonly Mock<IXmlParser> _mockXmlParser = new Mock<IXmlParser>();
         private const string SessionId = "test-session-id";
 
         public CivicaServiceTests()
@@ -42,7 +44,7 @@ namespace civica_service_tests.Service
                 .Setup(_ => _.Build())
                 .Returns(string.Empty);
 
-            _civicaService = new CivicaService(_mockGateway.Object, _mockQueryBuilder.Object, _mockSessionProvider.Object, _mockCacheProvider.Object);
+            _civicaService = new CivicaService(_mockGateway.Object, _mockQueryBuilder.Object, _mockSessionProvider.Object, _mockCacheProvider.Object, _mockXmlParser.Object);
         }
 
         [Fact]
@@ -86,14 +88,23 @@ namespace civica_service_tests.Service
         [Fact]
         public async void GetAccounts_ShouldCallCorrectGatewayUrl()
         {
+            _mockXmlParser
+                .Setup(_ => _.DeserializeXmlStringToType<CtaxSelectDoc>(It.IsAny<string>(), It.IsAny<string>()))
+                .Returns(new CtaxSelectDoc
+                {
+                    CtaxActList = new CtaxActList()
+                });
+
             _mockGateway
                 .Setup(_ => _.GetAsync(It.IsAny<string>()))
                 .ReturnsAsync(new HttpResponseMessage
                 {
-                    Content = new StringContent("<CtaxSelectDoc><CtaxActList/></CtaxSelectDoc>")
+                    Content = new StringContent(string.Empty)
                 });
 
             _ = await _civicaService.GetAccounts("");
+
+            _mockXmlParser.Verify(_ => _.DeserializeXmlStringToType<CtaxSelectDoc>(It.IsAny<string>(), It.IsAny<string>()), Times.Once);
 
             _mockQueryBuilder.Verify(_ => _.Add("docid", "ctxsel"), Times.Once);
             _mockQueryBuilder.Verify(_ => _.Add("sessionId", SessionId), Times.Once);
