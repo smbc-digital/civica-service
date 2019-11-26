@@ -1,22 +1,15 @@
 ﻿using System.Collections.Generic;
-using System.Fabric;
 using System.Net.Http;
-using System.Text;
-using System.Threading;
-using System.Xml;
 using civica_service.Helpers.QueryBuilder;
 using civica_service.Helpers.SessionProvider;
 using civica_service.Services;
 using civica_service.Services.Models;
 using civica_service.Utils.StorageProvider;
 using civica_service.Utils.Xml;
-using Microsoft.Extensions.Caching.Distributed;
-using Microsoft.Extensions.Caching.Memory;
-using Microsoft.Extensions.Options;
 using Moq;
-using Newtonsoft.Json;
 using StockportGovUK.AspNetCore.Gateways;
 using StockportGovUK.NetStandard.Models.Models.Civica.CouncilTax;
+using StockportGovUK.NetStandard.Models.RevsAndBens;
 using Xunit;
 
 namespace civica_service_tests.Service
@@ -51,11 +44,6 @@ namespace civica_service_tests.Service
         [Fact]
         public async void GetSessionId_ShouldCallSessionProvider()
         {
-            //Arrange
-            _mockSessionProvider
-                .Setup(_ => _.GetSessionId(It.IsAny<string>()))
-                .ReturnsAsync(It.IsAny<string>());
-
             //Act
             await _civicaService.GetSessionId(It.IsAny<string>());
 
@@ -64,26 +52,13 @@ namespace civica_service_tests.Service
         }
 
         [Fact]
-        public async void GetSessionId_ShouldReturnPersonReference()
+        public async void GetSessionId_ShouldReturnSessionId()
         {
-            //Arrange
-            _mockSessionProvider
-                .Setup(_ => _.GetSessionId(It.IsAny<string>()))
-                    .ReturnsAsync(It.IsAny<string>());
-
             //Act
-            var result = await _civicaService.GetSessionId("test");
+            var result = await _civicaService.GetSessionId("test-session-id");
 
             //Assert
-            Assert.Equal(It.IsAny<string>(), result);
-        }
-
-        [Fact]
-        public async void IsBenefitsClaimant_ShouldReturnIsBenefitsClaimant()
-        {
-            //Arrange
-
-          
+            Assert.Equal(SessionId, result);
         }
 
         [Fact]
@@ -112,6 +87,48 @@ namespace civica_service_tests.Service
             _mockQueryBuilder.Verify(_ => _.Build(), Times.Once);
 
             _mockGateway.Verify(_ => _.GetAsync(It.IsAny<string>()), Times.Once);
+        }
+
+        [Fact]
+        public async void GetBenefits_ShouldCallSessionProvider()
+        {
+            // Act
+            await _civicaService.GetSessionId(It.IsAny<string>());
+
+            // Assert
+            _mockSessionProvider.Verify(_ => _.GetSessionId(It.IsAny<string>()), Times.Once);
+        }
+
+        [Fact]
+        public async void GetBenefits_ShouldCallGateway()
+        {
+            // Arrange
+            _mockXmlParser
+                .Setup(_ => _.DeserializeXmlStringToType<BenefitsClaimsSummaryResponse>(It.IsAny<string>(), It.IsAny<string>()))
+                .Returns(new BenefitsClaimsSummaryResponse
+                {
+                    Claims = new BenefitsClaimList
+                    {
+                        Summary = new List<BenefitsClaimSummary>()
+                    }
+                });
+
+            _mockGateway
+                .Setup(_ => _.PostAsync(It.IsAny<string>(), It.IsAny<object>()))
+                .ReturnsAsync(new HttpResponseMessage
+                {
+                    Content = new StringContent(string.Empty)
+                });
+
+            // Act
+            _ = await _civicaService.GetBenefits("");
+
+            // Assert
+            _mockXmlParser.Verify(_ => _.DeserializeXmlStringToType<BenefitsClaimsSummaryResponse>(It.IsAny<string>(), It.IsAny<string>()), Times.Once);
+            _mockQueryBuilder.Verify(_ => _.Add("docid", "hbsel"), Times.Once);
+            _mockQueryBuilder.Verify(_ => _.Add("sessionId", SessionId), Times.Once);
+            _mockQueryBuilder.Verify(_ => _.Build(), Times.Once);
+            _mockGateway.Verify(_ => _.PostAsync(It.IsAny<string>(), It.IsAny<object>()), Times.Once);
         }
     }
 }
