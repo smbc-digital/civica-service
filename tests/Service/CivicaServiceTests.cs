@@ -7,6 +7,7 @@ using civica_service.Services.Models;
 using civica_service.Utils.StorageProvider;
 using civica_service.Utils.Xml;
 using Moq;
+using Newtonsoft.Json;
 using StockportGovUK.AspNetCore.Gateways;
 using StockportGovUK.NetStandard.Models.Models.Civica.CouncilTax;
 using StockportGovUK.NetStandard.Models.RevsAndBens;
@@ -38,7 +39,12 @@ namespace civica_service_tests.Service
                 .Setup(_ => _.Build())
                 .Returns(string.Empty);
 
-            _civicaService = new CivicaService(_mockGateway.Object, _mockQueryBuilder.Object, _mockSessionProvider.Object, _mockCacheProvider.Object, _mockXmlParser.Object);
+            //_mockQueryBuilder
+            //    .Setup(_ => _.Add(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
+            //    .Returns(_mockQueryBuilder.Object);
+
+            _civicaService = new CivicaService(_mockGateway.Object, _mockQueryBuilder.Object,
+                _mockSessionProvider.Object, _mockCacheProvider.Object, _mockXmlParser.Object);
         }
 
         [Fact]
@@ -80,7 +86,8 @@ namespace civica_service_tests.Service
 
             _ = await _civicaService.GetAccounts("");
 
-            _mockXmlParser.Verify(_ => _.DeserializeXmlStringToType<CtaxSelectDoc>(It.IsAny<string>(), It.IsAny<string>()), Times.Once);
+            _mockXmlParser.Verify(
+                _ => _.DeserializeXmlStringToType<CtaxSelectDoc>(It.IsAny<string>(), It.IsAny<string>()), Times.Once);
 
             _mockQueryBuilder.Verify(_ => _.Add("docid", "ctxsel"), Times.Once);
             _mockQueryBuilder.Verify(_ => _.Add("sessionId", SessionId), Times.Once);
@@ -104,7 +111,8 @@ namespace civica_service_tests.Service
         {
             // Arrange
             _mockXmlParser
-                .Setup(_ => _.DeserializeXmlStringToType<BenefitsClaimsSummaryResponse>(It.IsAny<string>(), It.IsAny<string>()))
+                .Setup(_ => _.DeserializeXmlStringToType<BenefitsClaimsSummaryResponse>(It.IsAny<string>(),
+                    It.IsAny<string>()))
                 .Returns(new BenefitsClaimsSummaryResponse
                 {
                     Claims = new BenefitsClaimList
@@ -124,11 +132,153 @@ namespace civica_service_tests.Service
             _ = await _civicaService.GetBenefits("");
 
             // Assert
-            _mockXmlParser.Verify(_ => _.DeserializeXmlStringToType<BenefitsClaimsSummaryResponse>(It.IsAny<string>(), It.IsAny<string>()), Times.Once);
+            _mockXmlParser.Verify(
+                _ => _.DeserializeXmlStringToType<BenefitsClaimsSummaryResponse>(It.IsAny<string>(),
+                    It.IsAny<string>()), Times.Once);
             _mockQueryBuilder.Verify(_ => _.Add("docid", "hbsel"), Times.Once);
             _mockQueryBuilder.Verify(_ => _.Add("sessionId", SessionId), Times.Once);
             _mockQueryBuilder.Verify(_ => _.Build(), Times.Once);
             _mockGateway.Verify(_ => _.PostAsync(It.IsAny<string>(), It.IsAny<object>()), Times.Once);
+        }
+
+        [Fact]
+        public async void GetBenefits_ShouldCallCacheProvider_WithGetStringAsync()
+        {
+            // Arrange
+            var model = JsonConvert.SerializeObject(new List<BenefitsClaimSummary>());
+            _mockCacheProvider
+                .Setup(_ => _.GetStringAsync(It.IsAny<string>()))
+                .ReturnsAsync(model);
+
+            // Act
+            await _civicaService.GetBenefits(It.IsAny<string>());
+
+            // Assert
+            _mockCacheProvider.Verify(_ => _.GetStringAsync(It.IsAny<string>()));
+        }
+
+        [Fact]
+        public async void GetBenefits_ShouldCallCacheProvider_WithSetStringAsync()
+        {
+            // Arrange
+            _mockXmlParser
+                .Setup(_ => _.DeserializeXmlStringToType<BenefitsClaimsSummaryResponse>(It.IsAny<string>(),
+                    It.IsAny<string>()))
+                .Returns(new BenefitsClaimsSummaryResponse
+                {
+                    Claims = new BenefitsClaimList
+                    {
+                        Summary = new List<BenefitsClaimSummary>()
+                    }
+                });
+
+            _mockCacheProvider
+                .Setup(_ => _.SetStringAsync(It.IsAny<string>(), It.IsAny<string>()));
+
+            _mockGateway
+                .Setup(_ => _.PostAsync(It.IsAny<string>(), It.IsAny<object>()))
+                .ReturnsAsync(new HttpResponseMessage
+                {
+                    Content = new StringContent(string.Empty)
+                });
+
+            // Act
+            await _civicaService.GetBenefits((It.IsAny<string>()));
+
+            //Assert
+            _mockCacheProvider.Verify(_ => _.SetStringAsync(It.IsAny<string>(), It.IsAny<string>()));
+        }
+
+        [Fact]
+        public async void GetBenefitDetails_ShouldCallCacheProvider_WithGetStringAsync()
+        {
+            // Arrange
+            var model = JsonConvert.SerializeObject(new BenefitsClaim());
+            _mockCacheProvider
+                .Setup(_ => _.GetStringAsync(It.IsAny<string>()))
+                .ReturnsAsync(model);
+
+            // Act
+            await _civicaService.GetBenefitDetails(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>());
+
+            // Assert
+            _mockCacheProvider.Verify(_ => _.GetStringAsync(It.IsAny<string>()));
+        }
+
+        [Fact]
+        public async void GetBenefitDetails_ShouldCallCacheProvider_WithSetStringAsync()
+        {
+            // Arrange
+            _mockXmlParser
+                .Setup(_ => _.DeserializeXmlStringToType<BenefitsClaim>(It.IsAny<string>(),
+                    It.IsAny<string>()))
+                .Returns(new BenefitsClaim());
+
+            _mockCacheProvider
+                .Setup(_ => _.SetStringAsync(It.IsAny<string>(), It.IsAny<string>()));
+
+            _mockGateway
+                .Setup(_ => _.GetAsync(It.IsAny<string>()))
+                .ReturnsAsync(new HttpResponseMessage
+                {
+                    Content = new StringContent(string.Empty)
+                });
+
+            // Act
+            await _civicaService.GetBenefitDetails(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>());
+
+            //Assert
+            _mockCacheProvider.Verify(_ => _.SetStringAsync(It.IsAny<string>(), It.IsAny<string>()));
+        }
+
+        [Fact]
+        public async void GetBenefitDetails_ShouldCallSessionProvider()
+        {
+            // Act
+            await _civicaService.GetSessionId(It.IsAny<string>());
+
+            // Assert
+            _mockSessionProvider.Verify(_ => _.GetSessionId(It.IsAny<string>()), Times.Once);
+
+
+        }
+
+        [Fact]
+        public async void GetBenefitDetails_ShouldCallGateway()
+        {
+            // Arrange
+            _mockXmlParser
+                .Setup(_ => _.DeserializeXmlStringToType<BenefitsClaim>(It.IsAny<string>(),
+                    It.IsAny<string>()))
+                .Returns(new BenefitsClaim());
+
+            _mockCacheProvider
+                .Setup(_ => _.SetStringAsync(It.IsAny<string>(), It.IsAny<string>()));
+
+            _mockGateway
+                .Setup(_ => _.GetAsync(It.IsAny<string>()))
+                .ReturnsAsync(new HttpResponseMessage
+                {
+                    Content = new StringContent(string.Empty)
+                });
+
+            var claimReference = "test-claim-reference";
+            var placeReference = "test-place-reference";
+
+            // Act
+            _ = await _civicaService.GetBenefitDetails(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>());
+
+            // Assert
+            _mockXmlParser.Verify(
+                _ => _.DeserializeXmlStringToType<BenefitsClaim>(It.IsAny<string>(),
+                    It.IsAny<string>()), Times.Once);
+            _mockQueryBuilder.Verify(_ => _.Add("docid", "hbdet"), Times.Once);
+            _mockQueryBuilder.Verify(_ => _.Add("sessionId", SessionId), Times.Once);
+           // _mockQueryBuilder.Verify(_ => _.Add("claimref", claimReference), Times.Once);
+          //  _mockQueryBuilder.Verify(_ => _.Add("placeref", placeReference), Times.Once);
+
+            _mockQueryBuilder.Verify(_ => _.Build(), Times.Once);
+            _mockGateway.Verify(_ => _.GetAsync(It.IsAny<string>()), Times.Once);
         }
     }
 }
