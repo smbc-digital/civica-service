@@ -1,9 +1,20 @@
-﻿using civica_service.Helpers.QueryBuilder;
+﻿using System.Collections.Generic;
+using System.Fabric;
+using System.Net.Http;
+using System.Text;
+using System.Threading;
+using System.Xml;
+using civica_service.Helpers.QueryBuilder;
 using civica_service.Helpers.SessionProvider;
 using civica_service.Services;
+using civica_service.Utils.Xml;
 using Microsoft.Extensions.Caching.Distributed;
+using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Options;
 using Moq;
+using Newtonsoft.Json;
 using StockportGovUK.AspNetCore.Gateways;
+using StockportGovUK.NetStandard.Models.Models.Civica.CouncilTax;
 using Xunit;
 
 namespace civica_service_tests.Service
@@ -15,9 +26,22 @@ namespace civica_service_tests.Service
         private readonly Mock<IQueryBuilder> _mockQueryBuilder = new Mock<IQueryBuilder>();
         private readonly Mock<ISessionProvider> _mockSessionProvider = new Mock<ISessionProvider>();
         private readonly Mock<IDistributedCache> _mockCacheProvider = new Mock<IDistributedCache>();
+        private const string SessionId = "test-session-id";
 
         public CivicaServiceTests()
         {
+            _mockSessionProvider
+                .Setup(_ => _.GetSessionId(It.IsAny<string>()))
+                .ReturnsAsync(SessionId);
+
+            _mockQueryBuilder
+                .Setup(_ => _.Add(It.IsAny<string>(), It.IsAny<string>()))
+                .Returns(_mockQueryBuilder.Object);
+
+            _mockQueryBuilder
+                .Setup(_ => _.Build())
+                .Returns(string.Empty);
+
             _civicaService = new CivicaService(_mockGateway.Object, _mockQueryBuilder.Object, _mockSessionProvider.Object, _mockCacheProvider.Object);
         }
 
@@ -57,6 +81,25 @@ namespace civica_service_tests.Service
             //Arrange
 
           
+        }
+
+        [Fact]
+        public async void GetAccounts_ShouldCallCorrectGatewayUrl()
+        {
+            _mockGateway
+                .Setup(_ => _.GetAsync(It.IsAny<string>()))
+                .ReturnsAsync(new HttpResponseMessage
+                {
+                    Content = new StringContent("<CtaxSelectDoc><CtaxActList/></CtaxSelectDoc>")
+                });
+
+            _ = await _civicaService.GetAccounts("");
+
+            _mockQueryBuilder.Verify(_ => _.Add("docid", "ctxsel"), Times.Once);
+            _mockQueryBuilder.Verify(_ => _.Add("sessionId", SessionId), Times.Once);
+            _mockQueryBuilder.Verify(_ => _.Build(), Times.Once);
+
+            _mockGateway.Verify(_ => _.GetAsync(It.IsAny<string>()), Times.Once);
         }
     }
 }

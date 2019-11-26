@@ -16,7 +16,7 @@ namespace civica_service.Helpers.QueryBuilder
             _baseUrl = configuration.GetValue("QueryBuilderBaseUrl", string.Empty) + "?outputtype=xml";
         }
 
-        public QueryBuilder Add(string key, string value)
+        public IQueryBuilder Add(string key, string value)
         {
             _queryStrings.Add($"{HttpUtility.UrlEncode(key)}={HttpUtility.UrlEncode(value)}");
 

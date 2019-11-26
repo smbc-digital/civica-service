@@ -4,6 +4,6 @@
     {
         string Build();
 
-        QueryBuilder Add(string key, string value);
+        IQueryBuilder Add(string key, string value);
     }
 }
