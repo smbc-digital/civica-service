@@ -580,31 +580,46 @@ namespace civica_service_tests.Service
             _mockCacheProvider.Verify(_ => _.GetStringAsync(It.IsAny<string>()));
         }
 
+        //[Fact]
+        //public async void GetDocumentsWithAccountReference_ShouldCallCacheProvider_WithSetStringAsync()
+        //{
+        //    // Arrange
+        //    _mockCacheProvider
+        //        .Setup(_ => _.SetStringAsync(It.IsAny<string>(), It.IsAny<string>()));
+
+        //    // Act
+        //    await _civicaService.GetDocumentsWithAccountReference(It.IsAny<string>(), It.IsAny<string>());
+
+        //    //Assert
+        //    _mockCacheProvider.Verify(_ => _.SetStringAsync(It.IsAny<string>(), It.IsAny<string>()));
+        //}
+
         [Fact]
-        public async void GetDocumentsWithAccountReference_ShouldCallCacheProvider_WithSetStringAsync()
+        public async void GetPropertiesOwned_ShouldCallSessionProvider()
+        {
+            //Act
+            await _civicaService.GetSessionId(It.IsAny<string>());
+
+            //Assert
+            _mockSessionProvider.Verify(_ => _.GetSessionId(It.IsAny<string>()), Times.Once);
+        }
+
+        [Fact]
+        public async void GetPropertiesOwned_ShouldCallCacheProvider_WithGetStringAsync()
         {
             // Arrange
+            var model = JsonConvert.SerializeObject(new List<Place>());
             _mockCacheProvider
-                .Setup(_ => _.SetStringAsync(It.IsAny<string>(), It.IsAny<string>()));
+                .Setup(_ => _.GetStringAsync(It.IsAny<string>()))
+                .ReturnsAsync(model);
 
             // Act
-            await _civicaService.GetDocumentsWithAccountReference(It.IsAny<string>(), It.IsAny<string>());
+            await _civicaService.GetPropertiesOwned(It.IsAny<string>());
 
-            //Assert
-            _mockCacheProvider.Verify(_ => _.SetStringAsync(It.IsAny<string>(), It.IsAny<string>()));
-        }
-
-        [Fact]
-        public async void GetDocumentsWithAccountReference_WithCorrectAccountReference()
-        {
-            // Arrange
-
-
-            // Act
-
-
-            //Assert
+            // Assert
+            _mockCacheProvider.Verify(_ => _.GetStringAsync(It.IsAny<string>()));
 
         }
+
     }
 }
