@@ -43,12 +43,14 @@ namespace civica_service_tests.Service
                 .Setup(_ => _.Build())
                 .Returns(string.Empty);
 
-            //_mockQueryBuilder
-            //    .Setup(_ => _.Add(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
-            //    .Returns(_mockQueryBuilder.Object);
+            _mockGateway
+                .Setup(_ => _.GetAsync(It.IsAny<string>()))
+                .ReturnsAsync(new HttpResponseMessage
+                {
+                    Content = new StringContent(string.Empty)
+                });
 
-            _civicaService = new CivicaService(_mockGateway.Object, _mockQueryBuilder.Object,
-                _mockSessionProvider.Object, _mockCacheProvider.Object, _mockXmlParser.Object);
+            _civicaService = new CivicaService(_mockGateway.Object, _mockQueryBuilder.Object, _mockSessionProvider.Object, _mockCacheProvider.Object, _mockXmlParser.Object);
         }
 
         [Fact]
@@ -207,9 +209,6 @@ namespace civica_service_tests.Service
                 .Setup(_ => _.DeserializeXmlStringToType<BenefitsClaim>(It.IsAny<string>(),
                     It.IsAny<string>()))
                 .Returns(new BenefitsClaim());
-
-            _mockCacheProvider
-                .Setup(_ => _.SetStringAsync(It.IsAny<string>(), It.IsAny<string>()));
 
             _mockGateway
                 .Setup(_ => _.GetAsync(It.IsAny<string>()))
@@ -514,6 +513,172 @@ namespace civica_service_tests.Service
 
             _mockQueryBuilder.Verify(_ => _.Build(), Times.Once);
             _mockGateway.Verify(_ => _.GetAsync(It.IsAny<string>()), Times.Once);
+
+            _mockCacheProvider.Verify(_ => _.SetStringAsync(It.IsAny<string>(), It.IsAny<string>()), Times.Once);
+        }
+
+        [Fact]
+        public async void GetAccounts_ShouldGetModelFromCacheProvider()
+        {
+            var model = JsonConvert.SerializeObject(new List<CtaxActDetails>
+            {
+                new CtaxActDetails()
+            });
+
+            _mockCacheProvider
+                .Setup(_ => _.GetStringAsync(It.IsAny<string>()))
+                .ReturnsAsync(model);
+
+            _ = await _civicaService.GetAccounts("");
+
+            _mockCacheProvider.Verify(_ => _.GetStringAsync(It.IsAny<string>()), Times.Once);
+            _mockGateway.VerifyNoOtherCalls();
+        }
+
+        [Fact]
+        public async void GetPropertiesOwned_ShouldCallCorrectGatewayUrl()
+        {
+            _mockXmlParser
+                .Setup(_ => _.DeserializeXmlStringToType<CouncilTaxPropertyDetails>(It.IsAny<string>(), It.IsAny<string>()))
+                .Returns(new CouncilTaxPropertyDetails
+                {
+                    PropertyList = new civica_service.Services.Models.PropertyList()
+                });
+
+            _ = await _civicaService.GetPropertiesOwned("");
+
+            _mockXmlParser.Verify(_ => _.DeserializeXmlStringToType<CouncilTaxPropertyDetails>(It.IsAny<string>(), It.IsAny<string>()), Times.Once);
+
+            _mockQueryBuilder.Verify(_ => _.Add("docid", "ctxprop"), Times.Once);
+            _mockQueryBuilder.Verify(_ => _.Add("proplist", "y"), Times.Once);
+            _mockQueryBuilder.Verify(_ => _.Add("sessionId", SessionId), Times.Once);
+            _mockQueryBuilder.Verify(_ => _.Build(), Times.Once);
+
+            _mockGateway.Verify(_ => _.GetAsync(It.IsAny<string>()), Times.Once);
+
+            _mockCacheProvider.Verify(_ => _.SetStringAsync(It.IsAny<string>(), It.IsAny<string>()), Times.Once);
+        }
+
+        [Fact]
+        public async void GetPropertiesOwned_ShouldGetModelFromCacheProvider()
+        {
+            var model = JsonConvert.SerializeObject(new List<Place>());
+
+            _mockCacheProvider
+                .Setup(_ => _.GetStringAsync(It.IsAny<string>()))
+                .ReturnsAsync(model);
+
+            _ = await _civicaService.GetPropertiesOwned("");
+
+            _mockCacheProvider.Verify(_ => _.GetStringAsync(It.IsAny<string>()), Times.Once);
+            _mockGateway.VerifyNoOtherCalls();
+        }
+
+        [Fact]
+        public async void GetCurrentProperty_ShouldCallCorrectGatewayUrl()
+        {
+            _mockXmlParser
+                .Setup(_ => _.DeserializeXmlStringToType<CouncilTaxPropertyDetails>(It.IsAny<string>(), It.IsAny<string>()))
+                .Returns(new CouncilTaxPropertyDetails
+                {
+                    PropertyList = new civica_service.Services.Models.PropertyList
+                    {
+                        Places = new List<Place>
+                        {
+                            new Place(),
+                            new Place
+                            {
+                                Status = "Current"
+                            },
+                            new Place()
+                        }
+                    }
+                });
+
+            var response = await _civicaService.GetCurrentProperty("");
+
+            _mockXmlParser.Verify(_ => _.DeserializeXmlStringToType<CouncilTaxPropertyDetails>(It.IsAny<string>(), It.IsAny<string>()), Times.Once);
+
+            _mockQueryBuilder.Verify(_ => _.Add("docid", "ctxprop"), Times.Once);
+            _mockQueryBuilder.Verify(_ => _.Add("proplist", "y"), Times.Once);
+            _mockQueryBuilder.Verify(_ => _.Add("sessionId", SessionId), Times.Once);
+            _mockQueryBuilder.Verify(_ => _.Build(), Times.Once);
+
+            _mockGateway.Verify(_ => _.GetAsync(It.IsAny<string>()), Times.Once);
+
+            _mockCacheProvider.Verify(_ => _.SetStringAsync(It.IsAny<string>(), It.IsAny<string>()), Times.Exactly(2));
+
+            Assert.Equal("Current", response.Status);
+        }
+
+        [Fact]
+        public async void GetCurrentProperty_ShouldGetModelFromCacheProvider()
+        {
+            var model = JsonConvert.SerializeObject(new Place());
+
+            _mockCacheProvider
+                .Setup(_ => _.GetStringAsync(It.IsAny<string>()))
+                .ReturnsAsync(model);
+
+            var response = await _civicaService.GetCurrentProperty("");
+
+            _mockCacheProvider.Verify(_ => _.GetStringAsync(It.IsAny<string>()), Times.Once);
+            _mockGateway.VerifyNoOtherCalls();
+        }
+
+        [Fact]
+        public async void GetCouncilTaxDetailsForYear_ShouldCallCorrectGatewayUrl()
+        {
+            var personReference = "test-person-ref";
+            var accountReference = "test-account-ref";
+            var year = "2019";
+
+            _mockXmlParser
+                .Setup(_ => _.DeserializeXmlStringToType<CouncilTaxAccountSummary>(It.IsAny<string>(), It.IsAny<string>()))
+                .Returns(new CouncilTaxAccountSummary
+                {
+                    FinancialDetails = new FinancialDetails()
+                });
+
+            _ = await _civicaService.GetCouncilTaxDetailsForYear(personReference, accountReference, year);
+
+            _mockXmlParser.Verify(_ => _.DeserializeXmlStringToType<CouncilTaxAccountSummary>(It.IsAny<string>(), It.IsAny<string>()), Times.Once);
+
+            _mockQueryBuilder.Verify(_ => _.Add("docid", "ctxdet"), Times.Once);
+            _mockQueryBuilder.Verify(_ => _.Add("actref", accountReference), Times.Once);
+            _mockQueryBuilder.Verify(_ => _.Add("year", year), Times.Once);
+            _mockQueryBuilder.Verify(_ => _.Add("sessionId", SessionId), Times.Once);
+            _mockQueryBuilder.Verify(_ => _.Build(), Times.Once);
+
+            _mockGateway.Verify(_ => _.GetAsync(It.IsAny<string>()), Times.Once);
+
+            _mockCacheProvider.Verify(_ => _.SetStringAsync(It.IsAny<string>(), It.IsAny<string>()), Times.Once);
+        }
+
+        [Fact]
+        public async void GetCouncilTaxDetailsForYear_ShouldGetModelFromCacheProvider()
+        {
+            var personReference = "test-person-ref";
+            var accountReference = "test-account-ref";
+            var year = "2019";
+
+            var model = JsonConvert.SerializeObject(new RecievedYearTotal
+            {
+                TotalCharge = "400",
+                TotalPayments = "500",
+                BalanceOutstanding = "500",
+                TotalBenefits = "500"
+            });
+
+            _mockCacheProvider
+                .Setup(_ => _.GetStringAsync(It.IsAny<string>()))
+                .ReturnsAsync(model);
+
+
+            _ = await _civicaService.GetCouncilTaxDetailsForYear(personReference, accountReference, year);
+
+            _mockCacheProvider.Verify(_ => _.GetStringAsync(It.IsAny<string>()), Times.Once);
+            _mockGateway.VerifyNoOtherCalls();
         }
 
         [Fact]

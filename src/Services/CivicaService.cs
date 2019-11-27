@@ -352,11 +352,11 @@ namespace civica_service.Services
             var response = await _gateway.GetAsync(url);
             var responseContent = await response.Content.ReadAsStringAsync();
             var parsedResponse = _xmlParser.DeserializeXmlStringToType<CouncilTaxAccountSummary>(responseContent, "CtaxDetails");
-            var recievedYearTotals = parsedResponse.FinancialDetails.RecievedYearTotal;
+            var receivedYearTotals = parsedResponse.FinancialDetails.RecievedYearTotal;
 
-            _ = _cacheProvider.SetStringAsync($"{personReference}-{CacheKeys.CouncilTaxAccountForYear}", JsonConvert.SerializeObject(recievedYearTotals));
+            _ = _cacheProvider.SetStringAsync($"{personReference}-{CacheKeys.CouncilTaxAccountForYear}", JsonConvert.SerializeObject(receivedYearTotals));
 
-            return recievedYearTotals;
+            return receivedYearTotals;
         }
 
         public async Task<List<Transaction>> GetAllTransactionsForYear(string personReference, int year)
