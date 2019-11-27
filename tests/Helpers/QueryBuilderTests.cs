@@ -4,7 +4,7 @@ using Microsoft.Extensions.Configuration;
 using Moq;
 using Xunit;
 
-namespace civica_service_tests.Utils
+namespace civica_service_tests.Helpers
 {
     public class QueryBuilderTests
     {
