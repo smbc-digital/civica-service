@@ -5,9 +5,7 @@ using civica_service.Helpers.QueryBuilder;
 using civica_service.Helpers.SessionProvider.Models;
 using civica_service.Utils.Xml;
 using Microsoft.Extensions.Options;
-using Microsoft.Extensions.Caching.Distributed;
 using StockportGovUK.AspNetCore.Gateways;
-using Newtonsoft.Json;
 using civica_service.Utils.StorageProvider;
 
 namespace civica_service.Helpers.SessionProvider
@@ -17,14 +15,14 @@ namespace civica_service.Helpers.SessionProvider
         private readonly IGateway _gateway;
         private readonly IQueryBuilder _queryBuilder;
         private readonly SessionConfiguration _configuration;
-        private readonly IDistributedCache _distributedCache;
+        private readonly ICacheProvider _distributedCache;
         private readonly IXmlParser _xmlParser;
 
         public SessionProvider(
             IGateway gateway, 
             IQueryBuilder queryBuilder, 
             IOptions<SessionConfiguration> configuration,
-            IDistributedCache distributedCache,
+            ICacheProvider distributedCache,
             IXmlParser xmlParser)
         {
             _gateway = gateway;
@@ -36,7 +34,7 @@ namespace civica_service.Helpers.SessionProvider
 
         public async Task<string> GetSessionId(string personReference)
         {
-            var cacheResponse = _distributedCache.GetString($"{personReference}-{CacheKeys.SessionId}");
+            var cacheResponse = await _distributedCache.GetStringAsync($"{personReference}-{CacheKeys.SessionId}");
             if (!string.IsNullOrEmpty(cacheResponse))
             {
                 return cacheResponse;
