@@ -50,6 +50,13 @@ namespace civica_service_tests.Service
                     Content = new StringContent(string.Empty)
                 });
 
+            _mockGateway
+              .Setup(_ => _.PostAsync(It.IsAny<string>(), It.IsAny<object>()))
+              .ReturnsAsync(new HttpResponseMessage
+              {
+                  Content = new StringContent(string.Empty)
+              });
+
             _civicaService = new CivicaService(_mockGateway.Object, _mockQueryBuilder.Object, _mockSessionProvider.Object, _mockCacheProvider.Object, _mockXmlParser.Object);
         }
 
@@ -83,13 +90,6 @@ namespace civica_service_tests.Service
                     CtaxActList = new CtaxActList()
                 });
 
-            _mockGateway
-                .Setup(_ => _.GetAsync(It.IsAny<string>()))
-                .ReturnsAsync(new HttpResponseMessage
-                {
-                    Content = new StringContent(string.Empty)
-                });
-
             _ = await _civicaService.GetAccounts("");
 
             _mockXmlParser.Verify(
@@ -115,13 +115,6 @@ namespace civica_service_tests.Service
                     {
                         Summary = new List<BenefitsClaimSummary>()
                     }
-                });
-
-            _mockGateway
-                .Setup(_ => _.PostAsync(It.IsAny<string>(), It.IsAny<object>()))
-                .ReturnsAsync(new HttpResponseMessage
-                {
-                    Content = new StringContent(string.Empty)
                 });
 
             // Act
@@ -150,7 +143,7 @@ namespace civica_service_tests.Service
             await _civicaService.GetBenefits(It.IsAny<string>());
 
             // Assert
-            _mockCacheProvider.Verify(_ => _.GetStringAsync(It.IsAny<string>()));
+            _mockCacheProvider.Verify(_ => _.GetStringAsync(It.IsAny<string>()), Times.Once);
         }
 
         [Fact]
@@ -166,16 +159,6 @@ namespace civica_service_tests.Service
                     {
                         Summary = new List<BenefitsClaimSummary>()
                     }
-                });
-
-            _mockCacheProvider
-                .Setup(_ => _.SetStringAsync(It.IsAny<string>(), It.IsAny<string>()));
-
-            _mockGateway
-                .Setup(_ => _.PostAsync(It.IsAny<string>(), It.IsAny<object>()))
-                .ReturnsAsync(new HttpResponseMessage
-                {
-                    Content = new StringContent(string.Empty)
                 });
 
             // Act
@@ -198,7 +181,7 @@ namespace civica_service_tests.Service
             await _civicaService.GetBenefitDetails(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>());
 
             // Assert
-            _mockCacheProvider.Verify(_ => _.GetStringAsync(It.IsAny<string>()));
+            _mockCacheProvider.Verify(_ => _.GetStringAsync(It.IsAny<string>()), Times.Once);
         }
 
         [Fact]
@@ -210,18 +193,11 @@ namespace civica_service_tests.Service
                     It.IsAny<string>()))
                 .Returns(new BenefitsClaim());
 
-            _mockGateway
-                .Setup(_ => _.GetAsync(It.IsAny<string>()))
-                .ReturnsAsync(new HttpResponseMessage
-                {
-                    Content = new StringContent(string.Empty)
-                });
-
             // Act
             await _civicaService.GetBenefitDetails(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>());
 
             //Assert
-            _mockCacheProvider.Verify(_ => _.SetStringAsync(It.IsAny<string>(), It.IsAny<string>()));
+            _mockCacheProvider.Verify(_ => _.SetStringAsync(It.IsAny<string>(), It.IsAny<string>()), Times.Once);
         }
 
         [Fact]
@@ -232,16 +208,6 @@ namespace civica_service_tests.Service
                 .Setup(_ => _.DeserializeXmlStringToType<BenefitsClaim>(It.IsAny<string>(),
                     It.IsAny<string>()))
                 .Returns(new BenefitsClaim());
-
-            _mockCacheProvider
-                .Setup(_ => _.SetStringAsync(It.IsAny<string>(), It.IsAny<string>()));
-
-            _mockGateway
-                .Setup(_ => _.GetAsync(It.IsAny<string>()))
-                .ReturnsAsync(new HttpResponseMessage
-                {
-                    Content = new StringContent(string.Empty)
-                });
 
             // Act
             _ = await _civicaService.GetBenefitDetails(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>());
@@ -272,7 +238,7 @@ namespace civica_service_tests.Service
             await _civicaService.GetHousingBenefitPaymentHistory(It.IsAny<string>());
 
             // Assert
-            _mockCacheProvider.Verify(_ => _.GetStringAsync(It.IsAny<string>()));
+            _mockCacheProvider.Verify(_ => _.GetStringAsync(It.IsAny<string>()), Times.Once);
 
         }
 
@@ -291,21 +257,11 @@ namespace civica_service_tests.Service
                     }
                 });
 
-            _mockCacheProvider
-                .Setup(_ => _.SetStringAsync(It.IsAny<string>(), It.IsAny<string>()));
-
-            _mockGateway
-                .Setup(_ => _.GetAsync(It.IsAny<string>()))
-                .ReturnsAsync(new HttpResponseMessage
-                {
-                    Content = new StringContent(string.Empty)
-                });
-
             // Act
             await _civicaService.GetHousingBenefitPaymentHistory((It.IsAny<string>()));
 
             //Assert
-            _mockCacheProvider.Verify(_ => _.SetStringAsync(It.IsAny<string>(), It.IsAny<string>()));
+            _mockCacheProvider.Verify(_ => _.SetStringAsync(It.IsAny<string>(), It.IsAny<string>()), Times.Once);
         }
 
         [Fact]
@@ -321,13 +277,6 @@ namespace civica_service_tests.Service
                     {
                         PaymentDetails = new List<PaymentDetail>()
                     }
-                });
-
-            _mockGateway
-                .Setup(_ => _.GetAsync(It.IsAny<string>()))
-                .ReturnsAsync(new HttpResponseMessage
-                {
-                    Content = new StringContent(string.Empty)
                 });
 
             // Act
@@ -357,7 +306,7 @@ namespace civica_service_tests.Service
             await _civicaService.GetCouncilTaxBenefitPaymentHistory(It.IsAny<string>());
 
             // Assert
-            _mockCacheProvider.Verify(_ => _.GetStringAsync(It.IsAny<string>()));
+            _mockCacheProvider.Verify(_ => _.GetStringAsync(It.IsAny<string>()), Times.Once);
         }
 
         [Fact]
@@ -375,21 +324,11 @@ namespace civica_service_tests.Service
                     }
                 });
 
-            _mockCacheProvider
-                .Setup(_ => _.SetStringAsync(It.IsAny<string>(), It.IsAny<string>()));
-
-            _mockGateway
-                .Setup(_ => _.GetAsync(It.IsAny<string>()))
-                .ReturnsAsync(new HttpResponseMessage
-                {
-                    Content = new StringContent(string.Empty)
-                });
-
             // Act
             await _civicaService.GetCouncilTaxBenefitPaymentHistory((It.IsAny<string>()));
 
             //Assert
-            _mockCacheProvider.Verify(_ => _.SetStringAsync(It.IsAny<string>(), It.IsAny<string>()));
+            _mockCacheProvider.Verify(_ => _.SetStringAsync(It.IsAny<string>(), It.IsAny<string>()), Times.Once);
         }
 
         [Fact]
@@ -409,13 +348,6 @@ namespace civica_service_tests.Service
 
             _mockCacheProvider
                 .Setup(_ => _.SetStringAsync(It.IsAny<string>(), It.IsAny<string>()));
-
-            _mockGateway
-                .Setup(_ => _.GetAsync(It.IsAny<string>()))
-                .ReturnsAsync(new HttpResponseMessage
-                {
-                    Content = new StringContent(string.Empty)
-                });
 
             // Act
             _ = await _civicaService.GetCouncilTaxBenefitPaymentHistory(It.IsAny<string>());
@@ -445,7 +377,7 @@ namespace civica_service_tests.Service
             await _civicaService.GetDocuments(It.IsAny<string>());
 
             // Assert
-            _mockCacheProvider.Verify(_ => _.GetStringAsync(It.IsAny<string>()));
+            _mockCacheProvider.Verify(_ => _.GetStringAsync(It.IsAny<string>()), Times.Once);
         }
 
         [Fact]
@@ -460,21 +392,11 @@ namespace civica_service_tests.Service
                     DocumentList = new CouncilTaxDocumentReference[5]
                 });
 
-            _mockCacheProvider
-                .Setup(_ => _.SetStringAsync(It.IsAny<string>(), It.IsAny<string>()));
-
-            _mockGateway
-                .Setup(_ => _.GetAsync(It.IsAny<string>()))
-                .ReturnsAsync(new HttpResponseMessage
-                {
-                    Content = new StringContent(string.Empty)
-                });
-
             // Act
             await _civicaService.GetDocuments((It.IsAny<string>()));
 
             //Assert
-            _mockCacheProvider.Verify(_ => _.SetStringAsync(It.IsAny<string>(), It.IsAny<string>()));
+            _mockCacheProvider.Verify(_ => _.SetStringAsync(It.IsAny<string>(), It.IsAny<string>()), Times.Once);
         }
 
         [Fact]
@@ -487,16 +409,6 @@ namespace civica_service_tests.Service
                 .Returns(new CouncilTaxDocumentsResponse
                 {
                     DocumentList = new CouncilTaxDocumentReference[5]
-                });
-
-            _mockCacheProvider
-                .Setup(_ => _.SetStringAsync(It.IsAny<string>(), It.IsAny<string>()));
-
-            _mockGateway
-                .Setup(_ => _.GetAsync(It.IsAny<string>()))
-                .ReturnsAsync(new HttpResponseMessage
-                {
-                    Content = new StringContent(string.Empty)
                 });
 
             // Act
@@ -694,16 +606,13 @@ namespace civica_service_tests.Service
             await _civicaService.GetDocumentsWithAccountReference(It.IsAny<string>(), It.IsAny<string>());
 
             // Assert
-            _mockCacheProvider.Verify(_ => _.GetStringAsync(It.IsAny<string>()));
+            _mockCacheProvider.Verify(_ => _.GetStringAsync(It.IsAny<string>()), Times.Once);
         }
 
         [Fact]
         public async void GetDocumentsWithAccountReference_ShouldCallCacheProvider_WithSetStringAsync()
         {
             // Arrange
-            _mockCacheProvider
-                .Setup(_ => _.SetStringAsync(It.IsAny<string>(), It.IsAny<string>()));
-
             _mockXmlParser
                  .Setup(_ => _.DeserializeXmlStringToType<CouncilTaxDocumentsResponse>(It.IsAny<string>(),
                      It.IsAny<string>()))
@@ -719,19 +628,44 @@ namespace civica_service_tests.Service
                      }
                  });
 
-            _mockGateway
-                .Setup(_ => _.GetAsync(It.IsAny<string>()))
-                .ReturnsAsync(new HttpResponseMessage
-                {
-                    Content = new StringContent(string.Empty)
-                });
-
             // Act
-            var result = await _civicaService.GetDocuments("test");
+            await _civicaService.GetDocuments("test");
             await _civicaService.GetDocumentsWithAccountReference(It.IsAny<string>(), It.IsAny<string>());
 
             //Assert
             _mockCacheProvider.Verify(_ => _.SetStringAsync(It.IsAny<string>(), It.IsAny<string>()));
+        }
+
+        [Fact]
+        public async void GetCouncilTaxDetails_ShouldCallCacheProvider_WithGetStringAsync()
+        {
+            // Arrange
+            var model = JsonConvert.SerializeObject(new CouncilTaxAccountResponse());
+            _mockCacheProvider
+                .Setup(_ => _.GetStringAsync(It.IsAny<string>()))
+                .ReturnsAsync(model);
+
+            // Act
+            await _civicaService.GetCouncilTaxDetails(It.IsAny<string>(), It.IsAny<string>());
+
+            // Assert
+            _mockCacheProvider.Verify(_ => _.GetStringAsync(It.IsAny<string>()), Times.Once);
+        }
+
+        [Fact]
+        public async void GetCouncilTaxDetails_ShouldCallCacheProvider_WithSetStringAsync()
+        {
+            // Arrange
+            _mockXmlParser
+                .Setup(_ => _.DeserializeXmlStringToType<CouncilTaxAccountResponse>(It.IsAny<string>(),
+                    It.IsAny<string>()))
+                .Returns(new CouncilTaxAccountResponse());
+
+            // Act
+            await _civicaService.GetCouncilTaxDetails(It.IsAny<string>(), It.IsAny<string>());
+
+            //Assert
+            _mockCacheProvider.Verify(_ => _.SetStringAsync(It.IsAny<string>(), It.IsAny<string>()), Times.Once);
         }
     }
 }
