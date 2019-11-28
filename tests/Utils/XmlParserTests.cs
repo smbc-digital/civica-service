@@ -1,4 +1,6 @@
 ﻿using civica_service.Utils.Xml;
+using System.Xml.Linq;
+using System.Xml.Serialization;
 using Xunit;
 
 namespace civica_service_tests.Utils
@@ -6,6 +8,7 @@ namespace civica_service_tests.Utils
     public class XmlParserTests
     {
         private readonly XmlParser _xmlParser;
+        private const string elementValue = "test";
 
         public XmlParserTests()
         {
@@ -13,25 +16,23 @@ namespace civica_service_tests.Utils
         }
 
         [Fact]
-        public async void DeserializeXmlStringToType()
+        public void DeserializeXmlStringToType_ReturnsCorrectValue()
         {
             // Act
-            var result = _xmlParser.DeserializeXmlStringToType<XmlParserModel>("<Root><Element>test</Element></Root>", "Root");
+            var result = _xmlParser.DeserializeXmlStringToType<XmlParserModel>($"<Root><Element>{elementValue}</Element></Root>", "Root");
 
             // Assert
-            Assert.Equal("test", "test");
+            Assert.Equal(elementValue, result.XmlParserTest);
         }
 
         [Fact]
-        public async void DeserializeNodeToType ()
+        public void DeserializeNodeToType_ReturnsCorrectValue()
         {
-            // Arrange
-
-
             // Act
-
+            var test = _xmlParser.DeserializeNodeToType<XmlParserModel>(XElement.Parse($"<Root><Element>{elementValue}</Element></Root>"), "Root");
 
             // Assert
+            Assert.Equal(elementValue, test.XmlParserTest);
         }
     }
 }
