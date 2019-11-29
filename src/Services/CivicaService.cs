@@ -379,7 +379,7 @@ namespace civica_service.Services
 
             var response = await _gateway.GetAsync(url);
             var content = await response.Content.ReadAsStringAsync();
-            var parsedResponse = _xmlParser.DeserializeXmlStringToType<TransactionListModel>(content, "tranList");
+            var parsedResponse = _xmlParser.DeserializeXmlStringToType<TransactionListModel>(content, "TranList");
             var transactions = parsedResponse.Transaction;
 
             _ = _cacheProvider.SetStringAsync($"{personReference}-{CacheKeys.Transactions}", JsonConvert.SerializeObject(transactions));
