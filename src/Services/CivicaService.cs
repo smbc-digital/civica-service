@@ -85,7 +85,8 @@ namespace civica_service.Services
 
         public async Task<BenefitsClaim> GetBenefitDetails(string personReference, string claimReference, string placeReference)
         {
-            var cacheResponse = await _cacheProvider.GetStringAsync($"{personReference}-{CacheKeys.ClaimDetails}");
+            var key = $"{personReference}-{claimReference}-{placeReference}-{CacheKeys.ClaimDetails}";
+            var cacheResponse = await _cacheProvider.GetStringAsync(key);
 
             if (!string.IsNullOrEmpty(cacheResponse))
             {
@@ -105,7 +106,7 @@ namespace civica_service.Services
             var responseContent = await response.Content.ReadAsStringAsync();
             var parsedResponse = _xmlParser.DeserializeXmlStringToType<BenefitsClaim>(responseContent, "HBClaimDetails");
 
-            _ = _cacheProvider.SetStringAsync($"{personReference}-{CacheKeys.ClaimDetails}", JsonConvert.SerializeObject(parsedResponse));
+            _ = _cacheProvider.SetStringAsync(key, JsonConvert.SerializeObject(parsedResponse));
 
             return parsedResponse;
         }
@@ -193,7 +194,8 @@ namespace civica_service.Services
 
         public async Task<List<CouncilTaxDocumentReference>> GetDocumentsWithAccountReference(string personReference, string accountReference)
         {
-            var cacheResponse = await _cacheProvider.GetStringAsync($"{personReference}-{CacheKeys.CouncilTaxDocumentsByReference}");
+            var key = $"{personReference}-{accountReference}-{CacheKeys.CouncilTaxDocumentsByReference}";
+            var cacheResponse = await _cacheProvider.GetStringAsync(key);
 
             if (!string.IsNullOrEmpty(cacheResponse))
             {
@@ -205,7 +207,7 @@ namespace civica_service.Services
                 .Where(_ => _.AccountReference == accountReference)
                 .ToList();
 
-            _ = _cacheProvider.SetStringAsync($"{personReference}-{CacheKeys.CouncilTaxDocumentsByReference}", JsonConvert.SerializeObject(filteredDocuments));
+            _ = _cacheProvider.SetStringAsync(key, JsonConvert.SerializeObject(filteredDocuments));
 
             return filteredDocuments;
         }
@@ -285,7 +287,8 @@ namespace civica_service.Services
 
         public async Task<CouncilTaxPaymentScheduleResponse> GetPaymentSchedule(string personReference, int year)
         {
-            var cacheResponse = await _cacheProvider.GetStringAsync($"{personReference}-{CacheKeys.CouncilTaxPaymentSchedule}");
+            var key = $"{personReference}-{year}-{CacheKeys.CouncilTaxPaymentSchedule}";
+            var cacheResponse = await _cacheProvider.GetStringAsync(key);
 
             if (!string.IsNullOrEmpty(cacheResponse))
             {
@@ -306,14 +309,15 @@ namespace civica_service.Services
             var responseContent = await response.Content.ReadAsStringAsync();
             var parsedResponse = _xmlParser.DeserializeXmlStringToType<CouncilTaxPaymentScheduleResponse>(responseContent, "IRInstalments");
 
-            _ = _cacheProvider.SetStringAsync($"{personReference}-{CacheKeys.CouncilTaxPaymentSchedule}", JsonConvert.SerializeObject(parsedResponse));
+            _ = _cacheProvider.SetStringAsync(key, JsonConvert.SerializeObject(parsedResponse));
 
             return parsedResponse;
         }
 
         public async Task<CouncilTaxAccountResponse> GetCouncilTaxDetails(string personReference, string accountReference)
         {
-            var cacheResponse = await _cacheProvider.GetStringAsync($"{personReference}-{CacheKeys.CouncilTaxAccount}");
+            var key = $"{personReference}-{accountReference}-{CacheKeys.CouncilTaxAccount}";
+            var cacheResponse = await _cacheProvider.GetStringAsync(key);
 
             if (!string.IsNullOrEmpty(cacheResponse))
             {
@@ -332,14 +336,15 @@ namespace civica_service.Services
             var responseContent = await response.Content.ReadAsStringAsync();
             var parsedResponse = _xmlParser.DeserializeXmlStringToType<CouncilTaxAccountResponse>(responseContent, "CtaxDetails");
 
-            _ = _cacheProvider.SetStringAsync($"{personReference}-{CacheKeys.CouncilTaxAccount}", JsonConvert.SerializeObject(parsedResponse));
+            _ = _cacheProvider.SetStringAsync(key, JsonConvert.SerializeObject(parsedResponse));
 
             return parsedResponse;
         }
 
         public async Task<RecievedYearTotal> GetCouncilTaxDetailsForYear(string personReference, string accountReference, string year)
         {
-            var cacheResponse = await _cacheProvider.GetStringAsync($"{personReference}-{CacheKeys.CouncilTaxAccountForYear}");
+            var key = $"{personReference}-{accountReference}-{year}-{CacheKeys.CouncilTaxAccountForYear}";
+            var cacheResponse = await _cacheProvider.GetStringAsync(key);
 
             if (!string.IsNullOrEmpty(cacheResponse))
             {
@@ -360,14 +365,15 @@ namespace civica_service.Services
             var parsedResponse = _xmlParser.DeserializeXmlStringToType<CouncilTaxAccountSummary>(responseContent, "CtaxDetails");
             var receivedYearTotals = parsedResponse.FinancialDetails.RecievedYearTotal;
 
-            _ = _cacheProvider.SetStringAsync($"{personReference}-{CacheKeys.CouncilTaxAccountForYear}", JsonConvert.SerializeObject(receivedYearTotals));
+            _ = _cacheProvider.SetStringAsync(key, JsonConvert.SerializeObject(receivedYearTotals));
 
             return receivedYearTotals;
         }
 
         public async Task<List<Transaction>> GetAllTransactionsForYear(string personReference, int year)
         {
-            var cacheResponse = await _cacheProvider.GetStringAsync($"{personReference}-{CacheKeys.Transactions}");
+            var key = $"{personReference}-{year}-{CacheKeys.Transactions}";
+            var cacheResponse = await _cacheProvider.GetStringAsync(key);
 
             if (!string.IsNullOrEmpty(cacheResponse))
             {
@@ -388,7 +394,7 @@ namespace civica_service.Services
             var parsedResponse = _xmlParser.DeserializeXmlStringToType<TransactionListModel>(content, "TranList");
             var transactions = parsedResponse.Transaction;
 
-            _ = _cacheProvider.SetStringAsync($"{personReference}-{CacheKeys.Transactions}", JsonConvert.SerializeObject(transactions));
+            _ = _cacheProvider.SetStringAsync(key, JsonConvert.SerializeObject(transactions));
 
             return transactions;
         }

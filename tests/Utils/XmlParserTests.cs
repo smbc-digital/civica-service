@@ -1,6 +1,5 @@
 ﻿using civica_service.Utils.Xml;
 using System.Xml.Linq;
-using System.Xml.Serialization;
 using Xunit;
 
 namespace civica_service_tests.Utils
