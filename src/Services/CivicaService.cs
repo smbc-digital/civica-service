@@ -5,19 +5,17 @@ using System.Text;
 using System.Threading.Tasks;
 using civica_service.Helpers.QueryBuilder;
 using civica_service.Helpers.SessionProvider;
-using civica_service.Helpers.SessionProvider.Models;
 using civica_service.Services.Models;
 using civica_service.Utils.StorageProvider;
 using civica_service.Utils.Xml;
-using Microsoft.Extensions.Caching.Distributed;
 using Newtonsoft.Json;
 using StockportGovUK.AspNetCore.Gateways;
-using StockportGovUK.NetStandard.Models.Models.Civica.CouncilTax;
+using StockportGovUK.NetStandard.Models.Civica.CouncilTax;
 using StockportGovUK.NetStandard.Models.RevsAndBens;
-using CouncilTaxAccountResponse = StockportGovUK.NetStandard.Models.Models.Civica.CouncilTax.CouncilTaxAccountResponse;
-using CouncilTaxDocumentsResponse = StockportGovUK.NetStandard.Models.Models.Civica.CouncilTax.CouncilTaxDocumentsResponse;
-using CtaxSelectDoc = StockportGovUK.NetStandard.Models.Models.Civica.CouncilTax.CtaxSelectDoc;
-using Transaction = StockportGovUK.NetStandard.Models.Models.Civica.CouncilTax.Transaction;
+using CouncilTaxAccountResponse = StockportGovUK.NetStandard.Models.Civica.CouncilTax.CouncilTaxAccountResponse;
+using CouncilTaxDocumentsResponse = StockportGovUK.NetStandard.Models.Civica.CouncilTax.CouncilTaxDocumentsResponse;
+using CtaxSelectDoc = StockportGovUK.NetStandard.Models.Civica.CouncilTax.CtaxSelectDoc;
+using Transaction = StockportGovUK.NetStandard.Models.Civica.CouncilTax.Transaction;
 
 namespace civica_service.Services
 {
@@ -389,7 +387,7 @@ namespace civica_service.Services
 
             var response = await _gateway.GetAsync(url);
             var content = await response.Content.ReadAsStringAsync();
-            var parsedResponse = _xmlParser.DeserializeXmlStringToType<TransactionListModel>(content, "tranList");
+            var parsedResponse = _xmlParser.DeserializeXmlStringToType<TransactionListModel>(content, "TranList");
             var transactions = parsedResponse.Transaction;
 
             _ = _cacheProvider.SetStringAsync($"{personReference}-{CacheKeys.Transactions}", JsonConvert.SerializeObject(transactions));
