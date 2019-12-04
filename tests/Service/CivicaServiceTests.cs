@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Generic;
 using System.Net.Http;
 using civica_service.Helpers.QueryBuilder;
 using civica_service.Helpers.SessionProvider;
@@ -11,11 +9,10 @@ using civica_service.Utils.Xml;
 using Moq;
 using Newtonsoft.Json;
 using StockportGovUK.AspNetCore.Gateways;
-using StockportGovUK.NetStandard.Models.Models.Civica.CouncilTax;
+using StockportGovUK.NetStandard.Models.Civica.CouncilTax;
 using StockportGovUK.NetStandard.Models.RevsAndBens;
 using Xunit;
-using CouncilTaxDocumentsResponse = StockportGovUK.NetStandard.Models.Models.Civica.CouncilTax.CouncilTaxDocumentsResponse;
-using PropertyList = civica_service.Services.Models.PropertyList;
+using CouncilTaxDocumentsResponse = StockportGovUK.NetStandard.Models.Civica.CouncilTax.CouncilTaxDocumentsResponse;
 
 namespace civica_service_tests.Service
 {
