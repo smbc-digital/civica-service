@@ -43,6 +43,13 @@ namespace civica_service.Services
             return await _sessionProvider.GetSessionId(personReference);
         }
 
+        // This method may seem pointless, however, I am trying to wrap Civica's 
+        // nonsence of assigning a council-tax-reference to a session-id when this endpoint is called.
+        private async Task SetAccountRefererance(string personReference, string accountReference)
+        {
+            await GetCouncilTaxDetails(personReference, accountReference);
+        }
+
         public async Task<bool> IsBenefitsClaimant(string personReference)
         {
             var claims = await GetBenefits(personReference);
@@ -234,7 +241,7 @@ namespace civica_service.Services
             return places;
         }
 
-        public async Task<Place> GetCurrentProperty(string personReference)
+        public async Task<Place> GetCurrentProperty(string personReference, string accountReference)
         {
             var cacheResponse = await _cacheProvider.GetStringAsync($"{personReference}-{CacheKeys.CouncilTaxCurrentProperty}");
 
@@ -242,6 +249,9 @@ namespace civica_service.Services
             {
                 return JsonConvert.DeserializeObject<Place>(cacheResponse);
             }
+
+            //required for civica to return correct address for user
+            await SetAccountRefererance(personReference, accountReference);
 
             var properties = await GetPropertiesOwned(personReference);
             var currentProperty = properties.FirstOrDefault(p => p.Status == "Current") ?? properties.FirstOrDefault();

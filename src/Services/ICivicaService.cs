@@ -32,7 +32,7 @@ namespace civica_service.Services {
 
         Task<List<Place>> GetPropertiesOwned (string personReference);
 
-        Task<Place> GetCurrentProperty (string personReference);
+        Task<Place> GetCurrentProperty (string personReference, string accountReference);
 
         Task<List<CtaxActDetails>> GetAccounts (string personReference);
     }

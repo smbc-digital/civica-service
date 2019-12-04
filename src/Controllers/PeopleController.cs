@@ -138,10 +138,10 @@ namespace civica_service.Controllers
         }
 
         [HttpGet]
-        [Route("{personReference}/properties/current")]
-        public async Task<IActionResult> GetCurrentProperty([FromRoute][Required]string personReference)
+        [Route("{personReference}/accounts/{accountReference}/properties/current")]
+        public async Task<IActionResult> GetCurrentProperty([FromRoute][Required]string personReference, [FromRoute][Required]string accountReference)
         {
-            var response = await _civicaService.GetCurrentProperty(personReference);
+            var response = await _civicaService.GetCurrentProperty(personReference, accountReference);
 
             return Ok(response);
         }

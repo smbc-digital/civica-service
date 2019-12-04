@@ -64,7 +64,7 @@ namespace civica_service
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
-            if (env.IsDevelopment())
+            if (env.IsEnvironment("local"))
             {
                 app.UseDeveloperExceptionPage();
             }
@@ -79,7 +79,7 @@ namespace civica_service
             app.UseHealthChecks("/healthcheck", HealthCheckConfig.Options);
             app.UseMvc();
             app.UseSwagger();
-            var swaggerPrefix = env.IsDevelopment() ? string.Empty : "/civicaservice";
+            var swaggerPrefix = env.IsEnvironment("local") ? string.Empty : "/civicaservice";
             app.UseSwaggerUI(c =>
             {
                 c.SwaggerEndpoint($"{swaggerPrefix}/swagger/v1/swagger.json", "civica_service API");
