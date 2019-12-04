@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using System.Collections.Generic;
+using civica_service.Exceptions;
 using civica_service.Helpers.QueryBuilder;
 using civica_service.Helpers.SessionProvider;
 using civica_service.Helpers.SessionProvider.Models;
@@ -74,7 +75,7 @@ namespace civica_service
             }
 
             app.UseMiddleware<Availability>();
-            app.UseMiddleware<ExceptionHandling>();
+            app.UseMiddleware<CustomExceptionHandling>();
             app.UseHttpsRedirection();
             app.UseHealthChecks("/healthcheck", HealthCheckConfig.Options);
             app.UseMvc();

@@ -23,7 +23,7 @@ namespace civica_service.Services {
 
         Task<List<PaymentDetail>> GetCouncilTaxBenefitPaymentHistory (string personReference);
 
-        Task<CouncilTaxPaymentScheduleResponse> GetPaymentSchedule(string personReference, int year);
+        Task<List<StockportGovUK.NetStandard.Models.Civica.CouncilTax.Instalment>> GetPaymentSchedule(string personReference, int year);
 
         Task<List<CouncilTaxDocumentReference>> GetDocuments (string personReference);
 

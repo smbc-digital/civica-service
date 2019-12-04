@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Linq;
 using System.Xml.Linq;
 using System.Xml.Serialization;
@@ -14,5 +15,10 @@ namespace civica_service.Utils.Xml
 
             return (T)xmlSerializers.First().Deserialize(root.DescendantsAndSelf(nodeName).First().CreateReader());
         }
+
+        public IEnumerable<T> DeserializeDescendentsToIEnumerable<T>(string xmlElement, string descendentName) => XElement
+            .Parse(xmlElement)
+            .Descendants(descendentName)
+            .Select(descendent => DeserializeNodeToType<T>(descendent, descendentName));
     }
 }

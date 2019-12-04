@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using Microsoft.Extensions.Caching.Distributed;
 
 namespace civica_service.Utils.StorageProvider
@@ -14,6 +15,7 @@ namespace civica_service.Utils.StorageProvider
 
         public async Task<string> GetStringAsync(string key)
         {
+            return null;
             return await _cacheProvider.GetStringAsync(key);
         }
 

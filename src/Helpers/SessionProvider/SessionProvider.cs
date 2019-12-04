@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Net;
 using System.Threading.Tasks;
+using civica_service.Exceptions;
 using civica_service.Helpers.QueryBuilder;
 using civica_service.Helpers.SessionProvider.Models;
 using civica_service.Utils.Xml;
@@ -35,7 +37,7 @@ namespace civica_service.Helpers.SessionProvider
         public async Task<string> GetSessionId(string personReference)
         {
             var cacheResponse = await _distributedCache.GetStringAsync($"{personReference}-{CacheKeys.SessionId}");
-            if (!string.IsNullOrEmpty(cacheResponse))
+            if (false && !string.IsNullOrEmpty(cacheResponse))
             {
                 return cacheResponse;
             }
@@ -47,6 +49,12 @@ namespace civica_service.Helpers.SessionProvider
                 .Build();
 
             var response = await _gateway.GetAsync(url);
+
+            if (response.StatusCode != HttpStatusCode.OK)
+            {
+                throw new CivicaUnavailableException();
+            }
+
             var xmlResponse = await response.Content.ReadAsStringAsync();
             var deserializedResponse = _xmlParser.DeserializeXmlStringToType<SessionIdModel>(xmlResponse, "Login").Result;
 
