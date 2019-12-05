@@ -486,6 +486,7 @@ namespace civica_service_tests.Service
         [Fact]
         public async void GetCurrentProperty_ShouldCallCorrectGatewayUrl()
         {
+            // Arrange
             _mockXmlParser
                 .Setup(_ => _.DeserializeXmlStringToType<CouncilTaxPropertyDetails>(It.IsAny<string>(), It.IsAny<string>()))
                 .Returns(new CouncilTaxPropertyDetails
@@ -504,18 +505,19 @@ namespace civica_service_tests.Service
                     }
                 });
 
-            var response = await _civicaService.GetCurrentProperty("");
+            await _civicaService.GetCouncilTaxDetails("", "");
 
+            // Act
+            var response = await _civicaService.GetCurrentProperty("", "");
+
+            // Assert
             _mockXmlParser.Verify(_ => _.DeserializeXmlStringToType<CouncilTaxPropertyDetails>(It.IsAny<string>(), It.IsAny<string>()), Times.Once);
-
             _mockQueryBuilder.Verify(_ => _.Add("docid", "ctxprop"), Times.Once);
             _mockQueryBuilder.Verify(_ => _.Add("proplist", "y"), Times.Once);
-            _mockQueryBuilder.Verify(_ => _.Add("sessionId", SessionId), Times.Once);
-            _mockQueryBuilder.Verify(_ => _.Build(), Times.Once);
-
-            _mockGateway.Verify(_ => _.GetAsync(It.IsAny<string>()), Times.Once);
-
-            _mockCacheProvider.Verify(_ => _.SetStringAsync(It.IsAny<string>(), It.IsAny<string>()), Times.Exactly(2));
+            _mockQueryBuilder.Verify(_ => _.Add("sessionId", SessionId), Times.AtLeastOnce);
+            _mockQueryBuilder.Verify(_ => _.Build(), Times.AtLeastOnce);
+            _mockGateway.Verify(_ => _.GetAsync(It.IsAny<string>()), Times.AtLeastOnce);
+            _mockCacheProvider.Verify(_ => _.SetStringAsync(It.IsAny<string>(), It.IsAny<string>()), Times.Exactly(4));
 
             Assert.Equal("Current", response.Status);
         }
@@ -529,7 +531,7 @@ namespace civica_service_tests.Service
                 .Setup(_ => _.GetStringAsync(It.IsAny<string>()))
                 .ReturnsAsync(model);
 
-            var response = await _civicaService.GetCurrentProperty("");
+            var response = await _civicaService.GetCurrentProperty("", "");
 
             _mockCacheProvider.Verify(_ => _.GetStringAsync(It.IsAny<string>()), Times.Once);
             _mockGateway.VerifyNoOtherCalls();

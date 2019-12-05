@@ -207,14 +207,14 @@ namespace civica_service_tests.Controller
         public async void GetCurrentProperty_ShouldReturn200()
         {
             // Arrange
-            _mockService.Setup(_ => _.GetCurrentProperty(It.IsAny<string>()))
+            _mockService.Setup(_ => _.GetCurrentProperty(It.IsAny<string>(), It.IsAny<string>()))
                 .ReturnsAsync(It.IsAny<Place>());
 
             // Act
-            await _controller.GetCurrentProperty(It.IsAny<string>());
+            await _controller.GetCurrentProperty(It.IsAny<string>(), It.IsAny<string>());
 
             // Assert
-            _mockService.Verify(_ => _.GetCurrentProperty(It.IsAny<string>()), Times.Once);
+            _mockService.Verify(_ => _.GetCurrentProperty(It.IsAny<string>(), It.IsAny<string>()), Times.Once);
         }
 
         [Fact]
