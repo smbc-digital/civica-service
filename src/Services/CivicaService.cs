@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
-using System.Text;
 using System.Threading.Tasks;
 using civica_service.Helpers.QueryBuilder;
 using civica_service.Helpers.SessionProvider;
@@ -15,7 +14,6 @@ using StockportGovUK.NetStandard.Models.RevsAndBens;
 using CouncilTaxAccountResponse = StockportGovUK.NetStandard.Models.Civica.CouncilTax.CouncilTaxAccountResponse;
 using CouncilTaxDocumentsResponse = StockportGovUK.NetStandard.Models.Civica.CouncilTax.CouncilTaxDocumentsResponse;
 using CtaxSelectDoc = StockportGovUK.NetStandard.Models.Civica.CouncilTax.CtaxSelectDoc;
-using Transaction = StockportGovUK.NetStandard.Models.Civica.CouncilTax.Transaction;
 
 namespace civica_service.Services
 {

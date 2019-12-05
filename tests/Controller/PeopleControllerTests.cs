@@ -5,7 +5,6 @@ using StockportGovUK.NetStandard.Models.Civica.CouncilTax;
 using StockportGovUK.NetStandard.Models.RevsAndBens;
 using System.Collections.Generic;
 using Xunit;
-using Transaction = StockportGovUK.NetStandard.Models.Civica.CouncilTax.Transaction;
 
 namespace civica_service_tests.Controller
 {
