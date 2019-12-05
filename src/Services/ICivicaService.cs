@@ -2,7 +2,6 @@
 using System.Threading.Tasks;
 using StockportGovUK.NetStandard.Models.Civica.CouncilTax;
 using StockportGovUK.NetStandard.Models.RevsAndBens;
-using Transaction = StockportGovUK.NetStandard.Models.Civica.CouncilTax.Transaction;
 
 namespace civica_service.Services {
     public interface ICivicaService {
