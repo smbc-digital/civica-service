@@ -15,6 +15,7 @@ namespace civica_service.Utils.StorageProvider
                     services.AddStackExchangeRedisCache(options => 
                     {
                         options.Configuration = storageProviderConfiguration["Address"] ?? "http://127.0.0.1";
+                        options.InstanceName = storageProviderConfiguration["Name"] ?? "master";
                     });
                     break;
                 default:
