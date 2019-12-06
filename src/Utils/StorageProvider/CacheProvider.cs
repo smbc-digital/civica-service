@@ -15,7 +15,6 @@ namespace civica_service.Utils.StorageProvider
 
         public async Task<string> GetStringAsync(string key)
         {
-            return null;
             return await _cacheProvider.GetStringAsync(key);
         }
 
