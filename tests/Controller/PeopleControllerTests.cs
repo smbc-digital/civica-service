@@ -222,7 +222,7 @@ namespace civica_service_tests.Controller
         {
             // Arrange
             _mockService.Setup(_ => _.GetPaymentSchedule(It.IsAny<string>(), It.IsAny<int>()))
-                .ReturnsAsync(It.IsAny<CouncilTaxPaymentScheduleResponse>());
+                .ReturnsAsync(It.IsAny<List<StockportGovUK.NetStandard.Models.Civica.CouncilTax.Instalment>>());
 
             // Act
             await _controller.GetPaymentSchedule(It.IsAny<string>(), It.IsAny<int>());

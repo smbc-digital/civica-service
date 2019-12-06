@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
-using civica_service.Exceptions;
 using civica_service.Helpers.QueryBuilder;
 using civica_service.Helpers.SessionProvider.Models;
 using civica_service.Utils.Xml;
@@ -34,14 +33,8 @@ namespace civica_service.Helpers.SessionProvider
             _xmlParser = xmlParser;
         }
 
-        public async Task<string> GetSessionId(string personReference)
+        public async Task<string> GetSessionId()
         {
-            var cacheResponse = await _distributedCache.GetStringAsync($"{personReference}-{CacheKeys.SessionId}");
-            if (false && !string.IsNullOrEmpty(cacheResponse))
-            {
-                return cacheResponse;
-            }
-
             var url = _queryBuilder
                 .Add("docid", "crmlogin")
                 .Add("userid", _configuration.Username)
@@ -52,7 +45,7 @@ namespace civica_service.Helpers.SessionProvider
 
             if (response.StatusCode != HttpStatusCode.OK)
             {
-                throw new CivicaUnavailableException();
+                throw new Exception($"Civica is unavailable. Responded with status code: {response.StatusCode}");
             }
 
             var xmlResponse = await response.Content.ReadAsStringAsync();
@@ -69,6 +62,19 @@ namespace civica_service.Helpers.SessionProvider
             {
                 throw new Exception("No session id returned");
             }
+
+            return sessionId;
+        }
+
+        public async Task<string> GetSessionId(string personReference)
+        {
+            var cacheResponse = await _distributedCache.GetStringAsync($"{personReference}-{CacheKeys.SessionId}");
+            if (false && !string.IsNullOrEmpty(cacheResponse))
+            {
+                return cacheResponse;
+            }
+
+            var sessionId = await GetSessionId();
 
             if (!await AssignPersonToSession(sessionId, personReference))
             {
