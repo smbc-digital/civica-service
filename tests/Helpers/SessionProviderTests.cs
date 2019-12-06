@@ -62,6 +62,7 @@ namespace civica_service_tests.Helpers
             _distributedCache.Verify(_ => _.GetStringAsync(It.IsAny<string>()),Times.Once);
         }
 
+
         [Fact]
         public async void GetSessionId_ShouldCallDistributedCache_WithSetStringAsync()
         {
@@ -129,7 +130,7 @@ namespace civica_service_tests.Helpers
                 });
 
             // Act
-            await _sessionProvider.GetSessionId("");
+            await _sessionProvider.GetSessionId();
 
             // Assert
             _mockXmlParser.Verify(
@@ -138,8 +139,8 @@ namespace civica_service_tests.Helpers
             _mockQueryBuilder.Verify(_ => _.Add("docid", "crmlogin"), Times.Once);
             _mockQueryBuilder.Verify(_ => _.Add("userid", "username-test"), Times.Once);
             _mockQueryBuilder.Verify(_ => _.Add("password", "password-test"), Times.Once);
-            _mockQueryBuilder.Verify(_ => _.Build(), Times.Exactly(2));
-            _mockGateway.Verify(_ => _.GetAsync(It.IsAny<string>()), Times.Exactly(2));
+            _mockQueryBuilder.Verify(_ => _.Build(), Times.Once);
+            _mockGateway.Verify(_ => _.GetAsync(It.IsAny<string>()), Times.Once);
         }
 
         [Fact]

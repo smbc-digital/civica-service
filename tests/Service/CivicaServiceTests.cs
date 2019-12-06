@@ -81,16 +81,20 @@ namespace civica_service_tests.Service
         public async void GetAccounts_ShouldCallCorrectGatewayUrl()
         {
             _mockXmlParser
-                .Setup(_ => _.DeserializeXmlStringToType<CtaxSelectDoc>(It.IsAny<string>(), It.IsAny<string>()))
-                .Returns(new CtaxSelectDoc
-                {
-                    CtaxActList = new CtaxActList()
-                });
+                .Setup(_ => _.DeserializeXmlStringToType<CtaxActDetails>(It.IsAny<string>(), It.IsAny<string>()))
+                .Returns( new CtaxActDetails
+                    {
+                        AccountStatus = "",
+                        CtaxActAddress = "",
+                        CtaxActRef = "",
+                        CtaxBalance = ""
+                    }
+                );
 
             _ = await _civicaService.GetAccounts("");
 
             _mockXmlParser.Verify(
-                _ => _.DeserializeXmlStringToType<CtaxSelectDoc>(It.IsAny<string>(), It.IsAny<string>()), Times.Once);
+                _ => _.DeserializeDescendentsToIEnumerable<CtaxActDetails>(It.IsAny<string>(), It.IsAny<string>()), Times.Once);
 
             _mockQueryBuilder.Verify(_ => _.Add("docid", "ctxsel"), Times.Once);
             _mockQueryBuilder.Verify(_ => _.Add("sessionId", SessionId), Times.Once);
@@ -414,7 +418,7 @@ namespace civica_service_tests.Service
 
             // Assert
             _mockXmlParser.Verify(
-                _ => _.DeserializeXmlStringToType<CouncilTaxDocumentsResponse>(It.IsAny<string>(),
+                _ => _.DeserializeDescendentsToIEnumerable<CouncilTaxDocumentReference>(It.IsAny<string>(),
                     It.IsAny<string>()), Times.Once);
             _mockQueryBuilder.Verify(_ => _.Add("docid", "viewdoc"), Times.Once);
             _mockQueryBuilder.Verify(_ => _.Add("sessionId", SessionId), Times.Once);
@@ -456,7 +460,7 @@ namespace civica_service_tests.Service
 
             _ = await _civicaService.GetPropertiesOwned("");
 
-            _mockXmlParser.Verify(_ => _.DeserializeXmlStringToType<CouncilTaxPropertyDetails>(It.IsAny<string>(), It.IsAny<string>()), Times.Once);
+            _mockXmlParser.Verify(_ => _.DeserializeDescendentsToIEnumerable<Place>(It.IsAny<string>(), It.IsAny<string>()), Times.Once);
 
             _mockQueryBuilder.Verify(_ => _.Add("docid", "ctxprop"), Times.Once);
             _mockQueryBuilder.Verify(_ => _.Add("proplist", "y"), Times.Once);
@@ -614,7 +618,7 @@ namespace civica_service_tests.Service
                  .Returns(new CouncilTaxDocumentsResponse
                  {
                      DocumentList =
-                     new  []{
+                     new[]{
                          new CouncilTaxDocumentReference(),
                          new CouncilTaxDocumentReference(),
                          new CouncilTaxDocumentReference(),
