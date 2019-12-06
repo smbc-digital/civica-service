@@ -14,7 +14,7 @@
       "launchBrowser": true,
       "launchUrl": "swagger/index.html",
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "prod"
+        "ASPNETCORE_ENVIRONMENT": "local"
       }
     },
     "civica_service": {

@@ -1,5 +1,6 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using System.Reflection;
 
 namespace civica_service.Utils.StorageProvider
 {
@@ -14,9 +15,8 @@ namespace civica_service.Utils.StorageProvider
                 case "Redis":
                     services.AddStackExchangeRedisCache(options => 
                     {
-                        options.Configuration = string.IsNullOrEmpty(storageProviderConfiguration["Address"]) ? "127.0.0.1" : storageProviderConfiguration["Address"];
-                        options.InstanceName = string.IsNullOrEmpty(storageProviderConfiguration["Name"]) ? "master" : storageProviderConfiguration["Name"];
-
+                        options.Configuration = storageProviderConfiguration["Address"] ?? "127.0.0.1";
+                        options.InstanceName = storageProviderConfiguration["Name"] ?? Assembly.GetEntryAssembly().GetName().Name;
                     });
                     break;
                 default:
