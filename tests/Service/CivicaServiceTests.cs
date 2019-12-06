@@ -488,36 +488,32 @@ namespace civica_service_tests.Service
         {
             // Arrange
             _mockXmlParser
-                .Setup(_ => _.DeserializeXmlStringToType<CouncilTaxPropertyDetails>(It.IsAny<string>(), It.IsAny<string>()))
-                .Returns(new CouncilTaxPropertyDetails
+                .Setup(_ => _.DeserializeDescendentsToIEnumerable<Place>(It.IsAny<string>(), It.IsAny<string>()))
+                .Returns(new List<Place>
                 {
-                    PropertyList = new civica_service.Services.Models.PropertyList
+                    new Place(),
+                    new Place
                     {
-                        Places = new List<Place>
-                        {
-                            new Place(),
-                            new Place
-                            {
-                                Status = "Current"
-                            },
-                            new Place()
-                        }
-                    }
+                        Status = "Current"
+                    },
+                    new Place()
                 });
 
-            await _civicaService.GetCouncilTaxDetails("", "");
+            _mockXmlParser
+                .Setup(_ => _.DeserializeXmlStringToType<CouncilTaxAccountResponse>(It.IsAny<string>(), It.IsAny<string>()))
+                .Returns(new CouncilTaxAccountResponse());
 
             // Act
             var response = await _civicaService.GetCurrentProperty("", "");
 
             // Assert
-            _mockXmlParser.Verify(_ => _.DeserializeXmlStringToType<CouncilTaxPropertyDetails>(It.IsAny<string>(), It.IsAny<string>()), Times.Once);
+            _mockXmlParser.Verify(_ => _.DeserializeDescendentsToIEnumerable<Place>(It.IsAny<string>(), It.IsAny<string>()), Times.Once);
             _mockQueryBuilder.Verify(_ => _.Add("docid", "ctxprop"), Times.Once);
             _mockQueryBuilder.Verify(_ => _.Add("proplist", "y"), Times.Once);
             _mockQueryBuilder.Verify(_ => _.Add("sessionId", SessionId), Times.AtLeastOnce);
             _mockQueryBuilder.Verify(_ => _.Build(), Times.AtLeastOnce);
             _mockGateway.Verify(_ => _.GetAsync(It.IsAny<string>()), Times.AtLeastOnce);
-            _mockCacheProvider.Verify(_ => _.SetStringAsync(It.IsAny<string>(), It.IsAny<string>()), Times.Exactly(4));
+            _mockCacheProvider.Verify(_ => _.SetStringAsync(It.IsAny<string>(), It.IsAny<string>()), Times.Exactly(3));
 
             Assert.Equal("Current", response.Status);
         }

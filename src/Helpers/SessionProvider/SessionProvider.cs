@@ -69,7 +69,7 @@ namespace civica_service.Helpers.SessionProvider
         public async Task<string> GetSessionId(string personReference)
         {
             var cacheResponse = await _distributedCache.GetStringAsync($"{personReference}-{CacheKeys.SessionId}");
-            if (false && !string.IsNullOrEmpty(cacheResponse))
+            if (!string.IsNullOrEmpty(cacheResponse))
             {
                 return cacheResponse;
             }
