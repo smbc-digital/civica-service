@@ -105,7 +105,7 @@ namespace civica_service.Controllers
         [Route("{personReference}/accounts/{accountReference}/transactions/{year}")]
         public async Task<IActionResult> GetAllTransactionsForYear([FromRoute][Required]string personReference, [FromRoute][Required]string accountReference, [FromRoute][Required] int year)
         {
-            var response = await _civicaService.GetAllTransactionsForYear(personReference, year);
+            var response = await _civicaService.GetAllTransactionsForYear(personReference, accountReference, year);
 
             return Ok(response);
         }

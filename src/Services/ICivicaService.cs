@@ -13,7 +13,7 @@ namespace civica_service.Services {
 
         Task<RecievedYearTotal> GetCouncilTaxDetailsForYear (string personReference, string accountReference, string year);
 
-        Task<List<Transaction>> GetAllTransactionsForYear (string personReference, int year);
+        Task<List<Transaction>> GetAllTransactionsForYear (string personReference, string accountReference, int year);
 
         Task<List<BenefitsClaimSummary>> GetBenefits (string personReference);
 
@@ -29,7 +29,7 @@ namespace civica_service.Services {
 
         Task<List<CouncilTaxDocumentReference>> GetDocumentsWithAccountReference (string personReference, string accountReference);
 
-        Task<List<Place>> GetPropertiesOwned (string personReference);
+        Task<List<Place>> GetPropertiesOwned (string personReference, string accountReference = "");
 
         Task<Place> GetCurrentProperty (string personReference, string accountReference);
 

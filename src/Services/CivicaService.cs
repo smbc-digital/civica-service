@@ -227,10 +227,10 @@ namespace civica_service.Services
             return filteredDocuments;
         }
 
-        public async Task<List<Place>> GetPropertiesOwned(string personReference)
+        public async Task<List<Place>> GetPropertiesOwned(string personReference, string accountReference = "")
         {
             var cacheResponse =
-                await _cacheProvider.GetStringAsync($"{personReference}-{CacheKeys.CouncilTaxPropertiesOwned}");
+                await _cacheProvider.GetStringAsync($"{personReference}-{accountReference}-{CacheKeys.CouncilTaxPropertiesOwned}");
 
             if (!string.IsNullOrEmpty(cacheResponse))
             {
@@ -245,14 +245,13 @@ namespace civica_service.Services
                 .Add("sessionId", sessionId)
                 .Build();
 
-
             var response = await _gateway.GetAsync(url);
             var responseContent = await response.Content.ReadAsStringAsync();
             var places = _xmlParser
                 .DeserializeDescendentsToIEnumerable<Place>(responseContent, "Places")
                 .ToList();
 
-            _ = _cacheProvider.SetStringAsync($"{personReference}-{CacheKeys.CouncilTaxPropertiesOwned}",
+            _ = _cacheProvider.SetStringAsync($"{personReference}-{accountReference}-{CacheKeys.CouncilTaxPropertiesOwned}",
                 JsonConvert.SerializeObject(places));
 
             return places;
@@ -261,7 +260,7 @@ namespace civica_service.Services
         public async Task<Place> GetCurrentProperty(string personReference, string accountReference)
         {
             var cacheResponse =
-                await _cacheProvider.GetStringAsync($"{personReference}-{CacheKeys.CouncilTaxCurrentProperty}");
+                await _cacheProvider.GetStringAsync($"{personReference}-{accountReference}-{CacheKeys.CouncilTaxCurrentProperty}");
 
             if (!string.IsNullOrEmpty(cacheResponse))
             {
@@ -271,10 +270,10 @@ namespace civica_service.Services
             //required for civica to return correct address for user
             await SetAccountRefererance(personReference, accountReference);
 
-            var properties = await GetPropertiesOwned(personReference);
+            var properties = await GetPropertiesOwned(personReference, accountReference);
             var currentProperty = properties.FirstOrDefault(p => p.Status == "Current") ?? properties.FirstOrDefault();
 
-            _ = _cacheProvider.SetStringAsync($"{personReference}-{CacheKeys.CouncilTaxCurrentProperty}",
+            _ = _cacheProvider.SetStringAsync($"{personReference}-{accountReference}-{CacheKeys.CouncilTaxCurrentProperty}",
                 JsonConvert.SerializeObject(currentProperty));
 
             return currentProperty;
@@ -400,15 +399,17 @@ namespace civica_service.Services
             return receivedYearTotals;
         }
 
-        public async Task<List<Transaction>> GetAllTransactionsForYear(string personReference, int year)
+        public async Task<List<Transaction>> GetAllTransactionsForYear(string personReference, string accountReference, int year)
         {
-            var key = $"{personReference}-{year}-{CacheKeys.Transactions}";
+            var key = $"{personReference}-{accountReference}-{year}-{CacheKeys.Transactions}";
             var cacheResponse = await _cacheProvider.GetStringAsync(key);
 
             if (!string.IsNullOrEmpty(cacheResponse))
             {
                 return JsonConvert.DeserializeObject<List<Transaction>>(cacheResponse);
             }
+
+            await SetAccountRefererance(personReference, accountReference);
 
             var sessionId = await _sessionProvider.GetSessionId(personReference);
 

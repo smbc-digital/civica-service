@@ -151,14 +151,14 @@ namespace civica_service_tests.Controller
         public async void GetAllTransactionsForYear_ShouldReturn200()
         {
             // Arrange
-            _mockService.Setup(_ => _.GetAllTransactionsForYear(It.IsAny<string>(), It.IsAny<int>()))
+            _mockService.Setup(_ => _.GetAllTransactionsForYear(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<int>()))
                 .ReturnsAsync(It.IsAny<List<Transaction>>());
 
             // Act
             await _controller.GetAllTransactionsForYear(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<int>());
 
             // Assert
-            _mockService.Verify(_ => _.GetAllTransactionsForYear(It.IsAny<string>(), It.IsAny<int>()), Times.Once);
+            _mockService.Verify(_ => _.GetAllTransactionsForYear(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<int>()), Times.Once);
         }
 
         [Fact]
@@ -193,14 +193,14 @@ namespace civica_service_tests.Controller
         public async void GetPropertiesOwned_ShouldReturn200()
         {
             // Arrange
-            _mockService.Setup(_ => _.GetPropertiesOwned(It.IsAny<string>()))
+            _mockService.Setup(_ => _.GetPropertiesOwned(It.IsAny<string>(), It.IsAny<string>()))
                 .ReturnsAsync(It.IsAny<List<Place>>());
 
             // Act
             await _controller.GetPropertiesOwned(It.IsAny<string>());
 
             // Assert
-            _mockService.Verify(_ => _.GetPropertiesOwned(It.IsAny<string>()), Times.Once);
+            _mockService.Verify(_ => _.GetPropertiesOwned(It.IsAny<string>(), It.IsAny<string>()), Times.Once);
         }
 
         [Fact]
