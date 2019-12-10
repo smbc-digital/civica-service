@@ -154,5 +154,14 @@ namespace civica_service.Controllers
 
             return Ok(response);
         }
+
+        [HttpGet]
+        [Route("{personReference}/accounts/{accountReference}/documents/{documentId}")]
+        public async Task<IActionResult> GetDocumentForAccount([FromRoute][Required]string personReference, [FromRoute][Required]string accountReference, [FromRoute][Required]string documentId)
+        {
+            var response = await _civicaService.GetDocumentForAccount(personReference, accountReference, documentId);
+
+            return Ok(response);
+        }
     }
 }

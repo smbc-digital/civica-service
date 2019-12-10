@@ -1,6 +1,6 @@
 namespace civica_service.Utils.StorageProvider
 {
-    public enum CacheKeys
+    public enum ECacheKeys
     {
         SessionId,
         Benefits,
@@ -16,6 +16,7 @@ namespace civica_service.Utils.StorageProvider
         HousingBenefitsPaymentDetails,
         CouncilTaxPaymentDetails,
         CouncilTaxAccountForYear,
-        Transactions
+        Transactions,
+        Document
     }
 }

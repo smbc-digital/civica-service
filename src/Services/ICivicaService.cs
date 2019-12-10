@@ -34,5 +34,7 @@ namespace civica_service.Services {
         Task<Place> GetCurrentProperty (string personReference, string accountReference);
 
         Task<List<CtaxActDetails>> GetAccounts (string personReference);
+
+        Task<byte[]> GetDocumentForAccount(string personReference, string accountReference, string documentId);
     }
 }
