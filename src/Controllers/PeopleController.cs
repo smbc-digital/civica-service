@@ -161,6 +161,16 @@ namespace civica_service.Controllers
         {
             var response = await _civicaService.GetDocumentForAccount(personReference, accountReference, documentId);
 
+            if (response == null)
+            {
+                return NotFound();
+            }
+
+            if(response.Length == 0)
+            {
+                return NoContent();
+            }
+            
             return Ok(response);
         }
     }

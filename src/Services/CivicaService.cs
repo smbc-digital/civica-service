@@ -454,6 +454,13 @@ namespace civica_service.Services
                 .Build();
 
             var response = await _gateway.GetAsync(url);
+            var content = await response.Content.ReadAsStringAsync();
+
+            if (content.Contains("Cannot Find PDF Document"))
+            {
+                return null;
+            }
+            
             var document = await response.Content.ReadAsByteArrayAsync();
             
              _ = _cacheProvider.SetStringAsync(key, JsonConvert.SerializeObject(document));
