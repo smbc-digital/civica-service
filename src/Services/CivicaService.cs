@@ -7,6 +7,7 @@ using civica_service.Helpers.SessionProvider;
 using civica_service.Services.Models;
 using civica_service.Utils.StorageProvider;
 using civica_service.Utils.Xml;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using StockportGovUK.AspNetCore.Gateways;
 using StockportGovUK.NetStandard.Models.Civica.CouncilTax;
@@ -24,14 +25,17 @@ namespace civica_service.Services
         private readonly ICacheProvider _cacheProvider;
         private readonly IXmlParser _xmlParser;
 
+        private readonly ILogger _logger;
+
         public CivicaService(IGateway gateway, IQueryBuilder queryBuilder, ISessionProvider sessionProvider,
-            ICacheProvider cacheProvider, IXmlParser xmlParser)
+            ICacheProvider cacheProvider, IXmlParser xmlParser, ILogger logger)
         {
             _gateway = gateway;
             _queryBuilder = queryBuilder;
             _sessionProvider = sessionProvider;
             _cacheProvider = cacheProvider;
             _xmlParser = xmlParser;
+            _logger = logger;
         }
 
         public async Task<string> GetSessionId(string personReference)
@@ -362,6 +366,7 @@ namespace civica_service.Services
 
             var response = await _gateway.GetAsync(url);
             var responseContent = await response.Content.ReadAsStringAsync();
+            _logger.LogInformation($"Url: {url}, Response: {responseContent}");
             var parsedResponse =
                 _xmlParser.DeserializeXmlStringToType<CouncilTaxAccountResponse>(responseContent, "CtaxDetails");
 

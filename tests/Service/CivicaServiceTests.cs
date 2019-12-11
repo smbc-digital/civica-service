@@ -6,6 +6,7 @@ using civica_service.Services;
 using civica_service.Services.Models;
 using civica_service.Utils.StorageProvider;
 using civica_service.Utils.Xml;
+using Microsoft.Extensions.Logging;
 using Moq;
 using Newtonsoft.Json;
 using StockportGovUK.AspNetCore.Gateways;
@@ -24,6 +25,7 @@ namespace civica_service_tests.Service
         private readonly Mock<ISessionProvider> _mockSessionProvider = new Mock<ISessionProvider>();
         private readonly Mock<ICacheProvider> _mockCacheProvider = new Mock<ICacheProvider>();
         private readonly Mock<IXmlParser> _mockXmlParser = new Mock<IXmlParser>();
+        private readonly Mock<ILogger> _mockLogger = new Mock<ILogger>();
         private const string SessionId = "test-session-id";
 
         public CivicaServiceTests()
@@ -54,7 +56,7 @@ namespace civica_service_tests.Service
                   Content = new StringContent(string.Empty)
               });
 
-            _civicaService = new CivicaService(_mockGateway.Object, _mockQueryBuilder.Object, _mockSessionProvider.Object, _mockCacheProvider.Object, _mockXmlParser.Object);
+            _civicaService = new CivicaService(_mockGateway.Object, _mockQueryBuilder.Object, _mockSessionProvider.Object, _mockCacheProvider.Object, _mockXmlParser.Object, _mockLogger.Object);
         }
 
         [Fact]
