@@ -13,7 +13,7 @@ namespace civica_service.Utils.Xml
         {
             var xmlSerializers = XmlSerializer.FromTypes(new[] { typeof(T) });
 
-            return (T)xmlSerializers.First().Deserialize(root.DescendantsAndSelf(nodeName).First().CreateReader());
+            return (T)xmlSerializers.First().Deserialize(root.DescendantsAndSelf(nodeName).FirstOrDefault().CreateReader());
         }
 
         public IEnumerable<T> DeserializeDescendentsToIEnumerable<T>(string xmlElement, string descendentName) => XElement
