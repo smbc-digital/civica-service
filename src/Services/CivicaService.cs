@@ -25,10 +25,10 @@ namespace civica_service.Services
         private readonly ICacheProvider _cacheProvider;
         private readonly IXmlParser _xmlParser;
 
-        private readonly ILogger _logger;
+        private readonly ILogger<CivicaService> _logger;
 
         public CivicaService(IGateway gateway, IQueryBuilder queryBuilder, ISessionProvider sessionProvider,
-            ICacheProvider cacheProvider, IXmlParser xmlParser, ILogger logger)
+            ICacheProvider cacheProvider, IXmlParser xmlParser, ILogger<CivicaService> logger)
         {
             _gateway = gateway;
             _queryBuilder = queryBuilder;

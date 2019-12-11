@@ -25,7 +25,7 @@ namespace civica_service_tests.Service
         private readonly Mock<ISessionProvider> _mockSessionProvider = new Mock<ISessionProvider>();
         private readonly Mock<ICacheProvider> _mockCacheProvider = new Mock<ICacheProvider>();
         private readonly Mock<IXmlParser> _mockXmlParser = new Mock<IXmlParser>();
-        private readonly Mock<ILogger> _mockLogger = new Mock<ILogger>();
+        private readonly Mock<ILogger<CivicaService>> _mockLogger = new Mock<ILogger<CivicaService>>();
         private const string SessionId = "test-session-id";
 
         public CivicaServiceTests()
