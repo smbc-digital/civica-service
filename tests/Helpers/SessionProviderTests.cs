@@ -47,7 +47,7 @@ namespace civica_service_tests.Helpers
                 Password = "password-test"
             });
 
-            _sessionProvider = new SessionProvider(_mockGateway.Object, _mockQueryBuilder.Object, _configuration.Object, _distributedCache.Object, _mockXmlParser.Object, _mockLogger.Object);
+            _sessionProvider = new SessionProvider(_mockGateway.Object, _mockQueryBuilder.Object, _configuration.Object, _distributedCache.Object, _mockXmlParser.Object);
         }
 
         [Fact]

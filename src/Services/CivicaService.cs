@@ -7,7 +7,6 @@ using civica_service.Helpers.SessionProvider;
 using civica_service.Services.Models;
 using civica_service.Utils.StorageProvider;
 using civica_service.Utils.Xml;
-using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using StockportGovUK.AspNetCore.Gateways;
 using StockportGovUK.NetStandard.Models.Civica.CouncilTax;
@@ -25,17 +24,14 @@ namespace civica_service.Services
         private readonly ICacheProvider _cacheProvider;
         private readonly IXmlParser _xmlParser;
 
-        private readonly ILogger<CivicaService> _logger;
-
         public CivicaService(IGateway gateway, IQueryBuilder queryBuilder, ISessionProvider sessionProvider,
-            ICacheProvider cacheProvider, IXmlParser xmlParser, ILogger<CivicaService> logger)
+            ICacheProvider cacheProvider, IXmlParser xmlParser)
         {
             _gateway = gateway;
             _queryBuilder = queryBuilder;
             _sessionProvider = sessionProvider;
             _cacheProvider = cacheProvider;
             _xmlParser = xmlParser;
-            _logger = logger;
         }
 
         public async Task<string> GetSessionId(string personReference)
@@ -80,7 +76,6 @@ namespace civica_service.Services
 
             var response = await _gateway.PostAsync(url, body);
             var content = await response.Content.ReadAsStringAsync();
-            _logger.LogInformation($"GetBenefits - Url: {url}, Response: {content}");
             var parsedResponse =
                 _xmlParser.DeserializeXmlStringToType<BenefitsClaimsSummaryResponse>(content, "HBSelectDoc");
             var claimSummary = parsedResponse.Claims.Summary;
@@ -113,7 +108,6 @@ namespace civica_service.Services
 
             var response = await _gateway.GetAsync(url);
             var responseContent = await response.Content.ReadAsStringAsync();
-            _logger.LogInformation($"GetBenefitDetails - Url: {url}, Response: {responseContent}");
             var parsedResponse =
                 _xmlParser.DeserializeXmlStringToType<BenefitsClaim>(responseContent, "HBClaimDetails");
 
@@ -142,7 +136,6 @@ namespace civica_service.Services
 
             var response = await _gateway.GetAsync(url);
             var content = await response.Content.ReadAsStringAsync();
-            _logger.LogInformation($"GetHousingBenefitPaymentHistory - Url: {url}, Response: {content}");
             var paymentDetails =
                 _xmlParser.DeserializeXmlStringToType<PaymentDetailsResponse>(content, "HBPaymentDetails");
             var housingBenefitList = paymentDetails.PaymentList.PaymentDetails;
@@ -173,7 +166,6 @@ namespace civica_service.Services
 
             var response = await _gateway.GetAsync(url);
             var content = await response.Content.ReadAsStringAsync();
-            _logger.LogInformation($"GetCouncilTaxBenefitPaymentHistory - Url: {url}, Response: {content}");
             var paymentDetails =
                 _xmlParser.DeserializeXmlStringToType<PaymentDetailsResponse>(content, "HBPaymentDetails");
             var ctaxPaymentList = paymentDetails.PaymentList.PaymentDetails;
@@ -204,7 +196,6 @@ namespace civica_service.Services
 
             var response = await _gateway.GetAsync(url);
             var responseContent = await response.Content.ReadAsStringAsync();
-            _logger.LogInformation($"GetDocuments - Url: {url}, Response: {responseContent}");
             var documentsList = _xmlParser
                 .DeserializeDescendentsToIEnumerable<CouncilTaxDocumentReference>(responseContent, "Document")
                 .ToList();
@@ -258,7 +249,6 @@ namespace civica_service.Services
 
             var response = await _gateway.GetAsync(url);
             var responseContent = await response.Content.ReadAsStringAsync();
-            _logger.LogInformation($"GetPropertiesOwned - Url: {url}, Response: {responseContent}");
             var places = _xmlParser
                 .DeserializeDescendentsToIEnumerable<Place>(responseContent, "Places")
                 .ToList();
@@ -310,7 +300,6 @@ namespace civica_service.Services
 
             var response = await _gateway.GetAsync(url);
             var responseContent = await response.Content.ReadAsStringAsync();
-            _logger.LogInformation($"GetAccounts - Url: {url}, Response: {responseContent}");
             var accounts = _xmlParser
                 .DeserializeDescendentsToIEnumerable<CtaxActDetails>(responseContent, "CtaxActDetails")
                 .ToList();
@@ -343,7 +332,6 @@ namespace civica_service.Services
 
             var response = await _gateway.GetAsync(url);
             var responseContent = await response.Content.ReadAsStringAsync();
-            _logger.LogInformation($"GetPaymentSchedule - Url: {url}, Response: {responseContent}");
             var parsedResponse = _xmlParser
                 .DeserializeDescendentsToIEnumerable<Instalment>(responseContent, "Instalment")
                 .ToList();
@@ -374,7 +362,6 @@ namespace civica_service.Services
 
             var response = await _gateway.GetAsync(url);
             var responseContent = await response.Content.ReadAsStringAsync();
-            _logger.LogInformation($"GetCounciltaxDetails - Url: {url}, Response: {responseContent}");
             var parsedResponse =
                 _xmlParser.DeserializeXmlStringToType<CouncilTaxAccountResponse>(responseContent, "CtaxDetails");
 
@@ -405,7 +392,6 @@ namespace civica_service.Services
 
             var response = await _gateway.GetAsync(url);
             var responseContent = await response.Content.ReadAsStringAsync();
-            _logger.LogInformation($"url: {url}, responseContent: {responseContent}");
             var parsedResponse =
                 _xmlParser.DeserializeXmlStringToType<CouncilTaxAccountSummary>(responseContent, "CtaxDetails");
             var receivedYearTotals = parsedResponse.FinancialDetails.RecievedYearTotal;
@@ -438,7 +424,6 @@ namespace civica_service.Services
 
             var response = await _gateway.GetAsync(url);
             var content = await response.Content.ReadAsStringAsync();
-            _logger.LogInformation($"GetAllTransactionsForYear - Url: {url}, Response: {content}");
             var transactions = _xmlParser
                 .DeserializeDescendentsToIEnumerable<Transaction>(content, "Transaction")
                 .ToList();
@@ -471,7 +456,6 @@ namespace civica_service.Services
 
             var response = await _gateway.GetAsync(url);
             var content = await response.Content.ReadAsStringAsync();
-            _logger.LogInformation($"GetDocumentForAccount - Url: {url}, Response: {content}");
 
             if (content.Contains("Cannot Find PDF Document"))
             {

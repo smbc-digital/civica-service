@@ -6,7 +6,6 @@ using civica_service.Services;
 using civica_service.Services.Models;
 using civica_service.Utils.StorageProvider;
 using civica_service.Utils.Xml;
-using Microsoft.Extensions.Logging;
 using Moq;
 using Newtonsoft.Json;
 using StockportGovUK.AspNetCore.Gateways;
@@ -25,7 +24,6 @@ namespace civica_service_tests.Service
         private readonly Mock<ISessionProvider> _mockSessionProvider = new Mock<ISessionProvider>();
         private readonly Mock<ICacheProvider> _mockCacheProvider = new Mock<ICacheProvider>();
         private readonly Mock<IXmlParser> _mockXmlParser = new Mock<IXmlParser>();
-        private readonly Mock<ILogger<CivicaService>> _mockLogger = new Mock<ILogger<CivicaService>>();
         private const string SessionId = "test-session-id";
 
         public CivicaServiceTests()
@@ -56,7 +54,7 @@ namespace civica_service_tests.Service
                   Content = new StringContent(string.Empty)
               });
 
-            _civicaService = new CivicaService(_mockGateway.Object, _mockQueryBuilder.Object, _mockSessionProvider.Object, _mockCacheProvider.Object, _mockXmlParser.Object, _mockLogger.Object);
+            _civicaService = new CivicaService(_mockGateway.Object, _mockQueryBuilder.Object, _mockSessionProvider.Object, _mockCacheProvider.Object, _mockXmlParser.Object);
         }
 
         [Fact]
@@ -93,7 +91,7 @@ namespace civica_service_tests.Service
                     }
                 );
 
-            _ = await _civicaService.GetAccounts("");
+            await _civicaService.GetAccounts("");
 
             _mockXmlParser.Verify(
                 _ => _.DeserializeDescendentsToIEnumerable<CtaxActDetails>(It.IsAny<string>(), It.IsAny<string>()), Times.Once);
@@ -121,7 +119,7 @@ namespace civica_service_tests.Service
                 });
 
             // Act
-            _ = await _civicaService.GetBenefits("");
+            await _civicaService.GetBenefits("");
 
             // Assert
             _mockXmlParser.Verify(
@@ -213,7 +211,7 @@ namespace civica_service_tests.Service
                 .Returns(new BenefitsClaim());
 
             // Act
-            _ = await _civicaService.GetBenefitDetails(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>());
+            await _civicaService.GetBenefitDetails(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>());
 
             // Assert
             _mockXmlParser.Verify(
@@ -283,7 +281,7 @@ namespace civica_service_tests.Service
                 });
 
             // Act
-            _ = await _civicaService.GetHousingBenefitPaymentHistory("");
+            await _civicaService.GetHousingBenefitPaymentHistory("");
 
             // Assert
             _mockXmlParser.Verify(
@@ -353,7 +351,7 @@ namespace civica_service_tests.Service
                 .Setup(_ => _.SetStringAsync(It.IsAny<string>(), It.IsAny<string>()));
 
             // Act
-            _ = await _civicaService.GetCouncilTaxBenefitPaymentHistory(It.IsAny<string>());
+            await _civicaService.GetCouncilTaxBenefitPaymentHistory(It.IsAny<string>());
 
             // Assert
             _mockXmlParser.Verify(
@@ -416,7 +414,7 @@ namespace civica_service_tests.Service
 
             // Act
 
-            _ = await _civicaService.GetDocuments(It.IsAny<string>());
+            await _civicaService.GetDocuments(It.IsAny<string>());
 
             // Assert
             _mockXmlParser.Verify(
@@ -444,7 +442,7 @@ namespace civica_service_tests.Service
                 .Setup(_ => _.GetStringAsync(It.IsAny<string>()))
                 .ReturnsAsync(model);
 
-            _ = await _civicaService.GetAccounts("");
+            await _civicaService.GetAccounts("");
 
             _mockCacheProvider.Verify(_ => _.GetStringAsync(It.IsAny<string>()), Times.Once);
             _mockGateway.VerifyNoOtherCalls();
@@ -460,7 +458,7 @@ namespace civica_service_tests.Service
                     PropertyList = new civica_service.Services.Models.PropertyList()
                 });
 
-            _ = await _civicaService.GetPropertiesOwned("");
+            await _civicaService.GetPropertiesOwned("");
 
             _mockXmlParser.Verify(_ => _.DeserializeDescendentsToIEnumerable<Place>(It.IsAny<string>(), It.IsAny<string>()), Times.Once);
 
@@ -483,7 +481,7 @@ namespace civica_service_tests.Service
                 .Setup(_ => _.GetStringAsync(It.IsAny<string>()))
                 .ReturnsAsync(model);
 
-            _ = await _civicaService.GetPropertiesOwned("");
+            await _civicaService.GetPropertiesOwned("");
 
             _mockCacheProvider.Verify(_ => _.GetStringAsync(It.IsAny<string>()), Times.Once);
             _mockGateway.VerifyNoOtherCalls();
@@ -533,7 +531,7 @@ namespace civica_service_tests.Service
                 .Setup(_ => _.GetStringAsync(It.IsAny<string>()))
                 .ReturnsAsync(model);
 
-            var response = await _civicaService.GetCurrentProperty("", "");
+            await _civicaService.GetCurrentProperty("", "");
 
             _mockCacheProvider.Verify(_ => _.GetStringAsync(It.IsAny<string>()), Times.Once);
             _mockGateway.VerifyNoOtherCalls();
@@ -553,7 +551,7 @@ namespace civica_service_tests.Service
                     FinancialDetails = new FinancialDetails()
                 });
 
-            _ = await _civicaService.GetCouncilTaxDetailsForYear(personReference, accountReference, year);
+            await _civicaService.GetCouncilTaxDetailsForYear(personReference, accountReference, year);
 
             _mockXmlParser.Verify(_ => _.DeserializeXmlStringToType<CouncilTaxAccountSummary>(It.IsAny<string>(), It.IsAny<string>()), Times.Once);
 
@@ -588,7 +586,7 @@ namespace civica_service_tests.Service
                 .ReturnsAsync(model);
 
 
-            _ = await _civicaService.GetCouncilTaxDetailsForYear(personReference, accountReference, year);
+            await _civicaService.GetCouncilTaxDetailsForYear(personReference, accountReference, year);
 
             _mockCacheProvider.Verify(_ => _.GetStringAsync(It.IsAny<string>()), Times.Once);
             _mockGateway.VerifyNoOtherCalls();
