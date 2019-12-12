@@ -397,6 +397,7 @@ namespace civica_service.Services
 
             var response = await _gateway.GetAsync(url);
             var responseContent = await response.Content.ReadAsStringAsync();
+            _logger.LogInformation($"url: {url}, responseContent: {responseContent}");
             var parsedResponse =
                 _xmlParser.DeserializeXmlStringToType<CouncilTaxAccountSummary>(responseContent, "CtaxDetails");
             var receivedYearTotals = parsedResponse.FinancialDetails.RecievedYearTotal;
