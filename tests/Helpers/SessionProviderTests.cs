@@ -3,6 +3,7 @@ using civica_service.Helpers.SessionProvider;
 using civica_service.Helpers.SessionProvider.Models;
 using civica_service.Utils.StorageProvider;
 using civica_service.Utils.Xml;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
 using StockportGovUK.AspNetCore.Gateways;
@@ -20,6 +21,8 @@ namespace civica_service_tests.Helpers
         private readonly Mock<IOptions<SessionConfiguration>> _configuration = new Mock<IOptions<SessionConfiguration>>();
         private readonly Mock<ICacheProvider> _distributedCache = new Mock<ICacheProvider>();
         private readonly Mock<IXmlParser> _mockXmlParser = new Mock<IXmlParser>();
+
+        private readonly Mock<ILogger<SessionProvider>> _mockLogger = new Mock<ILogger<SessionProvider>>();
 
         public SessionProviderTests()
         {
@@ -44,7 +47,7 @@ namespace civica_service_tests.Helpers
                 Password = "password-test"
             });
 
-            _sessionProvider = new SessionProvider(_mockGateway.Object, _mockQueryBuilder.Object, _configuration.Object, _distributedCache.Object, _mockXmlParser.Object);
+            _sessionProvider = new SessionProvider(_mockGateway.Object, _mockQueryBuilder.Object, _configuration.Object, _distributedCache.Object, _mockXmlParser.Object, _mockLogger.Object);
         }
 
         [Fact]
