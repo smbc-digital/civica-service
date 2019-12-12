@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using civica_service.Helpers.QueryBuilder;
 using civica_service.Helpers.SessionProvider.Models;
 using civica_service.Utils.Xml;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using StockportGovUK.AspNetCore.Gateways;
 using civica_service.Utils.StorageProvider;
@@ -19,18 +20,22 @@ namespace civica_service.Helpers.SessionProvider
         private readonly ICacheProvider _distributedCache;
         private readonly IXmlParser _xmlParser;
 
+        private readonly ILogger<SessionProvider> _logger;
+
         public SessionProvider(
             IGateway gateway, 
             IQueryBuilder queryBuilder, 
             IOptions<SessionConfiguration> configuration,
             ICacheProvider distributedCache,
-            IXmlParser xmlParser)
+            IXmlParser xmlParser,
+            ILogger<SessionProvider> logger)
         {
             _gateway = gateway;
             _queryBuilder = queryBuilder;
             _configuration = configuration.Value;
             _distributedCache = distributedCache;
             _xmlParser = xmlParser;
+            _logger = logger;
         }
 
         public async Task<string> GetSessionId()
@@ -49,6 +54,8 @@ namespace civica_service.Helpers.SessionProvider
             }
 
             var xmlResponse = await response.Content.ReadAsStringAsync();
+            _logger.LogInformation($"GetSessionId - url: {url}, xmlResponse: {xmlResponse}");
+
             var deserializedResponse = _xmlParser.DeserializeXmlStringToType<SessionIdModel>(xmlResponse, "Login").Result;
 
             if (!deserializedResponse.ErrorCode.Text.Equals("5"))
@@ -96,6 +103,8 @@ namespace civica_service.Helpers.SessionProvider
 
             var response = await _gateway.GetAsync(url);
             var xmlResponse = await response.Content.ReadAsStringAsync();
+            _logger.LogInformation($"AssignPersonToSession - url: {url}, xmlResponse: {xmlResponse}");
+
             var result = _xmlParser.DeserializeXmlStringToType<SetPersonModel>(xmlResponse, "SetPerson");
 
             var matchingErrorCodes = new List<string>

@@ -461,6 +461,7 @@ namespace civica_service.Services
             await SetAccountRefererance(personReference, accountReference);
 
             var sessionId = await _sessionProvider.GetSessionId(personReference);
+            
 
             var url = _queryBuilder
                 .Add("sessionId", sessionId)
