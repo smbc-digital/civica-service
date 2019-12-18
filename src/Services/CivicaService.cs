@@ -109,7 +109,7 @@ namespace civica_service.Services
 
             var response = await _gateway.GetAsync(url);
             var responseContent = await response.Content.ReadAsStringAsync();
-            var parsedResponse = new CouncilTaxAccountResponse();
+            var parsedResponse = new BenefitsClaim();
 
             try
             {
