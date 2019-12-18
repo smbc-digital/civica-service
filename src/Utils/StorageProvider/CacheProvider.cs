@@ -16,7 +16,7 @@ namespace civica_service.Utils.StorageProvider
         public CacheProvider(IDistributedCache cacheProvider, IConfiguration configuration)
         {
             _allowCaching = configuration.GetSection("StorageProvider")["Type"] !=  "None";
-             _defaultTimeout = configuration.GetValue<double>("StorageProvider:Timeout") != 0
+            _defaultTimeout = configuration.GetValue<double>("StorageProvider:Timeout") != 0
                 ? configuration.GetValue<double>("StorageProvider:Timeout")
                 : 20;
             _cacheProvider = cacheProvider;
@@ -39,7 +39,7 @@ namespace civica_service.Utils.StorageProvider
             {
                 await _cacheProvider.SetStringAsync(key, value, new DistributedCacheEntryOptions
                 {
-                    AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(1)
+                    AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(_defaultTimeout)
                 });
             }
         }
