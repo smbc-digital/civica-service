@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -108,8 +109,16 @@ namespace civica_service.Services
 
             var response = await _gateway.GetAsync(url);
             var responseContent = await response.Content.ReadAsStringAsync();
-            var parsedResponse =
-                _xmlParser.DeserializeXmlStringToType<BenefitsClaim>(responseContent, "HBClaimDetails");
+            var parsedResponse = new CouncilTaxAccountResponse();
+
+            try
+            {
+                parsedResponse = _xmlParser.DeserializeXmlStringToType<BenefitsClaim>(responseContent, "HBClaimDetails");
+            }
+            catch(Exception ex)
+            {
+                throw new Exception($"Failed to deserialize XML - Person reference: {personReference}, Claim reference: {claimReference}, Place reference {placeReference}, Response: {responseContent}", ex.InnerException);
+            }
 
             _ = _cacheProvider.SetStringAsync(key, JsonConvert.SerializeObject(parsedResponse));
 
@@ -362,8 +371,16 @@ namespace civica_service.Services
 
             var response = await _gateway.GetAsync(url);
             var responseContent = await response.Content.ReadAsStringAsync();
-            var parsedResponse =
-                _xmlParser.DeserializeXmlStringToType<CouncilTaxAccountResponse>(responseContent, "CtaxDetails");
+            var parsedResponse = new CouncilTaxAccountResponse();
+
+            try
+            {
+                parsedResponse = _xmlParser.DeserializeXmlStringToType<CouncilTaxAccountResponse>(responseContent, "CtaxDetails");
+            }
+            catch(Exception ex)
+            {
+                throw new Exception($"Failed to deserialize XML - Person reference: {personReference}, Account reference: {accountReference}, Response: {responseContent}", ex.InnerException);
+            }
 
             _ = _cacheProvider.SetStringAsync(key, JsonConvert.SerializeObject(parsedResponse));
 
