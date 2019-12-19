@@ -1,10 +1,13 @@
 ﻿using civica_service.Controllers;
 using civica_service.Services;
+using Microsoft.AspNetCore.Mvc;
 using Moq;
 using StockportGovUK.NetStandard.Models.Civica.CouncilTax;
 using StockportGovUK.NetStandard.Models.RevsAndBens;
+using System;
 using System.Collections.Generic;
 using Xunit;
+using Instalment = StockportGovUK.NetStandard.Models.Civica.CouncilTax.Instalment;
 using Transaction = StockportGovUK.NetStandard.Models.RevsAndBens.Transaction;
 
 namespace civica_service_tests.Controller
@@ -20,7 +23,7 @@ namespace civica_service_tests.Controller
         }
 
         [Fact]
-        public async void GetSessionId_ShouldReturn200()
+        public async void GetSessionId_ShouldCallService()
         {
             // Arrange
             _mockService
@@ -28,14 +31,16 @@ namespace civica_service_tests.Controller
                 .ReturnsAsync(It.IsAny<string>());
 
             // Act
-            await _controller.GetSessionId(It.IsAny<string>());
+            var result = await _controller.GetSessionId(It.IsAny<string>());
 
             // Assert
             _mockService.Verify(_ => _.GetSessionId(It.IsAny<string>()), Times.Once);
+            var actionResult = Assert.IsType<ObjectResult>(result);
+            Assert.Equal(200, actionResult.StatusCode);
         }
 
         [Fact]
-        public async void IsBenefitsClaimant_ShouldReturn200()
+        public async void IsBenefitsClaimant_ShouldCallService()
         {
             // Arrange
             _mockService
@@ -43,108 +48,124 @@ namespace civica_service_tests.Controller
                 .ReturnsAsync(It.IsAny<bool>());
 
             // Act
-            await _controller.IsBenefitsClaimant(It.IsAny<string>());
+            var result = await _controller.IsBenefitsClaimant(It.IsAny<string>());
 
             // Assert
             _mockService.Verify(_ => _.IsBenefitsClaimant(It.IsAny<string>()), Times.Once);
+            var actionResult = Assert.IsType<ObjectResult>(result);
+            Assert.Equal(200, actionResult.StatusCode);
         }
 
         [Fact]
-        public async void GetBenefits_ShouldReturn200()
+        public async void GetBenefits_ShouldCallService()
         {
             // Arrange
             _mockService.Setup(_ => _.GetBenefits(It.IsAny<string>()))
                 .ReturnsAsync(It.IsAny<List<BenefitsClaimSummary>>());
 
             // Act
-            await _controller.GetBenefits(It.IsAny<string>());
+            var result =  await _controller.GetBenefits(It.IsAny<string>());
 
             // Assert
             _mockService.Verify(_ => _.GetBenefits(It.IsAny<string>()), Times.Once);
+            var actionResult = Assert.IsType<ObjectResult>(result);
+            Assert.Equal(200, actionResult.StatusCode);
         }
 
         [Fact]
-        public async void GetBenefitDetails_ShouldReturn200()
+        public async void GetBenefitDetails_ShouldCallService()
         {
             // Arrange
             _mockService.Setup(_ => _.GetBenefitDetails(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
                 .ReturnsAsync(It.IsAny<BenefitsClaim>());
 
             // Act
-            await _controller.GetBenefitDetails(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>());
+            var result = await _controller.GetBenefitDetails(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>());
 
             // Assert
             _mockService.Verify(_ => _.GetBenefitDetails(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()), Times.Once);
+            var actionResult = Assert.IsType<ObjectResult>(result);
+            Assert.Equal(200, actionResult.StatusCode);
         }
 
         [Fact]
-        public async void GetHousingBenefitPaymentHistory_ShouldReturn200()
+        public async void GetHousingBenefitPaymentHistory_ShouldCallService()
         {
             // Arrange
             _mockService.Setup(_ => _.GetHousingBenefitPaymentHistory(It.IsAny<string>()))
                 .ReturnsAsync(It.IsAny<List<PaymentDetail>>());
 
             // Act
-            await _controller.GetHousingBenefitPaymentHistory(It.IsAny<string>());
+            var result = await _controller.GetHousingBenefitPaymentHistory(It.IsAny<string>());
 
             // Assert
             _mockService.Verify(_ => _.GetHousingBenefitPaymentHistory(It.IsAny<string>()), Times.Once);
+            var actionResult = Assert.IsType<ObjectResult>(result);
+            Assert.Equal(200, actionResult.StatusCode);
         }
 
         [Fact]
-        public async void GetCouncilTaxBenefitPaymentHistory_ShouldReturn200()
+        public async void GetCouncilTaxBenefitPaymentHistory_ShouldCallService()
         {
             // Arrange
             _mockService.Setup(_ => _.GetCouncilTaxBenefitPaymentHistory(It.IsAny<string>()))
                 .ReturnsAsync(It.IsAny<List<PaymentDetail>>());
 
             // Act
-            await _controller.GetCouncilTaxBenefitPaymentHistory(It.IsAny<string>());
+            var result = await _controller.GetCouncilTaxBenefitPaymentHistory(It.IsAny<string>());
 
             // Assert
             _mockService.Verify(_ => _.GetCouncilTaxBenefitPaymentHistory(It.IsAny<string>()), Times.Once);
+            var actionResult = Assert.IsType<ObjectResult>(result);
+            Assert.Equal(200, actionResult.StatusCode);
         }
 
         [Fact]
-        public async void GetAccounts_ShouldReturn200()
+        public async void GetAccounts_ShouldCallService()
         {
             // Arrange
             _mockService.Setup(_ => _.GetAccounts(It.IsAny<string>()))
                 .ReturnsAsync(It.IsAny<List<CtaxActDetails>>());
 
             // Act
-            await _controller.GetAccounts(It.IsAny<string>());
+            var result = await _controller.GetAccounts(It.IsAny<string>());
 
             // Assert
             _mockService.Verify(_ => _.GetAccounts(It.IsAny<string>()), Times.Once);
+            var actionResult = Assert.IsType<OkObjectResult>(result);
+            Assert.Equal(200, actionResult.StatusCode);
         }
 
         [Fact]
-        public async void GetAccount_ShouldReturn200()
+        public async void GetAccount_ShouldCallService()
         {
             // Arrange
             _mockService.Setup(_ => _.GetCouncilTaxDetails(It.IsAny<string>(), It.IsAny<string>()))
                 .ReturnsAsync(It.IsAny<CouncilTaxAccountResponse>());
 
             // Act
-            await _controller.GetAccount(It.IsAny<string>(), It.IsAny<string>());
+            var result = await _controller.GetAccount(It.IsAny<string>(), It.IsAny<string>());
 
             // Assert
             _mockService.Verify(_ => _.GetCouncilTaxDetails(It.IsAny<string>(), It.IsAny<string>()), Times.Once);
+            var actionResult = Assert.IsType<OkObjectResult>(result);
+            Assert.Equal(200, actionResult.StatusCode);
         }
 
         [Fact]
-        public async void GetAccountDetailsForYear_ShouldReturn200()
+        public async void GetAccountDetailsForYear_ShouldCallService()
         {
             // Arrange
             _mockService.Setup(_ => _.GetCouncilTaxDetailsForYear(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
                 .ReturnsAsync(It.IsAny<RecievedYearTotal>());
 
             // Act
-            await _controller.GetAccountDetailsForYear(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>());
+            var result = await _controller.GetAccountDetailsForYear(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>());
 
             // Assert
             _mockService.Verify(_ => _.GetCouncilTaxDetailsForYear(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()), Times.Once);
+            var actionResult = Assert.IsType<OkObjectResult>(result);
+            Assert.Equal(200, actionResult.StatusCode);
         }
 
         [Fact]
@@ -155,80 +176,138 @@ namespace civica_service_tests.Controller
                 .ReturnsAsync(It.IsAny<List<Transaction>>());
 
             // Act
-            await _controller.GetAllTransactionsForYear(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<int>());
+            var result = await _controller.GetAllTransactionsForYear(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<int>());
 
             // Assert
             _mockService.Verify(_ => _.GetAllTransactionsForYear(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<int>()), Times.Once);
+            var actionResult = Assert.IsType<OkObjectResult>(result);
+            Assert.Equal(200, actionResult.StatusCode);
         }
 
         [Fact]
-        public async void GetDocumentsWithAccountReference_ShouldReturn200()
+        public async void GetDocumentsWithAccountReference_ShouldCallService()
         {
             // Arrange
             _mockService.Setup(_ => _.GetDocumentsWithAccountReference(It.IsAny<string>(), It.IsAny<string>()))
                 .ReturnsAsync(It.IsAny<List<CouncilTaxDocumentReference>>());
 
             // Act
-            await _controller.GetDocumentsWithAccountReference(It.IsAny<string>(), It.IsAny<string>());
+            var result = await _controller.GetDocumentsWithAccountReference(It.IsAny<string>(), It.IsAny<string>());
 
             // Assert
             _mockService.Verify(_ => _.GetDocumentsWithAccountReference(It.IsAny<string>(), It.IsAny<string>()), Times.Once);
+            var actionResult = Assert.IsType<OkObjectResult>(result);
+            Assert.Equal(200, actionResult.StatusCode);
         }
 
         [Fact]
-        public async void GetDocuments_ShouldReturn200()
+        public async void GetDocuments_ShouldCallService()
         {
             // Arrange
             _mockService.Setup(_ => _.GetDocuments(It.IsAny<string>()))
                 .ReturnsAsync(It.IsAny<List<CouncilTaxDocumentReference>>());
 
             // Act
-            await _controller.GetDocuments(It.IsAny<string>());
+            var result = await _controller.GetDocuments(It.IsAny<string>());
 
             // Assert
             _mockService.Verify(_ => _.GetDocuments(It.IsAny<string>()), Times.Once);
+            var actionResult = Assert.IsType<OkObjectResult>(result);
+            Assert.Equal(200, actionResult.StatusCode);
         }
 
         [Fact]
-        public async void GetPropertiesOwned_ShouldReturn200()
+        public async void GetPropertiesOwned_ShouldCallServide()
         {
             // Arrange
             _mockService.Setup(_ => _.GetPropertiesOwned(It.IsAny<string>(), It.IsAny<string>()))
                 .ReturnsAsync(It.IsAny<List<Place>>());
 
             // Act
-            await _controller.GetPropertiesOwned(It.IsAny<string>());
+            var result = await _controller.GetPropertiesOwned(It.IsAny<string>());
 
             // Assert
             _mockService.Verify(_ => _.GetPropertiesOwned(It.IsAny<string>(), It.IsAny<string>()), Times.Once);
+            var actionResult = Assert.IsType<OkObjectResult>(result);
+            Assert.Equal(200, actionResult.StatusCode);
         }
 
         [Fact]
-        public async void GetCurrentProperty_ShouldReturn200()
+        public async void GetCurrentProperty_ShouldCallService()
         {
             // Arrange
             _mockService.Setup(_ => _.GetCurrentProperty(It.IsAny<string>(), It.IsAny<string>()))
                 .ReturnsAsync(It.IsAny<Place>());
 
             // Act
-            await _controller.GetCurrentProperty(It.IsAny<string>(), It.IsAny<string>());
+            var result = await _controller.GetCurrentProperty(It.IsAny<string>(), It.IsAny<string>());
 
             // Assert
             _mockService.Verify(_ => _.GetCurrentProperty(It.IsAny<string>(), It.IsAny<string>()), Times.Once);
+            var actionResult = Assert.IsType<OkObjectResult>(result);
+            Assert.Equal(200, actionResult.StatusCode);
         }
 
         [Fact]
-        public async void GetPaymentSchedule_ShouldReturn200()
+        public async void GetPaymentSchedule_ShouldCallService()
         {
             // Arrange
             _mockService.Setup(_ => _.GetPaymentSchedule(It.IsAny<string>(), It.IsAny<int>()))
-                .ReturnsAsync(It.IsAny<List<StockportGovUK.NetStandard.Models.Civica.CouncilTax.Instalment>>());
+                .ReturnsAsync(It.IsAny<List<Instalment>>());
 
             // Act
-            await _controller.GetPaymentSchedule(It.IsAny<string>(), It.IsAny<int>());
+            var result = await _controller.GetPaymentSchedule(It.IsAny<string>(), It.IsAny<int>());
 
             // Assert
             _mockService.Verify(_ => _.GetPaymentSchedule(It.IsAny<string>(), It.IsAny<int>()), Times.Once);
+            var actionResult = Assert.IsType<OkObjectResult>(result);
+            Assert.Equal(200, actionResult.StatusCode);
+        }
+
+        [Fact]
+        public async void GetDocumentForAccount_ShouldCallService()
+        {
+            // Arrange
+            _mockService.Setup(_ => _.GetDocumentForAccount(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
+                .ReturnsAsync(new byte[5]);
+
+            // Act
+            var result = await _controller.GetDocumentForAccount(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>());
+
+            // Assert
+            _mockService.Verify(_ => _.GetDocumentForAccount(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()), Times.Once);
+            var actionResult = Assert.IsType<OkObjectResult>(result);
+            Assert.Equal(200, actionResult.StatusCode);
+        }
+
+        [Fact]
+        public async void GetDocumentForAccount_ShouldReturnNotFound_IfResponseNull()
+        {
+            // Arrange
+            _mockService.Setup(_ => _.GetDocumentForAccount(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
+                .ReturnsAsync((byte[])null);
+
+            // Act
+            var result = await _controller.GetDocumentForAccount(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>());
+
+            // Assert
+            var actionResult = Assert.IsType<NotFoundResult>(result);
+            Assert.Equal(404, actionResult.StatusCode);
+        }
+
+        [Fact]
+        public async void GetDocumentForAccount_ShouldReturnNoContent_IfResponseEmpty()
+        {
+            // Arrange
+            _mockService.Setup(_ => _.GetDocumentForAccount(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
+                .ReturnsAsync(new byte[0]);
+            
+            // Act
+            var result = await _controller.GetDocumentForAccount(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>());
+
+            // Assert
+            var actionResult = Assert.IsType<NoContentResult>(result);
+            Assert.Equal(204, actionResult.StatusCode);
         }
     }
 }
