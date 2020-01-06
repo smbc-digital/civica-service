@@ -8,6 +8,7 @@ using civica_service.Helpers.SessionProvider;
 using civica_service.Services.Models;
 using civica_service.Utils.StorageProvider;
 using civica_service.Utils.Xml;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using StockportGovUK.AspNetCore.Gateways;
 using StockportGovUK.NetStandard.Models.Civica.CouncilTax;
@@ -24,6 +25,7 @@ namespace civica_service.Services
         private readonly ISessionProvider _sessionProvider;
         private readonly ICacheProvider _cacheProvider;
         private readonly IXmlParser _xmlParser;
+        private readonly ILogger<CivicaService> _logger;
 
         public CivicaService(IGateway gateway, IQueryBuilder queryBuilder, ISessionProvider sessionProvider,
             ICacheProvider cacheProvider, IXmlParser xmlParser)
@@ -453,6 +455,7 @@ namespace civica_service.Services
         public async Task<byte[]> GetDocumentForAccount(string personReference, string accountReference, string documentId)
         {
             var key = $"{personReference}-{accountReference}-{documentId}-{ECacheKeys.Document}";
+
             var cacheResponse = await _cacheProvider.GetStringAsync(key);
 
             if (!string.IsNullOrEmpty(cacheResponse))
@@ -476,14 +479,20 @@ namespace civica_service.Services
 
             if (content.Contains("Cannot Find PDF Document"))
             {
+                _logger.LogError($"Cannot Find PDF Document for KEY: {key}, URL: {url}");
                 return null;
+            }
+
+            if (content.Length == 0)
+            {
+                _logger.LogError($"PDF Document returned with no content KEY: {key}, URL: {url}");
             }
             
             var document = await response.Content.ReadAsByteArrayAsync();
             
-             _ = _cacheProvider.SetStringAsync(key, JsonConvert.SerializeObject(document));
+            _ = _cacheProvider.SetStringAsync(key, JsonConvert.SerializeObject(document));
 
-             return document;
+            return document;
         }
     }
 }
