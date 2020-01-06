@@ -28,13 +28,14 @@ namespace civica_service.Services
         private readonly ILogger<CivicaService> _logger;
 
         public CivicaService(IGateway gateway, IQueryBuilder queryBuilder, ISessionProvider sessionProvider,
-            ICacheProvider cacheProvider, IXmlParser xmlParser)
+            ICacheProvider cacheProvider, IXmlParser xmlParser, ILogger<CivicaService> logger)
         {
             _gateway = gateway;
             _queryBuilder = queryBuilder;
             _sessionProvider = sessionProvider;
             _cacheProvider = cacheProvider;
             _xmlParser = xmlParser;
+            _logger = logger;
         }
 
         public async Task<string> GetSessionId(string personReference)
