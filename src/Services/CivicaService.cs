@@ -478,6 +478,8 @@ namespace civica_service.Services
             var response = await _gateway.GetAsync(url);
             var content = await response.Content.ReadAsStringAsync();
 
+            _logger.LogWarning($"Retrieve PDF Document KEY: {key}, URL: {url}");
+
             if (content.Contains("Cannot Find PDF Document"))
             {
                 _logger.LogError($"Cannot Find PDF Document for KEY: {key}, URL: {url}");
@@ -489,6 +491,8 @@ namespace civica_service.Services
                 _logger.LogError($"PDF Document returned with no content KEY: {key}, URL: {url}");
             }
             
+            
+
             var document = await response.Content.ReadAsByteArrayAsync();
             
             _ = _cacheProvider.SetStringAsync(key, JsonConvert.SerializeObject(document));
