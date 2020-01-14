@@ -159,19 +159,19 @@ namespace civica_service.Controllers
         [Route("{personReference}/accounts/{accountReference}/documents/{documentId}")]
         public async Task<IActionResult> GetDocumentForAccount([FromRoute][Required]string personReference, [FromRoute][Required]string accountReference, [FromRoute][Required]string documentId)
         {
-            var response = await _civicaService.GetDocumentForAccount(personReference, accountReference, documentId);
+            var document = await _civicaService.GetDocumentForAccount(personReference, accountReference, documentId);
 
-            if (response == null)
+            if (document == null)
             {
                 return NotFound();
             }
 
-            if(response.Length == 0)
+            if(document.Length == 0)
             {
                 return NoContent();
             }
             
-            return Ok(response);
+            return File(document, "applicaion/pdf", "download.pdf");
         }
     }
 }

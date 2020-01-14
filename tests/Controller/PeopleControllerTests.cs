@@ -276,8 +276,8 @@ namespace civica_service_tests.Controller
 
             // Assert
             _mockService.Verify(_ => _.GetDocumentForAccount(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()), Times.Once);
-            var actionResult = Assert.IsType<OkObjectResult>(result);
-            Assert.Equal(200, actionResult.StatusCode);
+            var actionResult = Assert.IsType<FileContentResult>(result);
+            Assert.NotNull(actionResult);
         }
 
         [Fact]
