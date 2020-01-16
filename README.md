@@ -11,8 +11,8 @@
 
 <div align="center">
   <img alt="Application version" src="https://img.shields.io/badge/version-1.0.0-brightgreen.svg?style=flat-square" />
-  <img alt="Open Issues" src="https://img.shields.io/github/issues/smbc-digital/civica-service" />
-  <img alt="Stars" src="https://img.shields.io/github/stars/smbc-digital/civica-service" />
+  <img alt="Open Issues" src="https://img.shields.io/github/issues/smbc-digital/civica-service?style=flat-square" />
+  <img alt="Stars" src="https://img.shields.io/github/stars/smbc-digital/civica-service?style=flat-square" />
   <img alt="Stability for application" src="https://img.shields.io/badge/stability-experimental-orange.svg?style=flat-square" />
 </div>
 
