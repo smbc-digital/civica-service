@@ -31,10 +31,11 @@
 
 <div align="center">
   <sub>Built with ❤︎ by
-  <a href="https://www.stockport.gov.uk">Stockport Council</a> and
-  <a href="">
-    contributors
-  </a>
+    <a href="https://www.stockport.gov.uk">Stockport Council</a> and
+    <a href="">
+      contributors
+    </a>
+  </sub>
 </div>
 
 
