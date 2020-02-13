@@ -10,7 +10,7 @@ using civica_service.Utils.StorageProvider;
 using civica_service.Utils.Xml;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using StockportGovUK.AspNetCore.Gateways;
+using StockportGovUK.NetStandard.Gateways;
 using StockportGovUK.NetStandard.Models.Civica.CouncilTax;
 using StockportGovUK.NetStandard.Models.RevsAndBens;
 using CouncilTaxAccountResponse = StockportGovUK.NetStandard.Models.Civica.CouncilTax.CouncilTaxAccountResponse;

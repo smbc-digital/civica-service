@@ -15,7 +15,7 @@ using Microsoft.Extensions.DependencyInjection;
 using StockportGovUK.AspNetCore.Middleware;
 using StockportGovUK.AspNetCore.Availability;
 using StockportGovUK.AspNetCore.Availability.Middleware;
-using StockportGovUK.AspNetCore.Gateways;
+using StockportGovUK.NetStandard.Gateways;
 using Swashbuckle.AspNetCore.Swagger;
 
 namespace civica_service

@@ -21,9 +21,9 @@
     <PackageReference Include="Serilog.Sinks.Console" Version="3.1.1" />
     <PackageReference Include="StockportGovUK.AspNetCore.Attributes.TokenAuthentication" Version="0.*" />
     <PackageReference Include="StockportGovUK.AspNetCore.Availability" Version="0.*" />
-    <PackageReference Include="StockportGovUK.AspNetCore.Gateways" Version="0.9.8" />
     <PackageReference Include="StockportGovUK.AspNetCore.Logging.Elasticsearch.Aws" Version="0.*" />
     <PackageReference Include="StockportGovUK.AspNetCore.Middleware.ExceptionHandling" Version="1.0.3" />
+    <PackageReference Include="StockportGovUK.NetStandard.Gateways" Version="1.0.11" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="4.0.1" />
   </ItemGroup>
 

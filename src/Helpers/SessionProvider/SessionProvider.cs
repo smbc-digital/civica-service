@@ -7,7 +7,7 @@ using civica_service.Helpers.SessionProvider.Models;
 using civica_service.Utils.Xml;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using StockportGovUK.AspNetCore.Gateways;
+using StockportGovUK.NetStandard.Gateways;
 using civica_service.Utils.StorageProvider;
 
 namespace civica_service.Helpers.SessionProvider

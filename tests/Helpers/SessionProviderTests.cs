@@ -6,7 +6,7 @@ using civica_service.Utils.Xml;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
-using StockportGovUK.AspNetCore.Gateways;
+using StockportGovUK.NetStandard.Gateways;
 using System;
 using System.Net.Http;
 using Xunit;
