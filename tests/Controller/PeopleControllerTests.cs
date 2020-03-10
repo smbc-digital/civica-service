@@ -1,6 +1,7 @@
 ﻿using civica_service.Controllers;
 using civica_service.Services;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using Moq;
 using StockportGovUK.NetStandard.Models.Civica.CouncilTax;
 using StockportGovUK.NetStandard.Models.RevsAndBens;
@@ -19,7 +20,8 @@ namespace civica_service_tests.Controller
 
         public PeopleControllerTests()
         {
-            _controller = new PeopleController(_mockService.Object);
+            var mockLogger = new Mock<ILogger>();
+            _controller = new PeopleController(_mockService.Object, mockLogger.Object);
         }
 
         [Fact]

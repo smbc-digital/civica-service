@@ -476,8 +476,10 @@ namespace civica_service.Services
 
             var response = await _gateway.GetAsync(url);
             var document = await response.Content.ReadAsByteArrayAsync();
-            
-            _ = _cacheProvider.SetStringAsync(key, JsonConvert.SerializeObject(document));
+
+            if (document != null && document.Length > 0) {
+                _ = _cacheProvider.SetStringAsync(key, JsonConvert.SerializeObject(document));
+            }
 
             return document;
         }

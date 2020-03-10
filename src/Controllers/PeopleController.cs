@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using civica_service.Services;
 using StockportGovUK.AspNetCore.Attributes.TokenAuthentication;
+using Microsoft.Extensions.Logging;
 
 namespace civica_service.Controllers
 {
@@ -14,10 +15,12 @@ namespace civica_service.Controllers
     public class PeopleController : ControllerBase
     {
         private readonly ICivicaService _civicaService;
+        private readonly ILogger _logger;
 
-        public PeopleController(ICivicaService civicaService)
+        public PeopleController(ICivicaService civicaService, ILogger logger)
         {
             _civicaService = civicaService;
+            _logger = logger;
         }
 
         [HttpGet]
@@ -163,6 +166,7 @@ namespace civica_service.Controllers
 
             if (document == null)
             {
+                _logger.LogWarning($"Document {documentId} is null for Person {personReference} with Account {accountReference}");
                 return NotFound();
             }
 
