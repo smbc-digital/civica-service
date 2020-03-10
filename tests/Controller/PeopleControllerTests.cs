@@ -20,7 +20,7 @@ namespace civica_service_tests.Controller
 
         public PeopleControllerTests()
         {
-            var mockLogger = new Mock<ILogger>();
+            var mockLogger = new Mock<ILogger<PeopleController>>();
             _controller = new PeopleController(_mockService.Object, mockLogger.Object);
         }
 

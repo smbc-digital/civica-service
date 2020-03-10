@@ -15,9 +15,9 @@ namespace civica_service.Controllers
     public class PeopleController : ControllerBase
     {
         private readonly ICivicaService _civicaService;
-        private readonly ILogger _logger;
+        private readonly ILogger<PeopleController> _logger;
 
-        public PeopleController(ICivicaService civicaService, ILogger logger)
+        public PeopleController(ICivicaService civicaService, ILogger<PeopleController> logger)
         {
             _civicaService = civicaService;
             _logger = logger;
