@@ -80,9 +80,9 @@ namespace civica_service.Services
 
             var response = await _gateway.PostAsync(url, body);
             var content = await response.Content.ReadAsStringAsync();
-            var parsedResponse =
-                _xmlParser.DeserializeXmlStringToType<BenefitsClaimsSummaryResponse>(content, "HBSelectDoc");
+            var parsedResponse = _xmlParser.DeserializeXmlStringToType<BenefitsClaimsSummaryResponse>(content, "HBSelectDoc");
             var claimSummary = parsedResponse.Claims.Summary;
+            claimSummary.ForEach(_ => _.PersonName = parsedResponse.PersonName);
 
             _ = _cacheProvider.SetStringAsync($"{personReference}-{ECacheKeys.Benefits}",
                 JsonConvert.SerializeObject(claimSummary));
