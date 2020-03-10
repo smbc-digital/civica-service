@@ -172,6 +172,7 @@ namespace civica_service.Controllers
 
             if(document.Length == 0)
             {
+                _logger.LogWarning($"Document {documentId} length is 0 for Person {personReference} with Account {accountReference}");
                 return NoContent();
             }
             
