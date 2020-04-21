@@ -21,10 +21,9 @@ namespace civica_service.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAvailability()
         {
-            _ = await _sessionProvider.GetSessionId();
+            await _sessionProvider.GetSessionId();
 
             return Ok();
         }
-
     }
 }

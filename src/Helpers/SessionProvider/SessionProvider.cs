@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using civica_service.Helpers.QueryBuilder;
 using civica_service.Helpers.SessionProvider.Models;
 using civica_service.Utils.Xml;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using StockportGovUK.NetStandard.Gateways;
 using civica_service.Utils.StorageProvider;
@@ -55,7 +54,7 @@ namespace civica_service.Helpers.SessionProvider
 
             if (!deserializedResponse.ErrorCode.Text.Equals("5"))
             {
-                throw new Exception($"API login unsuccessful, check credentials. Actual response: {xmlResponse.ToString()}");
+                throw new Exception($"API login unsuccessful, check credentials. Actual response: {xmlResponse}");
             }
 
             var sessionId = deserializedResponse.SessionID;

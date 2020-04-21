@@ -7,7 +7,7 @@ namespace civica_service_tests.Utils
     public class XmlParserTests
     {
         private readonly XmlParser _xmlParser;
-        private const string elementValue = "test";
+        private const string ElementValue = "test";
 
         public XmlParserTests()
         {
@@ -18,20 +18,20 @@ namespace civica_service_tests.Utils
         public void DeserializeXmlStringToType_ReturnsCorrectValue()
         {
             // Act
-            var result = _xmlParser.DeserializeXmlStringToType<XmlParserModel>($"<Root><Element>{elementValue}</Element></Root>", "Root");
+            var result = _xmlParser.DeserializeXmlStringToType<XmlParserModel>($"<Root><Element>{ElementValue}</Element></Root>", "Root");
 
             // Assert
-            Assert.Equal(elementValue, result.XmlParserTest);
+            Assert.Equal(ElementValue, result.XmlParserTest);
         }
 
         [Fact]
         public void DeserializeNodeToType_ReturnsCorrectValue()
         {
             // Act
-            var test = _xmlParser.DeserializeNodeToType<XmlParserModel>(XElement.Parse($"<Root><Element>{elementValue}</Element></Root>"), "Root");
+            var test = _xmlParser.DeserializeNodeToType<XmlParserModel>(XElement.Parse($"<Root><Element>{ElementValue}</Element></Root>"), "Root");
 
             // Assert
-            Assert.Equal(elementValue, test.XmlParserTest);
+            Assert.Equal(ElementValue, test.XmlParserTest);
         }
     }
 }

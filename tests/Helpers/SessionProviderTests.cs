@@ -3,7 +3,6 @@ using civica_service.Helpers.SessionProvider;
 using civica_service.Helpers.SessionProvider.Models;
 using civica_service.Utils.StorageProvider;
 using civica_service.Utils.Xml;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
 using StockportGovUK.NetStandard.Gateways;
@@ -21,8 +20,6 @@ namespace civica_service_tests.Helpers
         private readonly Mock<IOptions<SessionConfiguration>> _configuration = new Mock<IOptions<SessionConfiguration>>();
         private readonly Mock<ICacheProvider> _distributedCache = new Mock<ICacheProvider>();
         private readonly Mock<IXmlParser> _mockXmlParser = new Mock<IXmlParser>();
-
-        private readonly Mock<ILogger<SessionProvider>> _mockLogger = new Mock<ILogger<SessionProvider>>();
 
         public SessionProviderTests()
         {

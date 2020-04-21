@@ -1,6 +1,5 @@
 using System.Xml.Serialization;
 
-
 namespace civica_service.Helpers.SessionProvider.Models
 {
     public class ErrorCode {

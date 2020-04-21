@@ -6,7 +6,6 @@ using civica_service.Services;
 using civica_service.Services.Models;
 using civica_service.Utils.StorageProvider;
 using civica_service.Utils.Xml;
-using Microsoft.Extensions.Logging;
 using Moq;
 using Newtonsoft.Json;
 using StockportGovUK.NetStandard.Gateways;
@@ -26,7 +25,6 @@ namespace civica_service_tests.Service
         private readonly Mock<ICacheProvider> _mockCacheProvider = new Mock<ICacheProvider>();
         private readonly Mock<IXmlParser> _mockXmlParser = new Mock<IXmlParser>();
 
-        private readonly Mock<ILogger<CivicaService>> _mockLogger = new Mock<ILogger<CivicaService>>();
         private const string SessionId = "test-session-id";
 
         public CivicaServiceTests()
@@ -57,7 +55,7 @@ namespace civica_service_tests.Service
                   Content = new StringContent(string.Empty)
               });
 
-            _civicaService = new CivicaService(_mockGateway.Object, _mockQueryBuilder.Object, _mockSessionProvider.Object, _mockCacheProvider.Object, _mockXmlParser.Object, _mockLogger.Object);
+            _civicaService = new CivicaService(_mockGateway.Object, _mockQueryBuilder.Object, _mockSessionProvider.Object, _mockCacheProvider.Object, _mockXmlParser.Object);
         }
 
         [Fact]
@@ -543,9 +541,9 @@ namespace civica_service_tests.Service
         [Fact]
         public async void GetCouncilTaxDetailsForYear_ShouldCallCorrectGatewayUrl()
         {
-            var personReference = "test-person-ref";
-            var accountReference = "test-account-ref";
-            var year = "2019";
+            const string personReference = "test-person-ref";
+            const string accountReference = "test-account-ref";
+            const string year = "2019";
 
             _mockXmlParser
                 .Setup(_ => _.DeserializeXmlStringToType<CouncilTaxAccountSummary>(It.IsAny<string>(), It.IsAny<string>()))
@@ -572,11 +570,11 @@ namespace civica_service_tests.Service
         [Fact]
         public async void GetCouncilTaxDetailsForYear_ShouldGetModelFromCacheProvider()
         {
-            var personReference = "test-person-ref";
-            var accountReference = "test-account-ref";
-            var year = "2019";
+            const string personReference = "test-person-ref";
+            const string accountReference = "test-account-ref";
+            const string year = "2019";
 
-            var model = JsonConvert.SerializeObject(new RecievedYearTotal
+            var model = JsonConvert.SerializeObject(new ReceivedYearTotal
             {
                 TotalCharge = "400",
                 TotalPayments = "500",

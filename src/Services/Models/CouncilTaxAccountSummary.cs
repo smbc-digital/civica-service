@@ -14,6 +14,6 @@ namespace civica_service.Services.Models
     public class FinancialDetails
     {
         [XmlElement("RecYrTotals")]
-        public RecievedYearTotal RecievedYearTotal { get; set; }
+        public ReceivedYearTotal ReceivedYearTotal { get; set; }
     }
 }

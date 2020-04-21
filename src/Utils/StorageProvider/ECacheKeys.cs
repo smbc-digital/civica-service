@@ -4,7 +4,6 @@ namespace civica_service.Utils.StorageProvider
     {
         SessionId,
         Benefits,
-        CouncilTaxTransactionHistory,
         CouncilTaxDocuments,
         CouncilTaxDocumentsByReference,
         CouncilTaxPropertiesOwned,

@@ -8,13 +8,10 @@ using civica_service.Helpers.SessionProvider;
 using civica_service.Services.Models;
 using civica_service.Utils.StorageProvider;
 using civica_service.Utils.Xml;
-using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using StockportGovUK.NetStandard.Gateways;
 using StockportGovUK.NetStandard.Models.Civica.CouncilTax;
 using StockportGovUK.NetStandard.Models.RevsAndBens;
-using CouncilTaxAccountResponse = StockportGovUK.NetStandard.Models.Civica.CouncilTax.CouncilTaxAccountResponse;
-using Instalment = StockportGovUK.NetStandard.Models.Civica.CouncilTax.Instalment;
 
 namespace civica_service.Services
 {
@@ -25,17 +22,15 @@ namespace civica_service.Services
         private readonly ISessionProvider _sessionProvider;
         private readonly ICacheProvider _cacheProvider;
         private readonly IXmlParser _xmlParser;
-        private readonly ILogger<CivicaService> _logger;
 
         public CivicaService(IGateway gateway, IQueryBuilder queryBuilder, ISessionProvider sessionProvider,
-            ICacheProvider cacheProvider, IXmlParser xmlParser, ILogger<CivicaService> logger)
+            ICacheProvider cacheProvider, IXmlParser xmlParser)
         {
             _gateway = gateway;
             _queryBuilder = queryBuilder;
             _sessionProvider = sessionProvider;
             _cacheProvider = cacheProvider;
             _xmlParser = xmlParser;
-            _logger = logger;
         }
 
         public async Task<string> GetSessionId(string personReference)
@@ -44,8 +39,8 @@ namespace civica_service.Services
         }
 
         // This method may seem pointless, however, I am trying to wrap Civica's 
-        // nonsence of assigning a council-tax-reference to a session-id when this endpoint is called.
-        private async Task SetAccountRefererance(string personReference, string accountReference)
+        // nonsense of assigning a council-tax-reference to a session-id when this endpoint is called.
+        private async Task SetAccountReference(string personReference, string accountReference)
         {
             await GetCouncilTaxDetails(personReference, accountReference);
         }
@@ -112,7 +107,7 @@ namespace civica_service.Services
 
             var response = await _gateway.GetAsync(url);
             var responseContent = await response.Content.ReadAsStringAsync();
-            var parsedResponse = new BenefitsClaim();
+            BenefitsClaim parsedResponse;
 
             try
             {
@@ -282,7 +277,7 @@ namespace civica_service.Services
             }
 
             //required for civica to return correct address for user
-            await SetAccountRefererance(personReference, accountReference);
+            await SetAccountReference(personReference, accountReference);
 
             var properties = await GetPropertiesOwned(personReference, accountReference);
             var currentProperty = properties.FirstOrDefault(p => p.Status == "Current") ?? properties.FirstOrDefault();
@@ -322,14 +317,14 @@ namespace civica_service.Services
             return accounts;
         }
 
-        public async Task<List<Instalment>> GetPaymentSchedule(string personReference, int year)
+        public async Task<List<Installment>> GetPaymentSchedule(string personReference, int year)
         {
             var key = $"{personReference}-{year}-{ECacheKeys.CouncilTaxPaymentSchedule}";
             var cacheResponse = await _cacheProvider.GetStringAsync(key);
 
             if (!string.IsNullOrEmpty(cacheResponse))
             {
-                return JsonConvert.DeserializeObject<List<Instalment>>(cacheResponse);
+                return JsonConvert.DeserializeObject<List<Installment>>(cacheResponse);
             }
 
             var sessionId = await _sessionProvider.GetSessionId(personReference);
@@ -345,7 +340,7 @@ namespace civica_service.Services
             var response = await _gateway.GetAsync(url);
             var responseContent = await response.Content.ReadAsStringAsync();
             var parsedResponse = _xmlParser
-                .DeserializeDescendentsToIEnumerable<Instalment>(responseContent, "Instalment")
+                .DeserializeDescendentsToIEnumerable<Installment>(responseContent, "Instalment")
                 .ToList();
 
             _ = _cacheProvider.SetStringAsync(key, JsonConvert.SerializeObject(parsedResponse));
@@ -374,7 +369,7 @@ namespace civica_service.Services
 
             var response = await _gateway.GetAsync(url);
             var responseContent = await response.Content.ReadAsStringAsync();
-            var parsedResponse = new CouncilTaxAccountResponse();
+            CouncilTaxAccountResponse parsedResponse;
 
             try
             {
@@ -390,7 +385,7 @@ namespace civica_service.Services
             return parsedResponse;
         }
 
-        public async Task<RecievedYearTotal> GetCouncilTaxDetailsForYear(string personReference,
+        public async Task<ReceivedYearTotal> GetCouncilTaxDetailsForYear(string personReference,
             string accountReference, string year)
         {
             var key = $"{personReference}-{accountReference}-{year}-{ECacheKeys.CouncilTaxAccountForYear}";
@@ -398,7 +393,7 @@ namespace civica_service.Services
 
             if (!string.IsNullOrEmpty(cacheResponse))
             {
-                return JsonConvert.DeserializeObject<RecievedYearTotal>(cacheResponse);
+                return JsonConvert.DeserializeObject<ReceivedYearTotal>(cacheResponse);
             }
 
             var sessionId = await _sessionProvider.GetSessionId(personReference);
@@ -414,7 +409,7 @@ namespace civica_service.Services
             var responseContent = await response.Content.ReadAsStringAsync();
             var parsedResponse =
                 _xmlParser.DeserializeXmlStringToType<CouncilTaxAccountSummary>(responseContent, "CtaxDetails");
-            var receivedYearTotals = parsedResponse.FinancialDetails.RecievedYearTotal;
+            var receivedYearTotals = parsedResponse.FinancialDetails.ReceivedYearTotal;
 
             _ = _cacheProvider.SetStringAsync(key, JsonConvert.SerializeObject(receivedYearTotals));
 
@@ -431,7 +426,7 @@ namespace civica_service.Services
                 return JsonConvert.DeserializeObject<List<Transaction>>(cacheResponse);
             }
 
-            await SetAccountRefererance(personReference, accountReference);
+            await SetAccountReference(personReference, accountReference);
 
             var sessionId = await _sessionProvider.GetSessionId(personReference);
 
@@ -464,7 +459,7 @@ namespace civica_service.Services
                 return JsonConvert.DeserializeObject<byte[]>(cacheResponse);
             }
 
-            await SetAccountRefererance(personReference, accountReference);
+            await SetAccountReference(personReference, accountReference);
 
             var sessionId = await _sessionProvider.GetSessionId(personReference);
             

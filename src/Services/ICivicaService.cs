@@ -11,7 +11,7 @@ namespace civica_service.Services {
 
         Task<CouncilTaxAccountResponse> GetCouncilTaxDetails (string personReference, string accountReference);
 
-        Task<RecievedYearTotal> GetCouncilTaxDetailsForYear (string personReference, string accountReference, string year);
+        Task<ReceivedYearTotal> GetCouncilTaxDetailsForYear (string personReference, string accountReference, string year);
 
         Task<List<Transaction>> GetAllTransactionsForYear (string personReference, string accountReference, int year);
 
@@ -23,7 +23,7 @@ namespace civica_service.Services {
 
         Task<List<PaymentDetail>> GetCouncilTaxBenefitPaymentHistory (string personReference);
 
-        Task<List<StockportGovUK.NetStandard.Models.Civica.CouncilTax.Instalment>> GetPaymentSchedule(string personReference, int year);
+        Task<List<Installment>> GetPaymentSchedule(string personReference, int year);
 
         Task<List<CouncilTaxDocumentReference>> GetDocuments (string personReference);
 

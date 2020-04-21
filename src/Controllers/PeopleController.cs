@@ -176,7 +176,7 @@ namespace civica_service.Controllers
                 return NoContent();
             }
             
-            return File(document, "applicaion/pdf", "download.pdf");
+            return File(document, "application/pdf", "download.pdf");
         }
     }
 }

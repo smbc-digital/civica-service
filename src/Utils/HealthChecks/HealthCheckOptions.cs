@@ -10,7 +10,7 @@ namespace civica_service.Utils.HealthChecks
 {
     public static class HealthCheckConfig
     {
-        private static readonly AssemblyName _assembly = Assembly.GetEntryAssembly().GetName();
+        private static readonly AssemblyName Assembly = System.Reflection.Assembly.GetEntryAssembly()?.GetName();
 
         public static HealthCheckOptions Options => new HealthCheckOptions
         {
@@ -26,7 +26,8 @@ namespace civica_service.Utils.HealthChecks
                     case HealthStatus.Unhealthy:
                         await c.Response.WriteAsync(ProcessUnhealthy(r));
                         break;
-                    default:
+                    case HealthStatus.Degraded:
+                        await c.Response.WriteAsync(ProcessUnhealthy(r));
                         break;
                 }
             }
@@ -37,8 +38,8 @@ namespace civica_service.Utils.HealthChecks
             return JsonConvert.SerializeObject(new
                 {
                     application = new {
-                        name = _assembly.Name,
-                        version = _assembly.Version.ToString(),
+                        name = Assembly.Name,
+                        version = Assembly.Version.ToString(),
                         status = report.Status.ToString(),
                     },
                     checks = report.Entries.Select(e =>
@@ -58,8 +59,8 @@ namespace civica_service.Utils.HealthChecks
             return JsonConvert.SerializeObject(new
                 {
                     application = new {
-                        name = _assembly.Name,
-                        version = _assembly.Version.ToString(),
+                        name = Assembly.Name,
+                        version = Assembly.Version.ToString(),
                         status = report.Status.ToString(),
                     },
                     checks = report.Entries.Select(e =>

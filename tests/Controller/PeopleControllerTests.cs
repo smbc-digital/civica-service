@@ -5,11 +5,8 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using StockportGovUK.NetStandard.Models.Civica.CouncilTax;
 using StockportGovUK.NetStandard.Models.RevsAndBens;
-using System;
 using System.Collections.Generic;
 using Xunit;
-using Instalment = StockportGovUK.NetStandard.Models.Civica.CouncilTax.Instalment;
-using Transaction = StockportGovUK.NetStandard.Models.RevsAndBens.Transaction;
 
 namespace civica_service_tests.Controller
 {
@@ -159,7 +156,7 @@ namespace civica_service_tests.Controller
         {
             // Arrange
             _mockService.Setup(_ => _.GetCouncilTaxDetailsForYear(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
-                .ReturnsAsync(It.IsAny<RecievedYearTotal>());
+                .ReturnsAsync(It.IsAny<ReceivedYearTotal>());
 
             // Act
             var result = await _controller.GetAccountDetailsForYear(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>());
@@ -219,7 +216,7 @@ namespace civica_service_tests.Controller
         }
 
         [Fact]
-        public async void GetPropertiesOwned_ShouldCallServide()
+        public async void GetPropertiesOwned_ShouldCallService()
         {
             // Arrange
             _mockService.Setup(_ => _.GetPropertiesOwned(It.IsAny<string>(), It.IsAny<string>()))
@@ -255,7 +252,7 @@ namespace civica_service_tests.Controller
         {
             // Arrange
             _mockService.Setup(_ => _.GetPaymentSchedule(It.IsAny<string>(), It.IsAny<int>()))
-                .ReturnsAsync(It.IsAny<List<Instalment>>());
+                .ReturnsAsync(It.IsAny<List<Installment>>());
 
             // Act
             var result = await _controller.GetPaymentSchedule(It.IsAny<string>(), It.IsAny<int>());
