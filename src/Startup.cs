@@ -70,7 +70,7 @@ namespace civica_service
             app.UseSwagger();
             app.UseSwaggerUI(c =>
             {
-                c.SwaggerEndpoint($"{(env.IsEnvironment("local") ? string.Empty : "/civicaservice")}/swagger/v1/swagger.json", "civica_service API");
+                c.SwaggerEndpoint($"{(env.IsEnvironment("local") ? string.Empty : "/civicaservice")}/swagger/v1/swagger.json", "Civica service API");
             });
         }
     }

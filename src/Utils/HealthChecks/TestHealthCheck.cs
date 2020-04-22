@@ -9,7 +9,7 @@ namespace civica_service.Utils.HealthChecks
     {
         public async Task<HealthCheckResult> CheckHealthAsync(HealthCheckContext context, CancellationToken cancellationToken = default)
         {
-            return HealthCheckResult.Healthy(null, new Dictionary<string, object> {{"Result", "All working!"}});
+            return await Task.FromResult(HealthCheckResult.Healthy(null, new Dictionary<string, object> {{"Result", "All working!"}}));
         }
     }
 }
