@@ -2,13 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
+using System.Text.Json;
 using System.Threading.Tasks;
 using civica_service.Helpers.QueryBuilder;
 using civica_service.Helpers.SessionProvider;
 using civica_service.Services.Models;
 using civica_service.Utils.StorageProvider;
 using civica_service.Utils.Xml;
-using Newtonsoft.Json;
 using StockportGovUK.NetStandard.Gateways;
 using StockportGovUK.NetStandard.Models.Civica.CouncilTax;
 using StockportGovUK.NetStandard.Models.RevsAndBens;
@@ -58,7 +58,7 @@ namespace civica_service.Services
 
             if (!string.IsNullOrEmpty(cacheResponse))
             {
-                return JsonConvert.DeserializeObject<List<BenefitsClaimSummary>>(cacheResponse);
+                return JsonSerializer.Deserialize<List<BenefitsClaimSummary>>(cacheResponse);
             }
 
             var sessionId = await _sessionProvider.GetSessionId(personReference);
@@ -79,7 +79,7 @@ namespace civica_service.Services
             var claimSummary = parsedResponse.Claims.Summary;
             claimSummary.ForEach(_ => _.PersonName = parsedResponse.PersonName);
 
-            _ = _cacheProvider.SetStringAsync($"{personReference}-{ECacheKeys.Benefits}", JsonConvert.SerializeObject(claimSummary));
+            _ = _cacheProvider.SetStringAsync($"{personReference}-{ECacheKeys.Benefits}", JsonSerializer.Serialize(claimSummary));
 
             return claimSummary;
         }
@@ -91,7 +91,7 @@ namespace civica_service.Services
 
             if (!string.IsNullOrEmpty(cacheResponse))
             {
-                return JsonConvert.DeserializeObject<BenefitsClaim>(cacheResponse);
+                return JsonSerializer.Deserialize<BenefitsClaim>(cacheResponse);
             }
 
             var sessionId = await _sessionProvider.GetSessionId(personReference);
@@ -116,7 +116,7 @@ namespace civica_service.Services
                 throw new Exception($"Failed to deserialize XML - Person reference: {personReference}, Claim reference: {claimReference}, Place reference {placeReference}, Response: {responseContent}", ex.InnerException);
             }
 
-            _ = _cacheProvider.SetStringAsync(key, JsonConvert.SerializeObject(parsedResponse));
+            _ = _cacheProvider.SetStringAsync(key, JsonSerializer.Serialize(parsedResponse));
 
             return parsedResponse;
         }
@@ -127,7 +127,7 @@ namespace civica_service.Services
 
             if (!string.IsNullOrEmpty(cacheResponse))
             {
-                return JsonConvert.DeserializeObject<List<PaymentDetail>>(cacheResponse);
+                return JsonSerializer.Deserialize<List<PaymentDetail>>(cacheResponse);
             }
 
             var sessionId = await _sessionProvider.GetSessionId(personReference);
@@ -143,7 +143,7 @@ namespace civica_service.Services
             var paymentDetails = _xmlParser.DeserializeXmlStringToType<PaymentDetailsResponse>(content, "HBPaymentDetails");
             var housingBenefitList = paymentDetails.PaymentList.PaymentDetails;
 
-            _ = _cacheProvider.SetStringAsync($"{personReference}-{ECacheKeys.HousingBenefitsPaymentDetails}", JsonConvert.SerializeObject(housingBenefitList));
+            _ = _cacheProvider.SetStringAsync($"{personReference}-{ECacheKeys.HousingBenefitsPaymentDetails}", JsonSerializer.Serialize(housingBenefitList));
 
             return housingBenefitList;
         }
@@ -154,7 +154,7 @@ namespace civica_service.Services
 
             if (!string.IsNullOrEmpty(cacheResponse))
             {
-                return JsonConvert.DeserializeObject<List<PaymentDetail>>(cacheResponse);
+                return JsonSerializer.Deserialize<List<PaymentDetail>>(cacheResponse);
             }
 
             var sessionId = await _sessionProvider.GetSessionId(personReference);
@@ -170,7 +170,7 @@ namespace civica_service.Services
             var paymentDetails = _xmlParser.DeserializeXmlStringToType<PaymentDetailsResponse>(content, "HBPaymentDetails");
             var ctaxPaymentList = paymentDetails.PaymentList.PaymentDetails;
 
-            _ = _cacheProvider.SetStringAsync($"{personReference}-{ECacheKeys.CouncilTaxPaymentDetails}", JsonConvert.SerializeObject(ctaxPaymentList));
+            _ = _cacheProvider.SetStringAsync($"{personReference}-{ECacheKeys.CouncilTaxPaymentDetails}", JsonSerializer.Serialize(ctaxPaymentList));
 
             return ctaxPaymentList;
         }
@@ -181,7 +181,7 @@ namespace civica_service.Services
 
             if (!string.IsNullOrEmpty(cacheResponse))
             {
-                return JsonConvert.DeserializeObject<List<CouncilTaxDocumentReference>>(cacheResponse);
+                return JsonSerializer.Deserialize<List<CouncilTaxDocumentReference>>(cacheResponse);
             }
 
             var sessionId = await _sessionProvider.GetSessionId(personReference);
@@ -198,7 +198,7 @@ namespace civica_service.Services
                 .DeserializeDescendentsToIEnumerable<CouncilTaxDocumentReference>(responseContent, "Document")
                 .ToList();
 
-            _ = _cacheProvider.SetStringAsync($"{personReference}-{ECacheKeys.CouncilTaxDocuments}", JsonConvert.SerializeObject(documentsList));
+            _ = _cacheProvider.SetStringAsync($"{personReference}-{ECacheKeys.CouncilTaxDocuments}", JsonSerializer.Serialize(documentsList));
 
             return documentsList;
         }
@@ -213,7 +213,7 @@ namespace civica_service.Services
 
             if (!string.IsNullOrEmpty(cacheResponse))
             {
-                return JsonConvert.DeserializeObject<List<CouncilTaxDocumentReference>>(cacheResponse);
+                return JsonSerializer.Deserialize<List<CouncilTaxDocumentReference>>(cacheResponse);
             }
 
             var documents = await GetDocuments(personReference);
@@ -221,7 +221,7 @@ namespace civica_service.Services
                 .Where(_ => _.AccountReference == accountReference)
                 .ToList();
 
-            _ = _cacheProvider.SetStringAsync(key, JsonConvert.SerializeObject(filteredDocuments));
+            _ = _cacheProvider.SetStringAsync(key, JsonSerializer.Serialize(filteredDocuments));
 
             return filteredDocuments;
         }
@@ -232,7 +232,7 @@ namespace civica_service.Services
 
             if (!string.IsNullOrEmpty(cacheResponse))
             {
-                return JsonConvert.DeserializeObject<List<Place>>(cacheResponse);
+                return JsonSerializer.Deserialize<List<Place>>(cacheResponse);
             }
 
             var sessionId = await _sessionProvider.GetSessionId(personReference);
@@ -249,7 +249,7 @@ namespace civica_service.Services
                 .DeserializeDescendentsToIEnumerable<Place>(responseContent, "Places")
                 .ToList();
 
-            _ = _cacheProvider.SetStringAsync($"{personReference}-{accountReference}-{ECacheKeys.CouncilTaxPropertiesOwned}", JsonConvert.SerializeObject(places));
+            _ = _cacheProvider.SetStringAsync($"{personReference}-{accountReference}-{ECacheKeys.CouncilTaxPropertiesOwned}", JsonSerializer.Serialize(places));
 
             return places;
         }
@@ -260,7 +260,7 @@ namespace civica_service.Services
 
             if (!string.IsNullOrEmpty(cacheResponse))
             {
-                return JsonConvert.DeserializeObject<Place>(cacheResponse);
+                return JsonSerializer.Deserialize<Place>(cacheResponse);
             }
 
             //required for civica to return correct address for user
@@ -269,7 +269,7 @@ namespace civica_service.Services
             var properties = await GetPropertiesOwned(personReference, accountReference);
             var currentProperty = properties.FirstOrDefault(p => p.Status == "Current") ?? properties.FirstOrDefault();
 
-            _ = _cacheProvider.SetStringAsync($"{personReference}-{accountReference}-{ECacheKeys.CouncilTaxCurrentProperty}", JsonConvert.SerializeObject(currentProperty));
+            _ = _cacheProvider.SetStringAsync($"{personReference}-{accountReference}-{ECacheKeys.CouncilTaxCurrentProperty}", JsonSerializer.Serialize(currentProperty));
 
             return currentProperty;
         }
@@ -281,7 +281,7 @@ namespace civica_service.Services
 
             if (!string.IsNullOrEmpty(cacheResponse))
             {
-                return JsonConvert.DeserializeObject<List<CtaxActDetails>>(cacheResponse);
+                return JsonSerializer.Deserialize<List<CtaxActDetails>>(cacheResponse);
             }
 
             var sessionId = await _sessionProvider.GetSessionId(personReference);
@@ -297,7 +297,7 @@ namespace civica_service.Services
                 .DeserializeDescendentsToIEnumerable<CtaxActDetails>(responseContent, "CtaxActDetails")
                 .ToList();
 
-            _ = _cacheProvider.SetStringAsync($"{personReference}-{ECacheKeys.CouncilTaxAccounts}", JsonConvert.SerializeObject(accounts));
+            _ = _cacheProvider.SetStringAsync($"{personReference}-{ECacheKeys.CouncilTaxAccounts}", JsonSerializer.Serialize(accounts));
 
             return accounts;
         }
@@ -309,7 +309,7 @@ namespace civica_service.Services
 
             if (!string.IsNullOrEmpty(cacheResponse))
             {
-                return JsonConvert.DeserializeObject<List<Installment>>(cacheResponse);
+                return JsonSerializer.Deserialize<List<Installment>>(cacheResponse);
             }
 
             var sessionId = await _sessionProvider.GetSessionId(personReference);
@@ -328,7 +328,7 @@ namespace civica_service.Services
                 .DeserializeDescendentsToIEnumerable<Installment>(responseContent, "Instalment")
                 .ToList();
 
-            _ = _cacheProvider.SetStringAsync(key, JsonConvert.SerializeObject(parsedResponse));
+            _ = _cacheProvider.SetStringAsync(key, JsonSerializer.Serialize(parsedResponse));
 
             return parsedResponse;
         }
@@ -341,7 +341,7 @@ namespace civica_service.Services
 
             if (!string.IsNullOrEmpty(cacheResponse))
             {
-                return JsonConvert.DeserializeObject<CouncilTaxAccountResponse>(cacheResponse);
+                return JsonSerializer.Deserialize<CouncilTaxAccountResponse>(cacheResponse);
             }
 
             var sessionId = await _sessionProvider.GetSessionId(personReference);
@@ -365,7 +365,7 @@ namespace civica_service.Services
                 throw new Exception($"Failed to deserialize XML - Person reference: {personReference}, Account reference: {accountReference}, Response: {responseContent}", ex.InnerException);
             }
 
-            _ = _cacheProvider.SetStringAsync(key, JsonConvert.SerializeObject(parsedResponse));
+            _ = _cacheProvider.SetStringAsync(key, JsonSerializer.Serialize(parsedResponse));
 
             return parsedResponse;
         }
@@ -378,7 +378,7 @@ namespace civica_service.Services
 
             if (!string.IsNullOrEmpty(cacheResponse))
             {
-                return JsonConvert.DeserializeObject<ReceivedYearTotal>(cacheResponse);
+                return JsonSerializer.Deserialize<ReceivedYearTotal>(cacheResponse);
             }
 
             var sessionId = await _sessionProvider.GetSessionId(personReference);
@@ -395,7 +395,7 @@ namespace civica_service.Services
             var parsedResponse = _xmlParser.DeserializeXmlStringToType<CouncilTaxAccountSummary>(responseContent, "CtaxDetails");
             var receivedYearTotals = parsedResponse.FinancialDetails.ReceivedYearTotal;
 
-            _ = _cacheProvider.SetStringAsync(key, JsonConvert.SerializeObject(receivedYearTotals));
+            _ = _cacheProvider.SetStringAsync(key, JsonSerializer.Serialize(receivedYearTotals));
 
             return receivedYearTotals;
         }
@@ -407,7 +407,7 @@ namespace civica_service.Services
 
             if (!string.IsNullOrEmpty(cacheResponse))
             {
-                return JsonConvert.DeserializeObject<List<Transaction>>(cacheResponse);
+                return JsonSerializer.Deserialize<List<Transaction>>(cacheResponse);
             }
 
             await SetAccountReference(personReference, accountReference);
@@ -427,7 +427,7 @@ namespace civica_service.Services
                 .DeserializeDescendentsToIEnumerable<Transaction>(content, "Transaction")
                 .ToList();
 
-            _ = _cacheProvider.SetStringAsync(key, JsonConvert.SerializeObject(transactions));
+            _ = _cacheProvider.SetStringAsync(key, JsonSerializer.Serialize(transactions));
 
             return transactions;
         }
@@ -440,7 +440,7 @@ namespace civica_service.Services
 
             if (!string.IsNullOrEmpty(cacheResponse))
             {
-                return JsonConvert.DeserializeObject<byte[]>(cacheResponse);
+                return JsonSerializer.Deserialize<byte[]>(cacheResponse);
             }
 
             await SetAccountReference(personReference, accountReference);
@@ -458,7 +458,7 @@ namespace civica_service.Services
 
             if (document != null && document.Length > 0)
             {
-                _ = _cacheProvider.SetStringAsync(key, JsonConvert.SerializeObject(document));
+                _ = _cacheProvider.SetStringAsync(key, JsonSerializer.Serialize(document));
             }
 
             return document;
