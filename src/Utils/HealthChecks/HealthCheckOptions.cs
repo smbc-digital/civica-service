@@ -1,10 +1,10 @@
 using System.Linq;
 using System.Net.Mime;
 using System.Reflection;
-using System.Text.Json;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
+using Newtonsoft.Json;
 
 namespace civica_service.Utils.HealthChecks
 {
@@ -35,7 +35,7 @@ namespace civica_service.Utils.HealthChecks
 
         private static string ProcessUnhealthy(HealthReport report)
         {
-            return JsonSerializer.Serialize(new
+            return JsonConvert.SerializeObject(new
                 {
                     application = new {
                         name = Assembly.Name,
@@ -56,7 +56,7 @@ namespace civica_service.Utils.HealthChecks
 
         private static string ProcessHealthy(HealthReport report)
         {
-            return JsonSerializer.Serialize(new
+            return JsonConvert.SerializeObject(new
                 {
                     application = new {
                         name = Assembly.Name,

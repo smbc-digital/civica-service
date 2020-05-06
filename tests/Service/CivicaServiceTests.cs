@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Net.Http;
-using System.Text.Json;
 using civica_service.Helpers.QueryBuilder;
 using civica_service.Helpers.SessionProvider;
 using civica_service.Services;
@@ -8,6 +7,7 @@ using civica_service.Services.Models;
 using civica_service.Utils.StorageProvider;
 using civica_service.Utils.Xml;
 using Moq;
+using Newtonsoft.Json;
 using StockportGovUK.NetStandard.Gateways;
 using StockportGovUK.NetStandard.Models.Civica.CouncilTax;
 using StockportGovUK.NetStandard.Models.RevsAndBens;
@@ -136,7 +136,7 @@ namespace civica_service_tests.Service
         public async void GetBenefits_ShouldCallCacheProvider_WithGetStringAsync()
         {
             // Arrange
-            var model = JsonSerializer.Serialize(new List<BenefitsClaimSummary>());
+            var model = JsonConvert.SerializeObject(new List<BenefitsClaimSummary>());
             _mockCacheProvider
                 .Setup(_ => _.GetStringAsync(It.IsAny<string>()))
                 .ReturnsAsync(model);
@@ -174,7 +174,7 @@ namespace civica_service_tests.Service
         public async void GetBenefitDetails_ShouldCallCacheProvider_WithGetStringAsync()
         {
             // Arrange
-            var model = JsonSerializer.Serialize(new BenefitsClaim());
+            var model = JsonConvert.SerializeObject(new BenefitsClaim());
             _mockCacheProvider
                 .Setup(_ => _.GetStringAsync(It.IsAny<string>()))
                 .ReturnsAsync(model);
@@ -231,7 +231,7 @@ namespace civica_service_tests.Service
         public async void GetHousingBenefitPaymentHistory_ShouldCallCacheProvider_WithGetStringAsync()
         {
             // Arrange
-            var model = JsonSerializer.Serialize(new List<PaymentDetail>());
+            var model = JsonConvert.SerializeObject(new List<PaymentDetail>());
             _mockCacheProvider
                 .Setup(_ => _.GetStringAsync(It.IsAny<string>()))
                 .ReturnsAsync(model);
@@ -299,7 +299,7 @@ namespace civica_service_tests.Service
         public async void GetCouncilTaxBenefitPaymentHistory_ShouldCallCacheProvider_WithGetStringAsync()
         {
             // Arrange
-            var model = JsonSerializer.Serialize(new List<PaymentDetail>());
+            var model = JsonConvert.SerializeObject(new List<PaymentDetail>());
             _mockCacheProvider
                 .Setup(_ => _.GetStringAsync(It.IsAny<string>()))
                 .ReturnsAsync(model);
@@ -370,7 +370,7 @@ namespace civica_service_tests.Service
         public async void GetDocuments_ShouldCallCacheProvider_WithGetStringAsync()
         {
             // Arrange
-            var model = JsonSerializer.Serialize(new List<CouncilTaxDocumentReference>());
+            var model = JsonConvert.SerializeObject(new List<CouncilTaxDocumentReference>());
             _mockCacheProvider
                 .Setup(_ => _.GetStringAsync(It.IsAny<string>()))
                 .ReturnsAsync(model);
@@ -434,7 +434,7 @@ namespace civica_service_tests.Service
         [Fact]
         public async void GetAccounts_ShouldGetModelFromCacheProvider()
         {
-            var model = JsonSerializer.Serialize(new List<CtaxActDetails>
+            var model = JsonConvert.SerializeObject(new List<CtaxActDetails>
             {
                 new CtaxActDetails()
             });
@@ -476,7 +476,7 @@ namespace civica_service_tests.Service
         [Fact]
         public async void GetPropertiesOwned_ShouldGetModelFromCacheProvider()
         {
-            var model = JsonSerializer.Serialize(new List<Place>());
+            var model = JsonConvert.SerializeObject(new List<Place>());
 
             _mockCacheProvider
                 .Setup(_ => _.GetStringAsync(It.IsAny<string>()))
@@ -526,7 +526,7 @@ namespace civica_service_tests.Service
         [Fact]
         public async void GetCurrentProperty_ShouldGetModelFromCacheProvider()
         {
-            var model = JsonSerializer.Serialize(new Place());
+            var model = JsonConvert.SerializeObject(new Place());
 
             _mockCacheProvider
                 .Setup(_ => _.GetStringAsync(It.IsAny<string>()))
@@ -574,7 +574,7 @@ namespace civica_service_tests.Service
             const string accountReference = "test-account-ref";
             const string year = "2019";
 
-            var model = JsonSerializer.Serialize(new ReceivedYearTotal
+            var model = JsonConvert.SerializeObject(new ReceivedYearTotal
             {
                 TotalCharge = "400",
                 TotalPayments = "500",
@@ -597,7 +597,7 @@ namespace civica_service_tests.Service
         public async void GetDocumentsWithAccountReference_ShouldCallCacheProvider_WithGetStringAsync()
         {
             // Arrange
-            var model = JsonSerializer.Serialize(new List<CouncilTaxDocumentReference>());
+            var model = JsonConvert.SerializeObject(new List<CouncilTaxDocumentReference>());
             _mockCacheProvider
                 .Setup(_ => _.GetStringAsync(It.IsAny<string>()))
                 .ReturnsAsync(model);
@@ -640,7 +640,7 @@ namespace civica_service_tests.Service
         public async void GetCouncilTaxDetails_ShouldCallCacheProvider_WithGetStringAsync()
         {
             // Arrange
-            var model = JsonSerializer.Serialize(new CouncilTaxAccountResponse());
+            var model = JsonConvert.SerializeObject(new CouncilTaxAccountResponse());
             _mockCacheProvider
                 .Setup(_ => _.GetStringAsync(It.IsAny<string>()))
                 .ReturnsAsync(model);
