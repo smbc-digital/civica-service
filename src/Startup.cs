@@ -49,7 +49,7 @@ namespace civica_service
             {
                 app.UseDeveloperExceptionPage();
             }
-
+            
             app.UseRouting();
             app.UseEndpoints(endpoints => endpoints.MapControllers());
 
@@ -61,7 +61,7 @@ namespace civica_service
             app.UseSwagger();
             app.UseSwaggerUI(c =>
             {
-                c.SwaggerEndpoint($"{(env.IsEnvironment("local") ? string.Empty : "/civicaservice")}/swagger/v1/swagger.json", "Civica service API");
+                c.SwaggerEndpoint("v1/swagger.json", "Civica service API");
             });
         }
     }
