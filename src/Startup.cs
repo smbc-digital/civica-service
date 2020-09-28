@@ -10,8 +10,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using StockportGovUK.AspNetCore.Availability;
 using StockportGovUK.AspNetCore.Availability.Middleware;
-using StockportGovUK.AspNetCore.Middleware;
-using StockportGovUK.NetStandard.Gateways;
 
 namespace civica_service
 {
@@ -29,33 +27,28 @@ namespace civica_service
         {
             services.AddControllers()
                     .AddNewtonsoftJson();
-            services.AddStorageProvider(Configuration);
-            services.AddResilientHttpClients<IGateway, Gateway>(Configuration);
-            services.AddAvailability();
-            services.AddSwagger();
+
+            services.AddGateways(Configuration)
+                    .AddHelpers()
+                    .AddServices()
+                    .AddUtils()
+                    .AddStorageProvider(Configuration)
+                    .Configure<SessionConfiguration>(Configuration.GetSection("SessionConfiguration"))
+                    .AddSwagger()
+                    .AddAvailability();
+
             services.AddHealthChecks()
                     .AddCheck<TestHealthCheck>("TestHealthCheck");
-            
-            services.Configure<SessionConfiguration>(Configuration.GetSection("SessionConfiguration"));
-
-            services.RegisterHelpers();
-            services.RegisterServices();
-            services.RegisterUtils();            
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            if (env.IsEnvironment("local"))
-            {
-                app.UseDeveloperExceptionPage();
-            }
+            app.UseExceptionHandler($"/api/v1/error{(env.IsDevelopment() ? "/local" : string.Empty)}");
             
             app.UseRouting();
             app.UseEndpoints(endpoints => endpoints.MapControllers());
 
             app.UseMiddleware<Availability>();
-            app.UseMiddleware<ApiExceptionHandling>();
-            
             app.UseHealthChecks("/healthcheck", HealthCheckConfig.Options);
 
             app.UseSwagger();

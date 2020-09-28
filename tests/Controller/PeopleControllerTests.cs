@@ -34,7 +34,7 @@ namespace civica_service_tests.Controller
 
             // Assert
             _mockService.Verify(_ => _.GetSessionId(It.IsAny<string>()), Times.Once);
-            var actionResult = Assert.IsType<ObjectResult>(result);
+            var actionResult = Assert.IsType<OkObjectResult>(result);
             Assert.Equal(200, actionResult.StatusCode);
         }
 
@@ -51,7 +51,7 @@ namespace civica_service_tests.Controller
 
             // Assert
             _mockService.Verify(_ => _.IsBenefitsClaimant(It.IsAny<string>()), Times.Once);
-            var actionResult = Assert.IsType<ObjectResult>(result);
+            var actionResult = Assert.IsType<OkObjectResult>(result);
             Assert.Equal(200, actionResult.StatusCode);
         }
 
@@ -67,7 +67,7 @@ namespace civica_service_tests.Controller
 
             // Assert
             _mockService.Verify(_ => _.GetBenefits(It.IsAny<string>()), Times.Once);
-            var actionResult = Assert.IsType<ObjectResult>(result);
+            var actionResult = Assert.IsType<OkObjectResult>(result);
             Assert.Equal(200, actionResult.StatusCode);
         }
 
@@ -83,7 +83,7 @@ namespace civica_service_tests.Controller
 
             // Assert
             _mockService.Verify(_ => _.GetBenefitDetails(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()), Times.Once);
-            var actionResult = Assert.IsType<ObjectResult>(result);
+            var actionResult = Assert.IsType<OkObjectResult>(result);
             Assert.Equal(200, actionResult.StatusCode);
         }
 
@@ -99,7 +99,7 @@ namespace civica_service_tests.Controller
 
             // Assert
             _mockService.Verify(_ => _.GetHousingBenefitPaymentHistory(It.IsAny<string>()), Times.Once);
-            var actionResult = Assert.IsType<ObjectResult>(result);
+            var actionResult = Assert.IsType<OkObjectResult>(result);
             Assert.Equal(200, actionResult.StatusCode);
         }
 
@@ -115,7 +115,7 @@ namespace civica_service_tests.Controller
 
             // Assert
             _mockService.Verify(_ => _.GetCouncilTaxBenefitPaymentHistory(It.IsAny<string>()), Times.Once);
-            var actionResult = Assert.IsType<ObjectResult>(result);
+            var actionResult = Assert.IsType<OkObjectResult>(result);
             Assert.Equal(200, actionResult.StatusCode);
         }
 

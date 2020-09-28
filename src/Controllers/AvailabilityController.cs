@@ -1,7 +1,7 @@
-﻿using civica_service.Helpers.SessionProvider;
+﻿using System.Threading.Tasks;
+using civica_service.Helpers.SessionProvider;
 using Microsoft.AspNetCore.Mvc;
 using StockportGovUK.AspNetCore.Attributes.TokenAuthentication;
-using System.Threading.Tasks;
 
 namespace civica_service.Controllers
 {

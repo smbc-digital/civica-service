@@ -1,10 +1,9 @@
 using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
 using civica_service.Services;
-using StockportGovUK.AspNetCore.Attributes.TokenAuthentication;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using StockportGovUK.AspNetCore.Attributes.TokenAuthentication;
 
 namespace civica_service.Controllers
 {
@@ -29,7 +28,7 @@ namespace civica_service.Controllers
         {
             var sessionId = await _civicaService.GetSessionId(personReference);
 
-            return StatusCode(StatusCodes.Status200OK, sessionId);
+            return Ok(sessionId);
         }
 
         [HttpGet]
@@ -38,7 +37,7 @@ namespace civica_service.Controllers
         {
             var model = await _civicaService.IsBenefitsClaimant(personReference);
 
-            return StatusCode(StatusCodes.Status200OK, model);
+            return Ok(model);
         }
 
         [HttpGet]
@@ -47,7 +46,7 @@ namespace civica_service.Controllers
         {
             var model = await _civicaService.GetBenefits(personReference);
 
-            return StatusCode(StatusCodes.Status200OK, model);
+            return Ok(model);
         }
 
         [HttpGet]
@@ -56,7 +55,7 @@ namespace civica_service.Controllers
         {
             var model = await _civicaService.GetBenefitDetails(personReference, claimReference, placeReference);
 
-            return StatusCode(StatusCodes.Status200OK, model);
+            return Ok(model);
         }
 
         [HttpGet]
@@ -65,7 +64,7 @@ namespace civica_service.Controllers
         {
             var model = await _civicaService.GetHousingBenefitPaymentHistory(personReference);
 
-            return StatusCode(StatusCodes.Status200OK, model);
+            return Ok(model);
         }
 
         [HttpGet]
@@ -74,7 +73,7 @@ namespace civica_service.Controllers
         {
             var model = await _civicaService.GetCouncilTaxBenefitPaymentHistory(personReference);
 
-            return StatusCode(StatusCodes.Status200OK, model);
+            return Ok(model);
         }
 
         [HttpGet]

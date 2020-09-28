@@ -9,13 +9,6 @@ namespace civica_service.Helpers.QueryBuilder
     {
         private readonly List<string> _queryStrings = new List<string>();
 
-        private readonly string _baseUrl;
-
-        public QueryBuilder(IConfiguration configuration)
-        {
-            _baseUrl = configuration.GetValue("QueryBuilderBaseUrl", string.Empty) + "?outputtype=xml";
-        }
-
         public IQueryBuilder Add(string key, string value)
         {
             _queryStrings.Add($"{HttpUtility.UrlEncode(key)}={HttpUtility.UrlEncode(value)}");
@@ -25,7 +18,7 @@ namespace civica_service.Helpers.QueryBuilder
 
         public string Build()
         {
-            var url = _queryStrings.Aggregate($"{_baseUrl}", (previous, current) => $"{previous}&{current}");
+            var url = _queryStrings.Aggregate("?outputtype=xml", (previous, current) => $"{previous}&{current}");
 
             _queryStrings.Clear();
 

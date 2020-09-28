@@ -6,7 +6,7 @@ namespace civica_service.Utils.StorageProvider
 {
     public static class StorageProviderExtension
     {
-        public static void AddStorageProvider(this IServiceCollection services, IConfiguration configuration)
+        public static IServiceCollection AddStorageProvider(this IServiceCollection services, IConfiguration configuration)
         {
             var storageProviderConfiguration = configuration.GetSection("StorageProvider");
 
@@ -27,6 +27,8 @@ namespace civica_service.Utils.StorageProvider
             }
 
             services.AddSingleton<ICacheProvider, CacheProvider>();
+
+            return services;
         }
     }
 }

@@ -9,21 +9,10 @@ namespace civica_service_tests.Helpers
     public class QueryBuilderTests
     {
         private readonly IQueryBuilder _queryBuild;
-        private const string TestUrl = "http://test.gov.uk";
 
         public QueryBuilderTests()
         {
-            var mockConfigurationSection = new Mock<IConfigurationSection>();
-            mockConfigurationSection
-                .Setup(_ => _.Value)
-                .Returns(TestUrl);
-
-            var mockConfiguration = new Mock<IConfiguration>();
-            mockConfiguration
-                .Setup(_ => _.GetSection("QueryBuilderBaseUrl"))
-                .Returns(mockConfigurationSection.Object);
-
-            _queryBuild = new QueryBuilder(mockConfiguration.Object);
+            _queryBuild = new QueryBuilder();
         }
 
         [Theory]
@@ -33,7 +22,7 @@ namespace civica_service_tests.Helpers
         [InlineData(" ", " ")]
         public void Add_ShouldAddEncodedStringToUrl(string key, string value)
         {
-            var expectedUrl = $"{TestUrl}?outputtype=xml&{HttpUtility.UrlEncode(key)}={HttpUtility.UrlEncode(value)}";
+            var expectedUrl = $"?outputtype=xml&{HttpUtility.UrlEncode(key)}={HttpUtility.UrlEncode(value)}";
 
             var response = _queryBuild.Add(key, value).Build();
 
@@ -43,7 +32,7 @@ namespace civica_service_tests.Helpers
         [Fact]
         public void Add_ShouldAddEncodedStringsToUrl()
         {
-            var expectedUrl = $"{TestUrl}?outputtype=xml&{HttpUtility.UrlEncode("test")}={HttpUtility.UrlEncode("test")}&{HttpUtility.UrlEncode("test1")}={HttpUtility.UrlEncode("test1")}";
+            var expectedUrl = $"?outputtype=xml&{HttpUtility.UrlEncode("test")}={HttpUtility.UrlEncode("test")}&{HttpUtility.UrlEncode("test1")}={HttpUtility.UrlEncode("test1")}";
 
             var response = _queryBuild
                 .Add("test", "test")

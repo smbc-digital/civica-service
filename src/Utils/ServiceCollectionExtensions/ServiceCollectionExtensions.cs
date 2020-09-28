@@ -4,31 +4,47 @@ using civica_service.Helpers.QueryBuilder;
 using civica_service.Helpers.SessionProvider;
 using civica_service.Services;
 using civica_service.Utils.Xml;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OpenApi.Models;
+using StockportGovUK.NetStandard.Gateways;
+using StockportGovUK.NetStandard.Gateways.Extensions;
 
 namespace civica_service.Utils.ServiceCollectionExtensions
 {
     [ExcludeFromCodeCoverage]
     public static class ServiceCollectionExtensions
     {
-        public static void RegisterHelpers(this IServiceCollection services)
+        public static IServiceCollection AddGateways(this IServiceCollection services, IConfiguration configuration)
+        {
+            services.AddHttpClient<IGateway, Gateway>(configuration);
+
+            return services;
+        }
+
+        public static IServiceCollection AddHelpers(this IServiceCollection services)
         {
             services.AddSingleton<ISessionProvider, SessionProvider>();
             services.AddTransient<IQueryBuilder, QueryBuilder>();
+
+            return services;
         }
 
-        public static void RegisterServices(this IServiceCollection services)
+        public static IServiceCollection AddServices(this IServiceCollection services)
         {
             services.AddSingleton<ICivicaService, CivicaService>();
+
+            return services;
         }
 
-        public static void RegisterUtils(this IServiceCollection services)
+        public static IServiceCollection AddUtils(this IServiceCollection services)
         {
             services.AddSingleton<IXmlParser, XmlParser>();
+
+            return services;
         }
 
-        public static void AddSwagger(this IServiceCollection services)
+        public static IServiceCollection AddSwagger(this IServiceCollection services)
         {
             services.AddSwaggerGen(c =>
             {
@@ -52,6 +68,8 @@ namespace civica_service.Utils.ServiceCollectionExtensions
                     }
                 });
             });
+
+            return services;
         }
     }
 }
