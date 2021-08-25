@@ -51,5 +51,13 @@ namespace civica_service.Utils.StorageProvider
                 await _cacheProvider.SetStringAsync(key, value, options);
             }
         }
+
+        public async Task RemoveAsync(string key)
+        {
+            if (_allowCaching)
+            {
+                await _cacheProvider.RemoveAsync(key);
+            }
+        }
     }
 }
