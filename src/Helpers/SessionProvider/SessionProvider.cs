@@ -4,10 +4,11 @@ using System.Net;
 using System.Threading.Tasks;
 using civica_service.Helpers.QueryBuilder;
 using civica_service.Helpers.SessionProvider.Models;
+using civica_service.Utils.StorageProvider;
 using civica_service.Utils.Xml;
+using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Options;
 using StockportGovUK.NetStandard.Gateways;
-using civica_service.Utils.StorageProvider;
 
 namespace civica_service.Helpers.SessionProvider
 {
@@ -35,6 +36,13 @@ namespace civica_service.Helpers.SessionProvider
 
         public async Task<string> GetSessionId()
         {
+            string cacheKey = $"{ECacheKeys.SessionId}-Availability";
+            var cacheResponse = await _distributedCache.GetStringAsync(cacheKey);
+            if (!string.IsNullOrEmpty(cacheResponse))
+            {
+                throw new Exception($"Civica is unavailable. Cached response");
+            }
+
             var url = _queryBuilder
                 .Add("docid", "crmlogin")
                 .Add("userid", _configuration.Username)
@@ -45,8 +53,15 @@ namespace civica_service.Helpers.SessionProvider
 
             if (response.StatusCode != HttpStatusCode.OK)
             {
+                await _distributedCache.SetStringAsync(cacheKey, "Unavailable", new DistributedCacheEntryOptions
+                {
+                    AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5)
+                });
+
                 throw new Exception($"Civica is unavailable. Responded with status code: {response.StatusCode}");
             }
+
+            await _distributedCache.RemoveAsync(cacheKey);
 
             var xmlResponse = await response.Content.ReadAsStringAsync();
 
