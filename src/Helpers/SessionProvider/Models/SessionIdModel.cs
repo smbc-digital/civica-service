@@ -16,4 +16,17 @@ namespace civica_service.Helpers.SessionProvider.Models
         [XmlElement("ErrorCode")]
         public ErrorCode ErrorCode { get; set; }
     }
+
+    [XmlRoot("StandardInfo")]
+    public class AnonymousSessionIdModel
+    {
+        [XmlElement("SessionID")]
+        public string SessionID { get; set; }
+    }
+
+    public class AnonymousResult
+    {
+        [XmlElement("SessionID")]
+        public string SessionID { get; set; }
+    }
 }
