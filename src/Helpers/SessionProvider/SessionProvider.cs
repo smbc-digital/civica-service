@@ -34,6 +34,26 @@ namespace civica_service.Helpers.SessionProvider
             _xmlParser = xmlParser;
         }
 
+        public async Task<string> GetAnonymousSessionId()
+        {
+            var url = _queryBuilder
+                .Add("docid", "login")
+                .Build();
+
+            var response = await _gateway.GetAsync(url);
+
+            if (response.StatusCode != HttpStatusCode.OK)
+                throw new Exception($"Civica is unavailable. Responded with status code: {response.StatusCode}");
+
+            var xmlResponse = await response.Content.ReadAsStringAsync();
+
+            var deserializedResponse = _xmlParser.DeserializeXmlStringToType<AnonymousSessionIdModel>(xmlResponse, "StandardInfo");
+
+            var sessionId = deserializedResponse.SessionID;
+
+            return sessionId;
+        }
+
         public async Task<string> GetSessionId()
         {
             string cacheKey = $"{ECacheKeys.SessionId}-Availability";

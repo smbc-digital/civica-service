@@ -25,5 +25,14 @@ namespace civica_service.Controllers
 
             return Ok();
         }
+
+        [HttpGet]
+        [Route("get-anonymous-availability")]
+        public async Task<IActionResult> GetAnonymousAvailability()
+        {
+            await _sessionProvider.GetAnonymousSessionId();
+
+            return Ok();
+        }
     }
 }
