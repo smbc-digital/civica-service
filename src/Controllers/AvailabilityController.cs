@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using civica_service.Helpers.SessionProvider;
 using Microsoft.AspNetCore.Mvc;
 using StockportGovUK.AspNetCore.Attributes.TokenAuthentication;
@@ -21,9 +22,16 @@ namespace civica_service.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAvailability()
         {
-            await _sessionProvider.GetSessionId();
+            try
+            {
+                await _sessionProvider.GetSessionId();
 
-            return Ok();
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(424);
+            }
         }
 
         [HttpGet]
