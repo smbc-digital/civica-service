@@ -38,9 +38,16 @@ namespace civica_service.Controllers
         [Route("get-anonymous-availability")]
         public async Task<IActionResult> GetAnonymousAvailability()
         {
-            await _sessionProvider.GetAnonymousSessionId();
+            try
+            {
+                await _sessionProvider.GetAnonymousSessionId();
 
-            return Ok();
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(424);
+            }
         }
     }
 }

@@ -36,6 +36,14 @@ namespace civica_service.Helpers.SessionProvider
 
         public async Task<string> GetAnonymousSessionId()
         {
+            string cacheKey = $"{ECacheKeys.SessionId}-AnonymousAvailability";
+            var cacheResponse = await _distributedCache.GetStringAsync(cacheKey);
+
+            if (!string.IsNullOrEmpty(cacheResponse))
+            {
+                throw new Exception($"Civica is unavailable. Cached response");
+            }
+
             var url = _queryBuilder
                 .Add("docid", "login")
                 .Build();
@@ -43,15 +51,36 @@ namespace civica_service.Helpers.SessionProvider
             var response = await _gateway.GetAsync(url);
 
             if (response.StatusCode != HttpStatusCode.OK)
+            {
+                await _distributedCache.SetStringAsync(cacheKey, "Unavailable", new DistributedCacheEntryOptions
+                {
+                    AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5)
+                });
+
                 throw new Exception($"Civica is unavailable. Responded with status code: {response.StatusCode}");
+            }
+
+            await _distributedCache.RemoveAsync(cacheKey);
 
             var xmlResponse = await response.Content.ReadAsStringAsync();
 
-            var deserializedResponse = _xmlParser.DeserializeXmlStringToType<AnonymousSessionIdModel>(xmlResponse, "StandardInfo");
+            try
+            {
+                var deserializedResponse =
+                    _xmlParser.DeserializeXmlStringToType<AnonymousSessionIdModel>(xmlResponse, "StandardInfo");
+                var sessionId = deserializedResponse.SessionID;
 
-            var sessionId = deserializedResponse.SessionID;
+                return sessionId;
+            }
+            catch (Exception ex)
+            {
+                await _distributedCache.SetStringAsync(cacheKey, "Unavailable", new DistributedCacheEntryOptions
+                {
+                    AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5)
+                });
 
-            return sessionId;
+                throw new Exception($"Unable to parse the XML response: {xmlResponse}");
+            }
         }
 
         public async Task<string> GetSessionId()
@@ -84,11 +113,29 @@ namespace civica_service.Helpers.SessionProvider
             await _distributedCache.RemoveAsync(cacheKey);
 
             var xmlResponse = await response.Content.ReadAsStringAsync();
+            var deserializedResponse = new Result();
 
-            var deserializedResponse = _xmlParser.DeserializeXmlStringToType<SessionIdModel>(xmlResponse, "Login").Result;
+            try
+            {
+                deserializedResponse = _xmlParser.DeserializeXmlStringToType<SessionIdModel>(xmlResponse, "Login").Result;
+            }
+            catch (Exception ex)
+            {
+                await _distributedCache.SetStringAsync(cacheKey, "Unavailable", new DistributedCacheEntryOptions
+                {
+                    AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5)
+                });
+
+                throw new Exception($"Unable to parse the XML response: {xmlResponse}");
+            }
 
             if (!deserializedResponse.ErrorCode.Text.Equals("5"))
             {
+                await _distributedCache.SetStringAsync(cacheKey, "Unavailable", new DistributedCacheEntryOptions
+                {
+                    AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5)
+                });
+
                 throw new Exception($"API login unsuccessful, check credentials. Actual response: {xmlResponse}");
             }
 
@@ -96,6 +143,11 @@ namespace civica_service.Helpers.SessionProvider
 
             if (string.IsNullOrWhiteSpace(sessionId))
             {
+                await _distributedCache.SetStringAsync(cacheKey, "Unavailable", new DistributedCacheEntryOptions
+                {
+                    AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5)
+                });
+
                 throw new Exception("No session id returned");
             }
 
