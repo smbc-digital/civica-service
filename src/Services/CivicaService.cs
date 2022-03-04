@@ -368,7 +368,7 @@ namespace civica_service.Services
             }
             catch (Exception ex)
             {
-                throw new Exception($"Failed to deserialize XML - Person reference: {personReference}, Account reference: {accountReference}, Response: {responseContent}", ex.InnerException);
+                throw new Exception($"CivicaService:: GetCouncilTaxDetails:: Failed to deserialize XML - Person reference: {personReference}, Account reference: {accountReference}, Response: {responseContent}", ex.InnerException);
             }
 
             try
@@ -377,7 +377,7 @@ namespace civica_service.Services
             }
             catch (Exception ex)
             {
-                throw new Exception($"Failed to cache response due to model error - Person reference: {personReference}, Account reference: {accountReference}, Exception: {ex.Message}", ex.InnerException);
+                throw new Exception($"CivicaService:: GetCouncilTaxDetails:: Failed to cache response due to model error - Person reference: {personReference}, Account reference: {accountReference}, Exception: {ex.Message}", ex.InnerException);
             }
 
             return parsedResponse;

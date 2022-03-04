@@ -381,6 +381,19 @@ namespace civica_service_tests.Service
         }
 
         [Fact]
+        public async void GetCouncilTaxBenefitPaymentHistory_ShouldThrowExeception_IfPaymentListIsNull()
+        {
+            // Arrange
+            _mockXmlParser
+                .Setup(_ => _.DeserializeXmlStringToType<PaymentDetailsResponse>(It.IsAny<string>(),
+                    It.IsAny<string>()))
+                .Returns(new PaymentDetailsResponse());
+
+            // Act & Assert
+            await Assert.ThrowsAsync<Exception>(() => _civicaService.GetCouncilTaxBenefitPaymentHistory(""));
+        }
+
+        [Fact]
         public async void GetDocuments_ShouldCallCacheProvider_WithGetStringAsync()
         {
             // Arrange
