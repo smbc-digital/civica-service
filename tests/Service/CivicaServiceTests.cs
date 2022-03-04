@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Net.Http;
 using civica_service.Helpers.QueryBuilder;
 using civica_service.Helpers.SessionProvider;
@@ -296,6 +297,19 @@ namespace civica_service_tests.Service
         }
 
         [Fact]
+        public async void GetHousingBenefitPaymentHistory_ShouldThrowExeception_IfPaymentListIsNull()
+        {
+            // Arrange
+            _mockXmlParser
+                .Setup(_ => _.DeserializeXmlStringToType<PaymentDetailsResponse>(It.IsAny<string>(),
+                    It.IsAny<string>()))
+                .Returns(new PaymentDetailsResponse());
+
+            // Act & Assert
+            await Assert.ThrowsAsync<Exception>(() => _civicaService.GetHousingBenefitPaymentHistory(""));
+        }
+
+        [Fact]
         public async void GetCouncilTaxBenefitPaymentHistory_ShouldCallCacheProvider_WithGetStringAsync()
         {
             // Arrange
@@ -364,6 +378,19 @@ namespace civica_service_tests.Service
 
             _mockQueryBuilder.Verify(_ => _.Build(), Times.Once);
             _mockGateway.Verify(_ => _.GetAsync(It.IsAny<string>()), Times.Once);
+        }
+
+        [Fact]
+        public async void GetCouncilTaxBenefitPaymentHistory_ShouldThrowExeception_IfPaymentListIsNull()
+        {
+            // Arrange
+            _mockXmlParser
+                .Setup(_ => _.DeserializeXmlStringToType<PaymentDetailsResponse>(It.IsAny<string>(),
+                    It.IsAny<string>()))
+                .Returns(new PaymentDetailsResponse());
+
+            // Act & Assert
+            await Assert.ThrowsAsync<Exception>(() => _civicaService.GetCouncilTaxBenefitPaymentHistory(""));
         }
 
         [Fact]
