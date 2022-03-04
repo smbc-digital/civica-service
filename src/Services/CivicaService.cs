@@ -141,6 +141,11 @@ namespace civica_service.Services
             var response = await _gateway.GetAsync(url);
             var content = await response.Content.ReadAsStringAsync();
             var paymentDetails = _xmlParser.DeserializeXmlStringToType<PaymentDetailsResponse>(content, "HBPaymentDetails");
+
+            if (paymentDetails.PaymentList == null)
+                throw new Exception(
+                    $"CivicaService:: GetHousingBenefitPaymentHistory: No PaymentList found for {personReference}");
+
             var housingBenefitList = paymentDetails.PaymentList.PaymentDetails;
 
             _ = _cacheProvider.SetStringAsync($"{personReference}-{ECacheKeys.HousingBenefitsPaymentDetails}", JsonConvert.SerializeObject(housingBenefitList));
@@ -153,9 +158,7 @@ namespace civica_service.Services
             var cacheResponse = await _cacheProvider.GetStringAsync($"{personReference}-{ECacheKeys.CouncilTaxPaymentDetails}");
 
             if (!string.IsNullOrEmpty(cacheResponse))
-            {
                 return JsonConvert.DeserializeObject<List<PaymentDetail>>(cacheResponse);
-            }
 
             var sessionId = await _sessionProvider.GetSessionId(personReference);
 
@@ -168,6 +171,11 @@ namespace civica_service.Services
             var response = await _gateway.GetAsync(url);
             var content = await response.Content.ReadAsStringAsync();
             var paymentDetails = _xmlParser.DeserializeXmlStringToType<PaymentDetailsResponse>(content, "HBPaymentDetails");
+
+            if (paymentDetails.PaymentList == null)
+                throw new Exception(
+                    $"CivicaService:: GetCouncilTaxBenefitPaymentHistory: No PaymentList found for {personReference}");
+            
             var ctaxPaymentList = paymentDetails.PaymentList.PaymentDetails;
 
             _ = _cacheProvider.SetStringAsync($"{personReference}-{ECacheKeys.CouncilTaxPaymentDetails}", JsonConvert.SerializeObject(ctaxPaymentList));
@@ -202,8 +210,6 @@ namespace civica_service.Services
 
             return documentsList;
         }
-
-
 
         public async Task<List<CouncilTaxDocumentReference>> GetDocumentsWithAccountReference(string personReference,
             string accountReference)
@@ -365,7 +371,14 @@ namespace civica_service.Services
                 throw new Exception($"Failed to deserialize XML - Person reference: {personReference}, Account reference: {accountReference}, Response: {responseContent}", ex.InnerException);
             }
 
-            _ = _cacheProvider.SetStringAsync(key, JsonConvert.SerializeObject(parsedResponse));
+            try
+            {
+                _ = _cacheProvider.SetStringAsync(key, JsonConvert.SerializeObject(parsedResponse));
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Failed to cache response due to model error - Person reference: {personReference}, Account reference: {accountReference}, Exception: {ex.Message}", ex.InnerException);
+            }
 
             return parsedResponse;
         }
