@@ -14,26 +14,54 @@ namespace civica_service_tests.Controller
     {
         private readonly PeopleController _controller;
         private readonly Mock<ICivicaService> _mockService = new Mock<ICivicaService>();
+        private readonly Mock<ILogger<PeopleController>> _mockLogger = new Mock<ILogger<PeopleController>>();
 
         public PeopleControllerTests()
         {
-            var mockLogger = new Mock<ILogger<PeopleController>>();
-            _controller = new PeopleController(_mockService.Object, mockLogger.Object);
+            _mockService
+                .Setup(_ => _.GetSessionId(It.IsAny<string>()))
+                .ReturnsAsync("sessionId");
+
+            _mockService
+                .Setup(_ => _.IsBenefitsClaimant(It.IsAny<string>()))
+                .ReturnsAsync(true);
+
+            _mockService
+                .Setup(_ => _.GetBenefits(It.IsAny<string>()))
+                .ReturnsAsync(new List<BenefitsClaimSummary>());
+
+            _mockService
+                .Setup(_ => _.GetBenefitDetails(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
+                .ReturnsAsync(new BenefitsClaim());
+
+            _mockService
+                .Setup(_ => _.GetHousingBenefitPaymentHistory(It.IsAny<string>()))
+                .ReturnsAsync(new List<PaymentDetail>());
+
+            _mockService
+                .Setup(_ => _.GetCouncilTaxBenefitPaymentHistory(It.IsAny<string>()))
+                .ReturnsAsync(new List<PaymentDetail>());
+
+            _controller = new PeopleController(_mockService.Object, _mockLogger.Object);
         }
 
         [Fact]
         public async void GetSessionId_ShouldCallService()
         {
-            // Arrange
-            _mockService
-                .Setup(_ => _.GetSessionId(It.IsAny<string>()))
-                .ReturnsAsync(It.IsAny<string>());
+            // Act
+            await _controller.GetSessionId(It.IsAny<string>());
 
+            // Assert
+            _mockService.Verify(_ => _.GetSessionId(It.IsAny<string>()), Times.Once);
+        }
+
+        [Fact]
+        public async void GetSessionId_ShouldReturnOk()
+        {
             // Act
             var result = await _controller.GetSessionId(It.IsAny<string>());
 
             // Assert
-            _mockService.Verify(_ => _.GetSessionId(It.IsAny<string>()), Times.Once);
             var actionResult = Assert.IsType<OkObjectResult>(result);
             Assert.Equal(200, actionResult.StatusCode);
         }
@@ -41,16 +69,20 @@ namespace civica_service_tests.Controller
         [Fact]
         public async void IsBenefitsClaimant_ShouldCallService()
         {
-            // Arrange
-            _mockService
-                .Setup(_ => _.IsBenefitsClaimant(It.IsAny<string>()))
-                .ReturnsAsync(It.IsAny<bool>());
+            // Act
+            await _controller.IsBenefitsClaimant(It.IsAny<string>());
 
+            // Assert
+            _mockService.Verify(_ => _.IsBenefitsClaimant(It.IsAny<string>()), Times.Once);
+        }
+
+        [Fact]
+        public async void IsBenefitsClaimant_ShouldReturnOk()
+        {
             // Act
             var result = await _controller.IsBenefitsClaimant(It.IsAny<string>());
 
             // Assert
-            _mockService.Verify(_ => _.IsBenefitsClaimant(It.IsAny<string>()), Times.Once);
             var actionResult = Assert.IsType<OkObjectResult>(result);
             Assert.Equal(200, actionResult.StatusCode);
         }
@@ -58,15 +90,20 @@ namespace civica_service_tests.Controller
         [Fact]
         public async void GetBenefits_ShouldCallService()
         {
-            // Arrange
-            _mockService.Setup(_ => _.GetBenefits(It.IsAny<string>()))
-                .ReturnsAsync(It.IsAny<List<BenefitsClaimSummary>>());
-
             // Act
-            var result =  await _controller.GetBenefits(It.IsAny<string>());
+            await _controller.GetBenefits(It.IsAny<string>());
 
             // Assert
             _mockService.Verify(_ => _.GetBenefits(It.IsAny<string>()), Times.Once);
+        }
+
+        [Fact]
+        public async void GetBenefits_ShouldReturnOk()
+        {
+            // Act
+            var result = await _controller.GetBenefits(It.IsAny<string>());
+
+            // Assert
             var actionResult = Assert.IsType<OkObjectResult>(result);
             Assert.Equal(200, actionResult.StatusCode);
         }
@@ -74,15 +111,20 @@ namespace civica_service_tests.Controller
         [Fact]
         public async void GetBenefitDetails_ShouldCallService()
         {
-            // Arrange
-            _mockService.Setup(_ => _.GetBenefitDetails(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
-                .ReturnsAsync(It.IsAny<BenefitsClaim>());
+            // Act
+            await _controller.GetBenefitDetails(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>());
 
+            // Assert
+            _mockService.Verify(_ => _.GetBenefitDetails(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()), Times.Once);
+        }
+
+        [Fact]
+        public async void GetBenefitDetails_ShouldReturnOk()
+        {
             // Act
             var result = await _controller.GetBenefitDetails(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>());
 
             // Assert
-            _mockService.Verify(_ => _.GetBenefitDetails(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()), Times.Once);
             var actionResult = Assert.IsType<OkObjectResult>(result);
             Assert.Equal(200, actionResult.StatusCode);
         }
@@ -90,15 +132,20 @@ namespace civica_service_tests.Controller
         [Fact]
         public async void GetHousingBenefitPaymentHistory_ShouldCallService()
         {
-            // Arrange
-            _mockService.Setup(_ => _.GetHousingBenefitPaymentHistory(It.IsAny<string>()))
-                .ReturnsAsync(It.IsAny<List<PaymentDetail>>());
+            // Act
+            await _controller.GetHousingBenefitPaymentHistory(It.IsAny<string>());
 
+            // Assert
+            _mockService.Verify(_ => _.GetHousingBenefitPaymentHistory(It.IsAny<string>()), Times.Once);
+        }
+
+        [Fact]
+        public async void GetHousingBenefitPaymentHistory_ShouldReturnOk()
+        {
             // Act
             var result = await _controller.GetHousingBenefitPaymentHistory(It.IsAny<string>());
 
             // Assert
-            _mockService.Verify(_ => _.GetHousingBenefitPaymentHistory(It.IsAny<string>()), Times.Once);
             var actionResult = Assert.IsType<OkObjectResult>(result);
             Assert.Equal(200, actionResult.StatusCode);
         }
@@ -106,15 +153,20 @@ namespace civica_service_tests.Controller
         [Fact]
         public async void GetCouncilTaxBenefitPaymentHistory_ShouldCallService()
         {
-            // Arrange
-            _mockService.Setup(_ => _.GetCouncilTaxBenefitPaymentHistory(It.IsAny<string>()))
-                .ReturnsAsync(It.IsAny<List<PaymentDetail>>());
+            // Act
+            await _controller.GetCouncilTaxBenefitPaymentHistory(It.IsAny<string>());
 
+            // Assert
+            _mockService.Verify(_ => _.GetCouncilTaxBenefitPaymentHistory(It.IsAny<string>()), Times.Once);
+        }
+
+        [Fact]
+        public async void GetCouncilTaxBenefitPaymentHistory_ShouldReturnOk()
+        {
             // Act
             var result = await _controller.GetCouncilTaxBenefitPaymentHistory(It.IsAny<string>());
 
             // Assert
-            _mockService.Verify(_ => _.GetCouncilTaxBenefitPaymentHistory(It.IsAny<string>()), Times.Once);
             var actionResult = Assert.IsType<OkObjectResult>(result);
             Assert.Equal(200, actionResult.StatusCode);
         }
