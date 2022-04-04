@@ -14,6 +14,7 @@ using StockportGovUK.NetStandard.Models.Civica.CouncilTax;
 using StockportGovUK.NetStandard.Models.RevsAndBens;
 using Xunit;
 using CouncilTaxDocumentsResponse = StockportGovUK.NetStandard.Models.Civica.CouncilTax.CouncilTaxDocumentsResponse;
+using PersonName = StockportGovUK.NetStandard.Models.Civica.CouncilTax.PersonName;
 
 namespace civica_service_tests.Service
 {
@@ -103,6 +104,47 @@ namespace civica_service_tests.Service
             _mockQueryBuilder.Verify(_ => _.Build(), Times.Once);
 
             _mockGateway.Verify(_ => _.GetAsync(It.IsAny<string>()), Times.Once);
+        }
+
+        [Fact]
+        public async void GetPerson_ShouldCallSessionProvider()
+        {
+            // Act
+            await _civicaService.GetPerson("test");
+
+            // Assert
+            _mockSessionProvider.Verify(_ => _.GetSessionId("test"), Times.Once);
+        }
+
+        [Fact]
+        public async void GetPerson_ShouldCallGateway()
+        {
+            // Act
+            await _civicaService.GetPerson("test");
+
+            // Assert
+            _mockGateway.Verify(_ => _.GetAsync(It.IsAny<string>()), Times.Once);
+        }
+
+        [Fact]
+        public async void GetPerson_ShouldDeserializeToPersonNameType()
+        {
+            // Arrange
+            _mockXmlParser
+                .Setup(_ => _.DeserializeXmlStringToType<PersonName>(It.IsAny<string>(), It.IsAny<string>()))
+                .Returns(new PersonName
+                {
+                    Forenames = "First",
+                    Surname = "Last"
+                });
+
+            // Act
+            var result = await _civicaService.GetPerson("test");
+
+            // Assert
+            _mockXmlParser.Verify(_ =>
+                _.DeserializeXmlStringToType<PersonName>(It.IsAny<string>(), It.IsAny<string>()), Times.Once);
+            Assert.IsType<PersonName>(result);
         }
 
         [Fact]

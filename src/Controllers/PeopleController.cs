@@ -7,6 +7,7 @@ using Microsoft.Extensions.Logging;
 using StockportGovUK.AspNetCore.Attributes.TokenAuthentication;
 using StockportGovUK.NetStandard.Models.Civica.CouncilTax;
 using StockportGovUK.NetStandard.Models.RevsAndBens;
+using PersonName = StockportGovUK.NetStandard.Models.Civica.CouncilTax.PersonName;
 
 namespace civica_service.Controllers
 {
@@ -86,6 +87,15 @@ namespace civica_service.Controllers
             List<CtaxActDetails> accounts = await _civicaService.GetAccounts(personReference);
 
             return Ok(accounts);
+        }
+
+        [HttpGet]
+        [Route("{personReference}/person")]
+        public async Task<IActionResult> GetPerson([FromRoute][Required] string personReference)
+        {
+            PersonName person = await _civicaService.GetPerson(personReference);
+
+            return Ok(person);
         }
 
         [HttpGet]
