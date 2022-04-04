@@ -7,6 +7,7 @@ using StockportGovUK.NetStandard.Models.Civica.CouncilTax;
 using StockportGovUK.NetStandard.Models.RevsAndBens;
 using System.Collections.Generic;
 using Xunit;
+using PersonName = StockportGovUK.NetStandard.Models.Civica.CouncilTax.PersonName;
 
 namespace civica_service_tests.Controller
 {
@@ -41,6 +42,10 @@ namespace civica_service_tests.Controller
             _mockService
                 .Setup(_ => _.GetCouncilTaxBenefitPaymentHistory(It.IsAny<string>()))
                 .ReturnsAsync(new List<PaymentDetail>());
+
+            _mockService
+                .Setup(_ => _.GetPerson(It.IsAny<string>()))
+                .ReturnsAsync(new PersonName());
 
             _controller = new PeopleController(_mockService.Object, _mockLogger.Object);
         }
@@ -183,6 +188,27 @@ namespace civica_service_tests.Controller
 
             // Assert
             _mockService.Verify(_ => _.GetAccounts(It.IsAny<string>()), Times.Once);
+            var actionResult = Assert.IsType<OkObjectResult>(result);
+            Assert.Equal(200, actionResult.StatusCode);
+        }
+
+        [Fact]
+        public async void GetPerson_ShouldCallService()
+        {
+            // Act
+            await _controller.GetPerson(It.IsAny<string>());
+
+            // Assert
+            _mockService.Verify(_ => _.GetPerson(It.IsAny<string>()), Times.Once);
+        }
+
+        [Fact]
+        public async void GetPerson_ShouldReturnOk()
+        {
+            // Act
+            var result = await _controller.GetPerson(It.IsAny<string>());
+
+            // Assert
             var actionResult = Assert.IsType<OkObjectResult>(result);
             Assert.Equal(200, actionResult.StatusCode);
         }

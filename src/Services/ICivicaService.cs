@@ -35,6 +35,8 @@ namespace civica_service.Services {
 
         Task<List<CtaxActDetails>> GetAccounts (string personReference);
 
+        Task<StockportGovUK.NetStandard.Models.Civica.CouncilTax.PersonName> GetPerson(string personReference);
+
         Task<byte[]> GetDocumentForAccount(string personReference, string accountReference, string documentId);
     }
 }

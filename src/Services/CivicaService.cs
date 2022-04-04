@@ -12,6 +12,7 @@ using Newtonsoft.Json;
 using StockportGovUK.NetStandard.Gateways;
 using StockportGovUK.NetStandard.Models.Civica.CouncilTax;
 using StockportGovUK.NetStandard.Models.RevsAndBens;
+using PersonName = StockportGovUK.NetStandard.Models.Civica.CouncilTax.PersonName;
 
 namespace civica_service.Services
 {
@@ -306,6 +307,23 @@ namespace civica_service.Services
             _ = _cacheProvider.SetStringAsync($"{personReference}-{ECacheKeys.CouncilTaxAccounts}", JsonConvert.SerializeObject(accounts));
 
             return accounts;
+        }
+
+        public async Task<PersonName> GetPerson(string personReference)
+        {
+            var sessionId = await _sessionProvider.GetSessionId(personReference);
+
+            var url = _queryBuilder
+                .Add("docid", "ctxsel")
+                .Add("sessionId", sessionId)
+                .Build();
+
+            var response = await _gateway.GetAsync(url);
+            var responseContent = await response.Content.ReadAsStringAsync();
+            var person =
+                _xmlParser.DeserializeXmlStringToType<PersonName>(responseContent, "PersonName");
+
+            return person;
         }
 
         public async Task<List<Installment>> GetPaymentSchedule(string personReference, int year)
