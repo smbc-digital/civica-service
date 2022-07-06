@@ -166,7 +166,7 @@ namespace civica_service.Helpers.SessionProvider
 
             if (!await AssignPersonToSession(sessionId, personReference))
             {
-                throw new Exception($"Could not assign person reference {personReference} to session {sessionId}");
+                throw new ArgumentException($"Could not assign person reference {personReference} to session {sessionId}");
             }
 
             _ = _distributedCache.SetStringAsync($"{personReference}-{ECacheKeys.SessionId}", sessionId);

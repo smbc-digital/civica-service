@@ -1,4 +1,5 @@
-﻿using civica_service.Controllers;
+﻿using System;
+using civica_service.Controllers;
 using civica_service.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -193,6 +194,49 @@ namespace civica_service_tests.Controller
         }
 
         [Fact]
+        public async void GetAccounts_ShouldReturnOk()
+        {
+            // Act
+            var result = await _controller.GetAccounts(It.IsAny<string>());
+
+            // Assert
+            var actionResult = Assert.IsType<OkObjectResult>(result);
+            Assert.Equal(200, actionResult.StatusCode);
+        }
+
+        [Fact]
+        public async void GetAccounts_ShouldReturnNotFound()
+        {
+            // Arrange
+            _mockService
+                .Setup(_ => _.GetAccounts(It.IsAny<string>()))
+                .ThrowsAsync(new ArgumentException());
+
+            // Act
+            var result = await _controller.GetAccounts(It.IsAny<string>());
+
+            // Assert
+            var actionResult = Assert.IsType<NotFoundObjectResult>(result);
+            Assert.Equal(404, actionResult.StatusCode);
+        }
+
+        [Fact]
+        public async void GetAccounts_ShouldReturn500()
+        {
+            // Arrange
+            _mockService
+                .Setup(_ => _.GetAccounts(It.IsAny<string>()))
+                .ThrowsAsync(new Exception());
+
+            // Act
+            var result = await _controller.GetAccounts(It.IsAny<string>());
+
+            // Assert
+            var actionResult = Assert.IsType<ObjectResult>(result);
+            Assert.Equal(500, actionResult.StatusCode);
+        }
+
+        [Fact]
         public async void GetPerson_ShouldCallService()
         {
             // Act
@@ -214,6 +258,38 @@ namespace civica_service_tests.Controller
         }
 
         [Fact]
+        public async void GetPerson_ShouldReturnNotFound()
+        {
+            // Arrange
+            _mockService
+                .Setup(_ => _.GetPerson(It.IsAny<string>()))
+                .ThrowsAsync(new ArgumentException());
+
+            // Act
+            var result = await _controller.GetPerson(It.IsAny<string>());
+
+            // Assert
+            var actionResult = Assert.IsType<NotFoundObjectResult>(result);
+            Assert.Equal(404, actionResult.StatusCode);
+        }
+
+        [Fact]
+        public async void GetPerson_ShouldReturn500()
+        {
+            // Arrange
+            _mockService
+                .Setup(_ => _.GetPerson(It.IsAny<string>()))
+                .ThrowsAsync(new Exception());
+
+            // Act
+            var result = await _controller.GetPerson(It.IsAny<string>());
+
+            // Assert
+            var actionResult = Assert.IsType<ObjectResult>(result);
+            Assert.Equal(500, actionResult.StatusCode);
+        }
+
+        [Fact]
         public async void GetAccount_ShouldCallService()
         {
             // Arrange
@@ -227,6 +303,49 @@ namespace civica_service_tests.Controller
             _mockService.Verify(_ => _.GetCouncilTaxDetails(It.IsAny<string>(), It.IsAny<string>()), Times.Once);
             var actionResult = Assert.IsType<OkObjectResult>(result);
             Assert.Equal(200, actionResult.StatusCode);
+        }
+
+        [Fact]
+        public async void GetAccount_ShouldReturnOk()
+        {
+            // Act
+            var result = await _controller.GetAccount(It.IsAny<string>(), It.IsAny<string>());
+
+            // Assert
+            var actionResult = Assert.IsType<OkObjectResult>(result);
+            Assert.Equal(200, actionResult.StatusCode);
+        }
+
+        [Fact]
+        public async void GetAccount_ShouldReturnNotFound()
+        {
+            // Arrange
+            _mockService
+                .Setup(_ => _.GetCouncilTaxDetails(It.IsAny<string>(), It.IsAny<string>()))
+                .ThrowsAsync(new ArgumentException());
+
+            // Act
+            var result = await _controller.GetAccount(It.IsAny<string>(), It.IsAny<string>());
+
+            // Assert
+            var actionResult = Assert.IsType<NotFoundObjectResult>(result);
+            Assert.Equal(404, actionResult.StatusCode);
+        }
+
+        [Fact]
+        public async void GetAccount_ShouldReturn500()
+        {
+            // Arrange
+            _mockService
+                .Setup(_ => _.GetCouncilTaxDetails(It.IsAny<string>(), It.IsAny<string>()))
+                .ThrowsAsync(new Exception());
+
+            // Act
+            var result = await _controller.GetAccount(It.IsAny<string>(), It.IsAny<string>());
+
+            // Assert
+            var actionResult = Assert.IsType<ObjectResult>(result);
+            Assert.Equal(500, actionResult.StatusCode);
         }
 
         [Fact]
