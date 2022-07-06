@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
@@ -39,9 +40,20 @@ namespace civica_service.Controllers
         [Route("{personReference}/is-benefits-claimant")]
         public async Task<IActionResult> IsBenefitsClaimant([FromRoute][Required]string personReference)
         {
-            bool isBenefitClaimant = await _civicaService.IsBenefitsClaimant(personReference);
+            try
+            {
+                bool isBenefitClaimant = await _civicaService.IsBenefitsClaimant(personReference);
 
-            return Ok(isBenefitClaimant);
+                return Ok(isBenefitClaimant);
+            }
+            catch (ArgumentException ex)
+            {
+                return NotFound(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
         }
 
         [HttpGet]
@@ -84,27 +96,60 @@ namespace civica_service.Controllers
         [Route("{personReference}/accounts")]
         public async Task<IActionResult> GetAccounts([FromRoute][Required]string personReference)
         {
-            List<CtaxActDetails> accounts = await _civicaService.GetAccounts(personReference);
+            try
+            {
+                List<CtaxActDetails> accounts = await _civicaService.GetAccounts(personReference);
 
-            return Ok(accounts);
+                return Ok(accounts);
+            }
+            catch (ArgumentException ex)
+            {
+                return NotFound(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
         }
 
         [HttpGet]
         [Route("{personReference}/person")]
         public async Task<IActionResult> GetPerson([FromRoute][Required] string personReference)
         {
-            PersonName person = await _civicaService.GetPerson(personReference);
+            try
+            {
+                PersonName person = await _civicaService.GetPerson(personReference);
 
-            return Ok(person);
+                return Ok(person);
+            }
+            catch (ArgumentException ex)
+            {
+                return NotFound(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
         }
 
         [HttpGet]
         [Route("{personReference}/accounts/{accountReference}")]
         public async Task<IActionResult> GetAccount([FromRoute][Required]string personReference, [FromRoute][Required]string accountReference)
         {
-            CouncilTaxAccountResponse councilTaxDetails = await _civicaService.GetCouncilTaxDetails(personReference, accountReference);
+            try
+            {
+                CouncilTaxAccountResponse councilTaxDetails = await _civicaService.GetCouncilTaxDetails(personReference, accountReference);
 
-            return Ok(councilTaxDetails);
+                return Ok(councilTaxDetails);
+            }
+            catch (ArgumentException ex)
+            {
+                return NotFound(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
         }
 
         [HttpGet]
