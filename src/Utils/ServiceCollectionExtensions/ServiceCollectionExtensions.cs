@@ -24,15 +24,15 @@ namespace civica_service.Utils.ServiceCollectionExtensions
 
         public static IServiceCollection AddHelpers(this IServiceCollection services)
         {
-            services.AddSingleton<ISessionProvider, SessionProvider>();
-            services.AddTransient<IQueryBuilder, QueryBuilder>();
+            services.AddScoped<ISessionProvider, SessionProvider>();
+            services.AddScoped<IQueryBuilder, QueryBuilder>();
 
             return services;
         }
 
         public static IServiceCollection AddServices(this IServiceCollection services)
         {
-            services.AddSingleton<ICivicaService, CivicaService>();
+            services.AddScoped<ICivicaService, CivicaService>();
 
             return services;
         }
