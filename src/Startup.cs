@@ -34,8 +34,8 @@ namespace civica_service
                     .AddUtils()
                     .AddStorageProvider(Configuration)
                     .Configure<SessionConfiguration>(Configuration.GetSection("SessionConfiguration"))
-                    .AddSwagger()
-                    .AddAvailability();
+                    .AddSwagger();
+                    //.AddAvailability();
 
             services.AddHealthChecks()
                     .AddCheck<TestHealthCheck>("TestHealthCheck");
