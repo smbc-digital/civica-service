@@ -86,7 +86,7 @@ namespace civica_service.Helpers.SessionProvider
         public async Task<string> GetSessionId()
         {
             string cacheKey = $"{ECacheKeys.SessionId}-Availability";
-            var cacheResponse = await _distributedCache.GetStringAsync(cacheKey);
+            string cacheResponse = await _distributedCache.GetStringAsync(cacheKey);
             if (!string.IsNullOrEmpty(cacheResponse))
             {
                 throw new Exception($"Civica is unavailable. Cached response");
